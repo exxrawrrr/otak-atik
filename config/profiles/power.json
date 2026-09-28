@@ -1,0 +1,10 @@
+{
+  "name": "power",
+  "description": "Broad experienced-user profile. Critical actions still require explicit policy changes.",
+  "approval": {
+    "low": "auto",
+    "medium": "auto",
+    "high": "confirm",
+    "critical": "deny"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "developer",
+  "description": "Workspace development, terminal, and Git with high-risk confirmation.",
+  "approval": {
+    "low": "auto",
+    "medium": "auto",
+    "high": "confirm",
+    "critical": "deny"
+  }
+}

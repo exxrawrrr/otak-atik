@@ -43,6 +43,7 @@ function doctor() {
     "registries/capabilities.json",
     "registries/skills.json",
     "registries/recipes.json",
+    "registries/packs.json",
     "docs/product/PRD.md",
     "SECURITY.md"
   ];
@@ -58,9 +59,11 @@ function doctor() {
     const capabilities = readJson("registries/capabilities.json");
     const skills = readJson("registries/skills.json");
     const recipes = readJson("registries/recipes.json");
+    const packs = readJson("registries/packs.json");
     ok("Capability registry", `${capabilities.capabilities.length} capabilities`);
     ok("Skill registry", `${skills.skills.length} skills`);
     ok("Recipe registry", `${recipes.recipes.length} recipes`);
+    ok("Pack registry", `${packs.packs.length} packs`);
   } catch (error) {
     healthy = false;
     fail("Registry parse", error.message);
@@ -70,30 +73,10 @@ function doctor() {
   process.exitCode = healthy ? 0 : 1;
 }
 
-function listCapabilities() {
-  const data = readJson("registries/capabilities.json");
-  console.log("\nCapabilities\n");
-  for (const item of data.capabilities) {
-    console.log(`- ${item.id.padEnd(28)} risk=${item.risk} mutating=${item.mutating}`);
-  }
+function listRegistry(rel, key, render) {
+  const data = readJson(rel);
   console.log("");
-}
-
-function listSkills() {
-  const data = readJson("registries/skills.json");
-  console.log("\nSkills\n");
-  for (const item of data.skills) {
-    console.log(`- ${item.name.padEnd(28)} ${item.status.padEnd(12)} ${item.description}`);
-  }
-  console.log("");
-}
-
-function listRecipes() {
-  const data = readJson("registries/recipes.json");
-  console.log("\nRecipes\n");
-  for (const item of data.recipes) {
-    console.log(`- ${item.name.padEnd(28)} ${item.description}`);
-  }
+  for (const item of data[key]) console.log(render(item));
   console.log("");
 }
 
@@ -113,9 +96,13 @@ Usage:
   otak-atik capabilities
   otak-atik skills
   otak-atik recipes
+  otak-atik packs
   otak-atik policy
   otak-atik version
   otak-atik help
+
+Author a skill:
+  npm run skill:new -- my-skill category
 
 This alpha CLI intentionally stays small.
 The AI client remains the reasoning layer.
@@ -124,15 +111,36 @@ The AI client remains the reasoning layer.
 
 const command = process.argv[2] || "help";
 switch (command) {
-  case "doctor": doctor(); break;
-  case "capabilities": listCapabilities(); break;
-  case "skills": listSkills(); break;
-  case "recipes": listRecipes(); break;
-  case "policy": showPolicy(); break;
-  case "version": console.log(readJson("package.json").version); break;
+  case "doctor":
+    doctor();
+    break;
+  case "capabilities":
+    listRegistry("registries/capabilities.json", "capabilities",
+      (x) => `- ${x.id.padEnd(28)} risk=${x.risk} mutating=${x.mutating}`);
+    break;
+  case "skills":
+    listRegistry("registries/skills.json", "skills",
+      (x) => `- ${x.name.padEnd(28)} ${x.status.padEnd(12)} ${x.description}`);
+    break;
+  case "recipes":
+    listRegistry("registries/recipes.json", "recipes",
+      (x) => `- ${x.name.padEnd(28)} ${x.description}`);
+    break;
+  case "packs":
+    listRegistry("registries/packs.json", "packs",
+      (x) => `- ${x.name.padEnd(16)} ${x.description}`);
+    break;
+  case "policy":
+    showPolicy();
+    break;
+  case "version":
+    console.log(readJson("package.json").version);
+    break;
   case "help":
   case "--help":
-  case "-h": help(); break;
+  case "-h":
+    help();
+    break;
   default:
     console.error(`Unknown command: ${command}\n`);
     help();

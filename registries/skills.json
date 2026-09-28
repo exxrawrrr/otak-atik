@@ -9,6 +9,48 @@
       "path": "skills/core/desktop-inspector/SKILL.md"
     },
     {
+      "name": "safe-file-editor",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Perform controlled file edits with preflight and verification.",
+      "path": "skills/core/safe-file-editor/SKILL.md"
+    },
+    {
+      "name": "mcp-diagnostics",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Diagnose MCP connectivity, discovery, auth, and tool availability.",
+      "path": "skills/core/mcp-diagnostics/SKILL.md"
+    },
+    {
+      "name": "connector-doctor",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Diagnose external connector configuration and capability gaps.",
+      "path": "skills/core/connector-doctor/SKILL.md"
+    },
+    {
+      "name": "workspace-organizer",
+      "status": "incubating",
+      "scope": "generic",
+      "description": "Plan and execute auditable workspace organization without silent deletion.",
+      "path": "skills/core/workspace-organizer/SKILL.md"
+    },
+    {
+      "name": "document-workflow",
+      "status": "incubating",
+      "scope": "generic",
+      "description": "Process local document workflows while preserving source material.",
+      "path": "skills/core/document-workflow/SKILL.md"
+    },
+    {
+      "name": "skill-authoring",
+      "status": "incubating",
+      "scope": "generic",
+      "description": "Create compact portable SKILL.md modules with explicit boundaries.",
+      "path": "skills/core/skill-authoring/SKILL.md"
+    },
+    {
       "name": "project-bootstrap",
       "status": "stable",
       "scope": "generic",
@@ -23,11 +65,11 @@
       "path": "skills/engineering/project-debugger/SKILL.md"
     },
     {
-      "name": "safe-file-editor",
+      "name": "dependency-doctor",
       "status": "stable",
       "scope": "generic",
-      "description": "Perform controlled file edits with preflight and verification.",
-      "path": "skills/core/safe-file-editor/SKILL.md"
+      "description": "Diagnose dependency, runtime, lockfile, and package-manager failures.",
+      "path": "skills/engineering/dependency-doctor/SKILL.md"
     },
     {
       "name": "git-workflow",
@@ -37,18 +79,11 @@
       "path": "skills/engineering/git-workflow/SKILL.md"
     },
     {
-      "name": "mcp-diagnostics",
-      "status": "stable",
-      "scope": "generic",
-      "description": "Diagnose MCP connectivity, discovery, auth, and tool availability.",
-      "path": "skills/core/mcp-diagnostics/SKILL.md"
-    },
-    {
-      "name": "skill-authoring",
+      "name": "web-project-maintainer",
       "status": "incubating",
       "scope": "generic",
-      "description": "Create compact portable SKILL.md modules with explicit boundaries.",
-      "path": "skills/core/skill-authoring/SKILL.md"
+      "description": "Maintain web projects with build, link, content, and configuration verification.",
+      "path": "skills/engineering/web-project-maintainer/SKILL.md"
     },
     {
       "name": "release-checker",

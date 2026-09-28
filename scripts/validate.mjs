@@ -17,6 +17,7 @@ function readJson(rel) {
 const capabilities = readJson("registries/capabilities.json");
 const skills = readJson("registries/skills.json");
 const recipes = readJson("registries/recipes.json");
+const packs = readJson("registries/packs.json");
 
 if (capabilities) {
   const ids = new Set();
@@ -27,11 +28,11 @@ if (capabilities) {
   }
 }
 
+const skillNames = new Set();
 if (skills) {
-  const names = new Set();
   for (const skill of skills.skills || []) {
-    if (names.has(skill.name)) errors.push(`Duplicate skill: ${skill.name}`);
-    names.add(skill.name);
+    if (skillNames.has(skill.name)) errors.push(`Duplicate skill: ${skill.name}`);
+    skillNames.add(skill.name);
     const full = path.join(root, skill.path);
     if (!fs.existsSync(full)) {
       errors.push(`Missing skill file: ${skill.path}`);
@@ -45,8 +46,36 @@ if (skills) {
 
 if (recipes) {
   for (const recipe of recipes.recipes || []) {
-    if (!fs.existsSync(path.join(root, recipe.path))) errors.push(`Missing recipe: ${recipe.path}`);
+    if (!fs.existsSync(path.join(root, recipe.path))) {
+      errors.push(`Missing recipe: ${recipe.path}`);
+      continue;
+    }
+    const body = readJson(recipe.path);
+    for (const skill of body?.skills || []) {
+      if (!skillNames.has(skill)) errors.push(`${recipe.path}: unknown skill ${skill}`);
+    }
   }
+}
+
+if (packs) {
+  for (const pack of packs.packs || []) {
+    const full = path.join(root, pack.path);
+    if (!fs.existsSync(full)) {
+      errors.push(`Missing pack: ${pack.path}`);
+      continue;
+    }
+    const body = readJson(pack.path);
+    for (const skill of body?.skills || []) {
+      if (!skillNames.has(skill)) errors.push(`${pack.path}: unknown skill ${skill}`);
+    }
+  }
+}
+
+const requiredProfiles = ["observe", "workspace", "developer", "operator", "power"];
+for (const profile of requiredProfiles) {
+  const rel = `config/profiles/${profile}.json`;
+  if (!fs.existsSync(path.join(root, rel))) errors.push(`Missing policy profile: ${rel}`);
+  else readJson(rel);
 }
 
 const forbidden = ["D:\\RAFDI_DATA", "C:\\Users\\User", "prodrive.co.id"];

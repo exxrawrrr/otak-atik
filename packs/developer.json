@@ -1,0 +1,12 @@
+{
+  "name": "developer",
+  "skills": [
+    "project-bootstrap",
+    "project-debugger",
+    "dependency-doctor",
+    "safe-file-editor",
+    "git-workflow",
+    "release-checker",
+    "web-project-maintainer"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "observe",
+  "description": "Read and inspect. No mutation.",
+  "approval": {
+    "low": "auto",
+    "medium": "deny",
+    "high": "deny",
+    "critical": "deny"
+  }
+}

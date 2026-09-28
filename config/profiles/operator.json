@@ -1,0 +1,10 @@
+{
+  "name": "operator",
+  "description": "Broader automation while preserving confirmation for high-risk actions.",
+  "approval": {
+    "low": "auto",
+    "medium": "auto",
+    "high": "confirm",
+    "critical": "deny"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "packs": [
+    {
+      "name": "minimal",
+      "description": "Small safe baseline for inspection and controlled editing.",
+      "path": "packs/minimal.json"
+    },
+    {
+      "name": "developer",
+      "description": "Engineering-focused skills for repositories, debugging, dependencies, and Git.",
+      "path": "packs/developer.json"
+    },
+    {
+      "name": "office",
+      "description": "Workspace and document-oriented operator skills.",
+      "path": "packs/office.json"
+    },
+    {
+      "name": "power-user",
+      "description": "Broad official skill set for experienced operators.",
+      "path": "packs/power-user.json"
+    }
+  ]
+}

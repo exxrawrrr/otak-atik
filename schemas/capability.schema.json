@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/otak-atik/capability.schema.json",
+  "title": "otak-atik capability",
+  "type": "object",
+  "required": ["id", "category", "risk", "mutating", "reversible", "scopable"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "risk": {
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "mutating": {
+      "type": "boolean"
+    },
+    "reversible": {
+      "type": "boolean"
+    },
+    "scopable": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": true
+}

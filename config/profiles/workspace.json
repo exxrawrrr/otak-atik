@@ -1,0 +1,10 @@
+{
+  "name": "workspace",
+  "description": "Allow scoped workspace changes with approval gates.",
+  "approval": {
+    "low": "auto",
+    "medium": "confirm",
+    "high": "deny",
+    "critical": "deny"
+  }
+}
