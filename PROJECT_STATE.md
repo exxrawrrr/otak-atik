@@ -1,59 +1,45 @@
 # Project State
 
 **Current milestone:** V0.1 Foundation / onboarding hardening  
-**Repository maturity:** public alpha
+**Repository maturity:** public alpha  
+**Current package:** 0.1.0-alpha.2
 
 ## Implemented
 
-- public repository identity and product documentation;
-- zero-runtime-dependency CLI skeleton;
+- repository identity and product documentation;
+- zero-dependency CLI baseline;
 - doctor command;
 - capability/skill/recipe/pack registries;
-- 18 official skills;
-- default policy profiles;
-- deterministic validator;
-- Windows installer;
-- automatic `Desktop\OTAK-ATIK` launcher folder;
-- Remote Desktop Commander start/status/stop helpers;
-- optional MCP SuperAssistant browser-bridge helper;
-- explicit two-transport decision tree;
-- Desktop Commander and generic MCP reference adapter manifests;
-- Linux-side contract tests;
-- Windows-native onboarding CI;
-- security model, ADRs, roadmap, contribution templates.
+- conservative default policy;
+- Windows installer with dry-run;
+- automatic Desktop launcher generation;
+- Remote Desktop Commander remote start/status/stop helpers;
+- optional MCP SuperAssistant browser bridge;
+- Codex local Desktop Commander MCP setup helper;
+- transport-selection and remote-usage optimization skills;
+- setup decision tree and cost/usage documentation;
+- Linux tests plus Windows PowerShell smoke validation;
+- 21 official skills;
+- 10 passing contract/unit tests;
+- security, contribution, ADR, and roadmap documentation.
 
-## Verified
+## Real-world transport status
 
-Fresh public clone:
+The original setup currently uses Remote Desktop Commander as the primary ChatGPT → Windows route.
 
-- validator: PASS;
-- Node tests: 9/9 PASS;
-- CLI doctor: READY.
+The older MCP SuperAssistant browser bridge remains available as an optional/fallback path.
 
-GitHub Actions Windows onboarding:
-
-- PowerShell parse: PASS;
-- installer dry run: PASS;
-- real install on ephemeral Windows runner: PASS;
-- generated launchers: PASS;
-- CLI doctor: PASS.
-
-## Important architecture clarification
-
-Remote Desktop Commander remote MCP and MCP SuperAssistant are **separate access paths**.
-
-Remote Desktop Commander is the recommended default.
-
-MCP SuperAssistant is an optional browser compatibility bridge.
+For local engineering work, especially Codex, the recommended direction is local Desktop Commander MCP so hosted remote quota is reserved for genuinely remote access.
 
 ## Next
 
 1. executable adapter interface;
-2. user/project skill discovery;
-3. recipe executor prototype;
-4. audit ledger design;
-5. structured capability health reporting;
-6. cross-platform installers.
+2. automatic user/project skill discovery;
+3. declarative recipe executor;
+4. local audit ledger + checkpoints;
+5. stronger local/remote transport discovery;
+6. macOS/Linux installers;
+7. optional GUI-control adapter experiments.
 
 ## Deliberately deferred
 
@@ -63,4 +49,4 @@ MCP SuperAssistant is an optional browser compatibility bridge.
 - autonomous scheduling;
 - large dependency graph.
 
-The architecture is being expanded from contracts outward, not UI inward.
+The architecture continues to expand from contracts and real operator workflows outward, not from UI inward.
