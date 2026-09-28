@@ -20,22 +20,31 @@ const required = [
 ];
 
 test("end-to-end onboarding assets exist", () => {
-  for (const path of required) {
-    assert.equal(fs.existsSync(path), true, "missing " + path);
+  for (const file of required) {
+    assert.equal(fs.existsSync(file), true, "missing " + file);
   }
 });
 
-test("README clearly says both MCP paths are not mandatory", () => {
+test("README honestly documents Remote Desktop Commander as the practical primary route", () => {
   const readme = fs.readFileSync("README.md", "utf8");
-  assert.match(readme, /Do I need both\?/);
-  assert.match(readme, /\*\*No\.\*\*/);
-  assert.match(readme, /MCP SuperAssistant browser bridge — optional/i);
+  assert.match(readme, /Remote Desktop Commander/);
+  assert.match(readme, /jalur yang paling sering gue pakai justru plugin yang sudah ada/i);
+  assert.match(readme, /Codex \/ local AI/i);
 });
 
-test("README documents the author's primary real-world route", () => {
+test("README honestly documents MCP SuperAssistant as a partial failure", () => {
   const readme = fs.readFileSync("README.md", "utf8");
-  assert.match(readme, /uses \*\*Remote Desktop Commander much more often\*\*/);
-  assert.match(readme, /Codex \/ local AI on the same PC/);
+  assert.match(readme, /MCP SuperAssistant/);
+  assert.match(readme, /PARTIAL_FAILURE/);
+  assert.match(readme, /nggak terbukti jadi daily execution path yang reliable/i);
+});
+
+test("README exposes standalone value without requiring MCP", () => {
+  const readme = fs.readFileSync("README.md", "utf8");
+  assert.match(readme, /otak-atik snapshot/);
+  assert.match(readme, /otak-atik hygiene/);
+  assert.match(readme, /otak-atik handoff/);
+  assert.match(readme, /otak-atik diff-risk/);
 });
 
 test("browser bridge config uses local Desktop Commander", () => {

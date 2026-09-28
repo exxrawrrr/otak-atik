@@ -477,6 +477,131 @@ Gengsi engineering tidak lebih penting dari benda yang bekerja.
 
 ---
 
+## Biar mampir nggak cuma bawa cerita gagal 🙏🏼😭
+
+Nah ini yang sekarang gue paksa ada di repo.
+
+Walaupun lu **nggak install Remote Desktop Commander**, **nggak pakai MCP SuperAssistant**, dan bahkan belum punya MCP client sama sekali, clone repo ini tetap harus ngasih sesuatu yang kepake.
+
+Cukup Node.js 20+.
+
+### Peta project buat AI
+
+```powershell
+otak-atik snapshot .
+```
+
+Bikin ringkasan project tanpa nge-dump semua source:
+
+- jumlah file/folder;
+- file penting;
+- extension dominan;
+- top-level structure;
+- branch Git;
+- working tree dirty atau nggak.
+
+Berguna sebelum AI kalap baca 200 file satu-satu.
+
+### Cek kemungkinan secret sebelum publish
+
+```powershell
+otak-atik hygiene .
+otak-atik hygiene . --strict
+```
+
+Scanner ini nyari pola credential berisiko dan cuma laporan:
+
+```text
+file
+line
+jenis credential
+severity
+```
+
+**Nilai secret-nya sengaja nggak dicetak.**
+
+### Audit config MCP
+
+```powershell
+otak-atik mcp-check path\to\mcp.json
+```
+
+Bisa nangkep hal-hal receh tapi ngeselin:
+
+- JSON invalid;
+- `mcpServers` hilang;
+- command/url nggak jelas;
+- args/env bentuknya salah;
+- URL invalid;
+- remote MCP masih plain HTTP;
+- kemungkinan token ditulis inline di config.
+
+### Lint SKILL.md
+
+```powershell
+otak-atik skill-check path\to\SKILL.md
+```
+
+Buat ngecek skill sebelum dilempar ke repo publik:
+
+- frontmatter;
+- name;
+- description;
+- kebab-case;
+- status/scope;
+- file terlalu gendut;
+- folder/name mismatch;
+- path Windows pribadi nyangkut.
+
+### Bikin handoff ke AI lain
+
+```powershell
+otak-atik handoff . --task "lanjut benerin project ini" --out handoff.json
+```
+
+Jadi kalau mau pindah:
+
+```text
+ChatGPT
+→ Codex
+→ Claude
+→ AI lain
+```
+
+nggak harus mulai dari:
+
+> "jadi gini bro dari awal ya..."
+
+Handoff-nya bawa snapshot project, Git state, package scripts, task, hygiene counts, dan operating notes — **tanpa embed nilai secret**.
+
+### Review risiko Git diff
+
+```powershell
+otak-atik diff-risk .
+```
+
+Buat kasih perhatian ekstra kalau diff nyentuh:
+
+- delete file;
+- auth/security;
+- `.env`;
+- migration;
+- workflow GitHub Actions;
+- dependency/lockfile;
+- config/schema;
+- perubahan teks gede;
+- binary.
+
+Ini **bukan vonis** bahwa perubahan HIGH itu jelek.
+
+Maksudnya:
+
+> **"cak, sing iki ojo asal pencet commit."**
+
+Detail lengkap: [Standalone Utility Pack](docs/UTILITY-PACK.md).
+
+---
+
 ## Terus isi repo ini sekarang buat apa?
 
 Walaupun produk awalnya gagal, beberapa bagian masih berguna sebagai bahan eksperimen:
