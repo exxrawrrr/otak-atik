@@ -84,6 +84,7 @@ export function compileOperatorPlan({
   const candidates = selectCandidateSkills(normalizedTask, skills);
   for (const { skill, score } of candidates) {
     if (selected.length >= maxSkills) break;
+    if (score < 2) continue;
     addSkill(selected, skillIndex, skill.name, score, "task metadata match");
   }
 

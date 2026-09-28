@@ -9,6 +9,8 @@
     "mcp-topology-diagnoser",
     "operator-healthcheck",
     "windows-launcher-manager",
+    "failure-lab-reporter",
+    "evidence-verifier",
     "desktop-inspector",
     "safe-file-editor",
     "mcp-diagnostics",

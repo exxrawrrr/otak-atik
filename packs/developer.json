@@ -8,6 +8,7 @@
     "project-debugger",
     "dependency-doctor",
     "safe-file-editor",
+    "evidence-verifier",
     "git-workflow",
     "release-checker",
     "web-project-maintainer"

@@ -18,6 +18,10 @@ const capabilities = readJson("registries/capabilities.json");
 const skills = readJson("registries/skills.json");
 const recipes = readJson("registries/recipes.json");
 const packs = readJson("registries/packs.json");
+const providers = readJson("registries/providers.json");
+const experiments = readJson("labs/experiments.json");
+readJson("schemas/operator-plan.schema.json");
+readJson("schemas/evidence.schema.json");
 
 if (capabilities) {
   const ids = new Set();
@@ -67,6 +71,39 @@ if (packs) {
     const body = readJson(pack.path);
     for (const skill of body?.skills || []) {
       if (!skillNames.has(skill)) errors.push(`${pack.path}: unknown skill ${skill}`);
+    }
+  }
+}
+
+if (providers) {
+  const allowed = new Set([
+    "AUTHOR_PRIMARY",
+    "SUPPORTED_PATH",
+    "PARTIAL_FAILURE",
+    "CANDIDATE_UNVERIFIED",
+    "DEPRECATED"
+  ]);
+  const ids = new Set();
+
+  for (const provider of providers.providers || []) {
+    if (!provider.id) errors.push("Provider without id");
+    if (ids.has(provider.id)) errors.push("Duplicate provider: " + provider.id);
+    ids.add(provider.id);
+    if (!allowed.has(provider.status)) {
+      errors.push("Unknown provider status: " + provider.status);
+    }
+  }
+}
+
+if (experiments) {
+  for (const experiment of experiments.experiments || []) {
+    if (!experiment.id) errors.push("Experiment without id");
+    if (!experiment.report) {
+      errors.push("Experiment missing report: " + experiment.id);
+      continue;
+    }
+    if (!fs.existsSync(path.join(root, experiment.report))) {
+      errors.push("Missing experiment report: " + experiment.report);
     }
   }
 }
