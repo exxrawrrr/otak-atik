@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "providers": [
+    {
+      "id": "remote-desktop-commander",
+      "name": "Remote Desktop Commander",
+      "role": "remote-mcp",
+      "status": "AUTHOR_PRIMARY",
+      "author_verified": true,
+      "execution_verified": true,
+      "default": true,
+      "notes": "Primary ChatGPT-to-Windows remote path in the original setup."
+    },
+    {
+      "id": "desktop-commander-local",
+      "name": "Desktop Commander local MCP",
+      "role": "local-mcp",
+      "status": "SUPPORTED_PATH",
+      "author_verified": true,
+      "execution_verified": true,
+      "default": true,
+      "notes": "Preferred same-machine path for Codex/local clients and quota-heavy work."
+    },
+    {
+      "id": "mcp-superassistant",
+      "name": "MCP SuperAssistant",
+      "role": "browser-bridge",
+      "status": "PARTIAL_FAILURE",
+      "author_verified": true,
+      "execution_verified": false,
+      "default": false,
+      "notes": "Discovery worked in the inspected original setup; reliable day-to-day tools/call execution was not proven."
+    },
+    {
+      "id": "quickdesk",
+      "name": "QuickDesk",
+      "role": "gui-control",
+      "status": "CANDIDATE_UNVERIFIED",
+      "author_verified": false,
+      "execution_verified": false,
+      "default": false,
+      "notes": "Interesting candidate for screenshot/mouse/keyboard workflows; not claimed as author-tested."
+    },
+    {
+      "id": "windows-mcp-server",
+      "name": "Windows MCP Server",
+      "role": "windows-ui-control",
+      "status": "CANDIDATE_UNVERIFIED",
+      "author_verified": false,
+      "execution_verified": false,
+      "default": false,
+      "notes": "Advanced Windows/UI automation candidate; not claimed as author-tested."
+    }
+  ]
+}

@@ -9,6 +9,8 @@
     {"name":"mcp-topology-diagnoser","status":"stable","scope":"generic","description":"Map multi-hop MCP setups and identify the failing transport layer.","path":"skills/core/mcp-topology-diagnoser/SKILL.md"},
     {"name":"operator-healthcheck","status":"stable","scope":"generic","description":"Verify an AI-to-desktop operator stack end to end before work.","path":"skills/core/operator-healthcheck/SKILL.md"},
     {"name":"windows-launcher-manager","status":"stable","scope":"platform","description":"Create maintainable click-to-run Windows launchers.","path":"skills/core/windows-launcher-manager/SKILL.md"},
+    {"name":"failure-lab-reporter","status":"stable","scope":"generic","description":"Turn failed integration experiments into reproducible evidence reports.","path":"skills/core/failure-lab-reporter/SKILL.md"},
+    {"name":"evidence-verifier","status":"stable","scope":"generic","description":"Convert execution results into explicit verification evidence.","path":"skills/core/evidence-verifier/SKILL.md"},
     {"name":"desktop-inspector","status":"stable","scope":"generic","description":"Inspect a desktop or workspace without modifying it.","path":"skills/core/desktop-inspector/SKILL.md"},
     {"name":"safe-file-editor","status":"stable","scope":"generic","description":"Perform controlled file edits with preflight and verification.","path":"skills/core/safe-file-editor/SKILL.md"},
     {"name":"mcp-diagnostics","status":"stable","scope":"generic","description":"Diagnose MCP connectivity, discovery, auth, and tool availability.","path":"skills/core/mcp-diagnostics/SKILL.md"},
