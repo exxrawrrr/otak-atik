@@ -1,6 +1,6 @@
 {
   "name": "otak-atik",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Local-first operator layer for AI clients, desktop tools, MCP, skills, policies, recipes, and verification.",
   "type": "module",
   "license": "Apache-2.0",

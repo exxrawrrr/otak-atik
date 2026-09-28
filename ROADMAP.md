@@ -9,13 +9,18 @@
 - [x] recipe registry
 - [x] conservative default policy
 - [x] Windows installer + dry-run
+- [x] automatic Desktop launcher folder
+- [x] Remote Desktop Commander click-to-run launcher
+- [x] MCP SuperAssistant optional browser-bridge launcher
+- [x] setup decision tree
 - [x] doctor command
 - [x] validator
-- [x] initial official skills
-- [x] tests + CI
-- [ ] adapter interface
-- [ ] Desktop Commander adapter manifest
-- [ ] generic MCP adapter manifest
+- [x] 18 official starter/operator skills
+- [x] Linux-side contract tests
+- [x] Windows-native onboarding CI
+- [ ] executable adapter interface
+- [x] Desktop Commander reference adapter manifest
+- [x] generic MCP reference adapter manifest
 - [ ] user skill discovery from `~/.otak-atik/skills`
 - [ ] project skill discovery from `.otak-atik/skills`
 
@@ -33,7 +38,8 @@
 - macOS installer
 - Linux installer
 - client adapter generators
-- improved Claude/Codex/Cursor/VS Code docs
+- expanded Claude/Cursor/VS Code/Gemini verification matrix
+- optional GUI-control provider experiments
 
 ## V0.4 — Ecosystem
 
