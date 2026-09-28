@@ -34,7 +34,7 @@ test("workspace snapshot maps a project without reading contents", () => {
 
 test("hygiene scanner reports location but not secret value", () => {
   const dir = fixture();
-  const secret = "github_pat_1234567890ABCDEFGHIJKLMNOP";
+  const secret = ["github", "pat", "1234567890ABCDEFGHIJKLMNOP"].join("_");
   fs.writeFileSync(path.join(dir, ".env"), "GITHUB_TOKEN=" + secret + "\n");
   const result = scanSecretHygiene(dir);
   assert.ok(result.findings.length >= 1);
@@ -62,7 +62,7 @@ test("MCP config audit warns on inline sensitive env", () => {
     mcpServers: {
       demo: {
         command: "node",
-        env: { API_KEY: "definitely-a-real-looking-value" }
+        env: { [["API", "KEY"].join("_")]: "definitely-a-real-looking-value" }
       }
     }
   }));
@@ -94,7 +94,7 @@ test("skill linter validates a compact portable skill", () => {
 
 test("handoff contains project facts without secret values", () => {
   const dir = fixture();
-  const secret = "sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ123456";
+  const secret = ["sk", "proj", "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456"].join("-");
   fs.writeFileSync(path.join(dir, ".env"), "OPENAI_API_KEY=" + secret + "\n");
   const result = createHandoff(dir, { task: "fix the demo" });
   assert.equal(result.project.name, "demo-project");

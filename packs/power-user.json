@@ -28,6 +28,7 @@
     "secret-hygiene-auditor",
     "mcp-config-auditor",
     "skill-quality-auditor",
-    "ai-handoff-builder"
+    "ai-handoff-builder",
+    "change-risk-reviewer"
   ]
 }

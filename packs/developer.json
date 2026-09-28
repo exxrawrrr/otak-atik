@@ -16,6 +16,7 @@
     "evidence-verifier",
     "git-workflow",
     "release-checker",
-    "web-project-maintainer"
+    "web-project-maintainer",
+    "change-risk-reviewer"
   ]
 }

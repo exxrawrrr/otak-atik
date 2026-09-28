@@ -10,6 +10,7 @@ import { scanSecretHygiene } from "../src/hygiene.mjs";
 import { auditMcpConfig } from "../src/mcp-config-audit.mjs";
 import { lintSkill } from "../src/skill-lint.mjs";
 import { createHandoff } from "../src/handoff.mjs";
+import { analyzeDiffRisk } from "../src/diff-risk.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -198,6 +199,11 @@ function hygiene(args) {
   if (strict && result.findings.length) process.exitCode = 2;
 }
 
+function diffRisk(args) {
+  const target = args[0] || ".";
+  console.log(JSON.stringify(analyzeDiffRisk(target), null, 2));
+}
+
 function mcpCheck(args) {
   if (!args[0]) throw new Error("Usage: otak-atik mcp-check <config.json>");
   const result = auditMcpConfig(args[0]);
@@ -259,7 +265,7 @@ Useful without any MCP/plugin:
   otak-atik hygiene [path] [--strict]
   otak-atik mcp-check <config.json>
   otak-atik skill-check <SKILL.md>
-  otak-atik handoff [workspace] [--task "<task>"] [--out handoff.json]
+  otak-atik handoff [workspace] [--task "<task>"] [--out handoff.json]\n  otak-atik diff-risk [git-workspace]
 
 Native operator:
   otak-atik doctor
@@ -280,7 +286,7 @@ Examples:
   otak-atik hygiene . --strict
   otak-atik mcp-check ~/.config/my-client/mcp.json
   otak-atik skill-check ./skills/my-skill/SKILL.md
-  otak-atik handoff . --task "fix the build" --out handoff.json
+  otak-atik handoff . --task "fix the build" --out handoff.json\n  otak-atik diff-risk .
   otak-atik route --remote --quota 500
   otak-atik plan "fix failing project and run tests" --local
 `);
@@ -298,7 +304,7 @@ try {
     case "hygiene": hygiene(args); break;
     case "mcp-check": mcpCheck(args); break;
     case "skill-check": skillCheck(args); break;
-    case "handoff": handoff(args); break;
+    case "handoff": handoff(args); break;\n    case "diff-risk": diffRisk(args); break;
     case "providers": providers(); break;
     case "lab": lab(); break;
     case "capabilities":

@@ -93,3 +93,25 @@ No secret values are embedded.
 A visitor should not need to buy a service, install a browser extension, or configure a remote MCP just to get value from the repository.
 
 These tools are also building blocks for the larger operator engine.
+
+
+## Git diff risk review
+
+```bash
+otak-atik diff-risk .
+```
+
+Inspects the current `git diff HEAD` and prioritizes review attention for:
+
+- deletions;
+- auth/security paths;
+- env/config/schema changes;
+- dependency manifests and lockfiles;
+- migrations;
+- GitHub Actions workflows;
+- large textual changes;
+- binary changes.
+
+The output is deliberately a heuristic.
+
+It does not claim a HIGH-risk change is wrong; it says a human/agent should review that surface more carefully.

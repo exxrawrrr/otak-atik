@@ -196,6 +196,13 @@
       "scope": "generic",
       "description": "Produce a compact provider-neutral project handoff for another AI client or session.",
       "path": "skills/core/ai-handoff-builder/SKILL.md"
+    },
+    {
+      "name": "change-risk-reviewer",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Review Git diffs for high-attention changes before commit, push, or release.",
+      "path": "skills/core/change-risk-reviewer/SKILL.md"
     }
   ]
 }
