@@ -1,7 +1,7 @@
 {
   "name": "otak-atik",
-  "version": "0.1.0-alpha.2",
-  "description": "Local-first operator control layer for AI clients, desktop tools, MCP, skills, routing, policy, and verification.",
+  "version": "0.1.0-alpha.3",
+  "description": "Local-first operator control layer for AI clients, MCP transports, skills, routing, policy, evidence, and verification.",
   "type": "module",
   "license": "Apache-2.0",
   "bin": {
@@ -28,6 +28,7 @@
     "chatgpt",
     "codex",
     "transport-router",
-    "verification"
+    "verification",
+    "evidence"
   ]
 }

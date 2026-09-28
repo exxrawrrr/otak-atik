@@ -4,57 +4,57 @@ All notable changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.3] - 2026-09-28
+
+### Native engine
+
+- added provider-neutral transport router;
+- added operator plan compiler;
+- added task-to-capability inference;
+- added explicit risk/approval contract;
+- added evidence states: PASS / FAIL / CHANGED / COULD_NOT_VERIFY;
+- added provider scorecard with real-world status vocabulary;
+- added failed-experiment lab;
+- added executable routing benchmark scenarios;
+- added CLI commands: `route`, `plan`, `providers`, and `lab`.
+
+### Research honesty
+
+- recorded the author's MCP SuperAssistant experiment as **PARTIAL_FAILURE**;
+- documented what worked: install, proxy, initialize, tools/list, 53 discovered tools;
+- documented what was not proven: reliable daily tools/call execution;
+- explicitly stated that the project is active research and its final shape is not known.
+
+### Skills
+
+- added `failure-lab-reporter`;
+- added `evidence-verifier`;
+- improved skill matching to reject weak single-token matches;
+- updated developer and power-user packs.
+
+### Validation
+
+- provider matrix is validated;
+- experiment reports are validated;
+- operator-plan/evidence schemas are parsed during validation;
+- tests: **23/23 PASS**;
+- routing benchmark: **4/4 PASS**;
+- doctor: **READY**.
+
 ## [0.1.0-alpha.2] - 2026-09-28
 
-### Added
-
 - hybrid local/remote usage strategy;
-- Remote Desktop Commander quota-aware routing guidance;
-- Codex local Desktop Commander MCP setup launcher;
-- transport-selector skill;
-- remote-usage-optimizer skill;
-- local-mcp-bootstrap skill;
-- "what the author actually uses" evidence note;
-- Windows CI smoke checks for installer parsing/dry-run;
-- additional onboarding contract tests.
-
-### Changed
-
-- Remote Desktop Commander is explicitly documented as the author's primary day-to-day ChatGPT route.
-- MCP SuperAssistant is documented as optional/legacy-fallback rather than a required companion to Remote Desktop Commander.
-- local MCP is recommended for same-machine Codex/development work.
-- browser-bridge docs now call out current public reliability caveats.
-- onboarding explains when to choose local, remote, browser bridge, or GUI-control transport.
-
-### Verified
-
-- fresh public clone validator: PASS
-- Node tests: 10/10 PASS
-- CLI doctor: READY
-- Windows GROWTH smoke test: PASS
-- Windows PowerShell helper parse: PASS
-- Windows installer dry-run: PASS
+- quota-aware Remote Desktop Commander guidance;
+- Codex local MCP setup path;
+- transport and remote-usage skills.
 
 ## [0.1.0-alpha.1] - 2026-09-28
 
-### Added
-
-- end-to-end Windows onboarding and Desktop launchers;
-- Remote Desktop Commander start/status/stop helpers;
-- optional MCP SuperAssistant browser bridge;
-- setup decision tree;
-- AI client notes;
-- alternative provider documentation.
+- end-to-end Windows onboarding;
+- Desktop launchers;
+- optional browser bridge;
+- Windows validation.
 
 ## [0.1.0-alpha.0] - 2026-09-28
 
-### Added
-
-- public project foundation;
-- zero-runtime-dependency CLI;
-- doctor command;
-- capability, skill, recipe, and pack registries;
-- default permission policy;
-- Windows installer with dry-run;
-- product and architecture documentation;
-- initial validator and test contract.
+- initial public foundation.

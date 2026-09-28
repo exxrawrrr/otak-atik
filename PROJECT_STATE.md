@@ -2,7 +2,7 @@
 
 **Current milestone:** V0.2 Native operator/control layer  
 **Repository maturity:** active public experiment  
-**Current package:** 0.1.0-alpha.2
+**Current package:** 0.1.0-alpha.3
 
 ## Important honesty
 
