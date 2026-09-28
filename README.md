@@ -1,379 +1,650 @@
 # otak-atik
 
-> **AI-ne wes pinter. Saiki tangane sing dirapekno.**
+> **Status: gagal. Iyo, gagal.**
 >
-> A local-first operator kit for connecting AI clients to your computer, MCP tools, reusable skills, and repeatable workflows — with an onboarding path normal humans can actually finish.
+> Bukan repo rusak.
+>
+> Bukan karena test merah semua.
+>
+> Tapi kalau tujuan awalnya adalah:
+>
+> **"bikin jalur sendiri supaya AI bisa remote komputer gue tanpa akhirnya bergantung ke plugin orang lain"**
+>
+> ...ya kenyataannya sekarang gue malah paling sering pakai **Remote Desktop Commander**.
+>
+> Jadi secara tujuan awal:
+>
+> **wes, kalah. 😭**
 
-## Project status — this is still an experiment
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/feels-bad-man.jpg" width="290" alt="feels bad man meme" />
+</p>
 
-**otak-atik is in active progress.**
+## Rencanane awal e iki
 
-The author is literally building this from real experiments, including experiments that fail.
+Awalnya sederhana.
 
-The final shape is **not known yet**. The project may evolve toward an operator CLI, transport router, evidence layer, Agent Skills runtime, local control plane, or some combination learned from actual use.
+Gue sering pakai ChatGPT dari HP.
 
-That uncertainty is intentional and documented in [Research status](docs/RESEARCH-STATUS.md).
+Komputernya ada di tempat lain.
 
-> If reality proves an architecture wrong, the architecture changes. The README does not get to win an argument against the machine.
+Terus kepikiran:
 
-## What the author actually uses
+> **"kenapa AI gue nggak sekalian bisa masuk ke komputer, baca file, jalanin terminal, benerin project, terus kasih bukti kalau kerjaannya bener?"**
 
-The setup that inspired this project experimented with **two MCP paths**.
+Dari situ mulai otak-atik:
 
-Today, the author uses **Remote Desktop Commander much more often** for ChatGPT → Windows work.
+- MCP;
+- remote MCP;
+- local MCP;
+- browser bridge;
+- launcher;
+- skill;
+- capability;
+- approval;
+- evidence;
+- verification;
+- router;
+- CLI;
+- dan tentu saja...
 
-The old **MCP SuperAssistant** Chrome-extension path is still installed as a fallback/experiment, but it is not the normal daily execution path.
+**kebanyakan ide.**
 
-So for new users:
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/disaster-girl.jpg" width="300" alt="disaster girl meme" />
+</p>
 
-> **Start with Remote Desktop Commander. Add the browser bridge only if you actually need it.**
-
-Full evidence/history: [What I actually use](docs/WHAT-I-ACTUALLY-USE.md).
-
-## Pick the right mode
-
-| Situation | Recommended path |
-| --- | --- |
-| ChatGPT from phone / away from PC | **Remote Desktop Commander remote MCP** |
-| Codex / local AI on the same PC | **Desktop Commander local MCP** |
-| ChatGPT/Gemini website in Chrome needs local MCP | MCP SuperAssistant browser bridge — optional |
-| Need screenshot + click + type GUI control | evaluate QuickDesk / Windows UI MCP |
-
-### Remote — easiest for ChatGPT web/mobile
-
-On the target computer:
-
-```powershell
-npx @wonderwhy-er/desktop-commander@latest remote
-```
-
-Remote MCP endpoint:
-
-```text
-https://mcp.desktopcommander.app/mcp
-```
-
-The Windows installer creates a Desktop launcher so users do not need to retype that command.
-
-### Local — best for Codex and quota-heavy engineering
-
-Official Codex setup:
-
-```powershell
-codex mcp add desktop-commander -- npx -y @wonderwhy-er/desktop-commander@latest
-```
-
-This runs Desktop Commander as **local MCP**, not through the hosted Remote MCP service.
-
-That matters because the hosted free Remote Desktop Commander plan currently has a monthly tool-call ceiling, while the local MCP server is free/open-source without that monthly ceiling.
-
-See [Usage and cost strategy](docs/USAGE-AND-COST.md).
-
-## Do I need both?
-
-**No.**
-
-### So do I need the Chrome extension too?
-
-**No.**
-
-The installed extension in the original setup is:
-
-**MCP SuperAssistant**  
-Chrome extension ID: `kngiafgkdnlkgmefdafaibkibegkcaef`
-
-It is a separate browser bridge.
+Rencana kasarnya waktu itu:
 
 ```text
-REMOTE PATH
-ChatGPT / remote MCP client
-→ Remote Desktop Commander hosted relay
-→ paired device agent
-→ computer
-
-OPTIONAL BROWSER PATH
-AI website in Chrome
-→ MCP SuperAssistant
-→ local proxy
-→ local MCP server
-→ computer
+ChatGPT / AI
+      ↓
+otak-atik
+      ↓
+pilih transport
+      ↓
+pilih capability
+      ↓
+pilih skill
+      ↓
+jalanin kerjaan
+      ↓
+verify
+      ↓
+done
 ```
 
-Both can coexist.
+Cakep.
 
-One does not require the other.
+Di diagram.
 
-The original machine's old browser proxy still receives MCP discovery traffic, but an inspection of its current log found repeated `tools/list` requests and no `tools/call` entries in the checked history. In practice, Remote Desktop Commander has become the main path.
+---
 
-## Windows: install once, click later
+## Terus kenyataannya gimana?
 
-```powershell
-git clone https://github.com/exxrawrrr/otak-atik.git
-cd otak-atik
-
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -DryRun
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
-```
-
-The installer creates:
+Kenyataannya:
 
 ```text
-Desktop/
-└── OTAK-ATIK/
-    ├── 01 - START REMOTE DESKTOP.bat
-    ├── 02 - STATUS.bat
-    ├── 03 - OPEN SETUP PAGES.bat
-    ├── 04 - START BROWSER BRIDGE - OPTIONAL.bat
-    ├── 05 - STOP REMOTE DESKTOP.bat
-    ├── 06 - SETUP CODEX LOCAL MCP - NO REMOTE QUOTA.bat
-    └── 07 - WHICH MODE SHOULD I USE.bat
+ChatGPT
+   ↓
+Remote Desktop Commander plugin
+   ↓
+komputer gue
 ```
 
-The normal remote workflow becomes:
+😭
+
+Dan buat kerja lokal:
 
 ```text
-double-click 01
-→ authenticate once if needed
-→ connect AI
-→ work
+Codex / local AI
+   ↓
+Desktop Commander local MCP
+   ↓
+komputer gue
 ```
 
-The normal Codex/local workflow becomes:
+Jadi setelah bikin router, adapter concept, launcher, skill registry, benchmark, provider scorecard, failure lab, dan tetek bengek lainnya...
+
+**jalur yang paling sering gue pakai justru plugin yang sudah ada.**
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/ship-your-machine.jpg" width="305" alt="ship your machine meme" />
+</p>
+
+Kalau ukuran suksesnya:
+
+> "apakah otak-atik menggantikan plugin?"
+
+Jawabannya:
+
+## **nggak.**
+
+Setidaknya belum.
+
+---
+
+## Jadi repo ini gagal total?
+
+Nggak juga.
+
+Ini justru salah satu alasan gue nggak hapus repo ini.
+
+Karena dari eksperimen ini gue jadi ngerti bedanya:
 
 ```text
-double-click 06
-→ approve Codex MCP config
-→ use local Desktop Commander
-→ no hosted remote quota for that path
+REMOTE DESKTOP
+≠
+REMOTE MCP
+≠
+LOCAL MCP
+≠
+BROWSER BRIDGE
+≠
+GUI COMPUTER USE
+≠
+SKILL
+≠
+PERMISSION
+≠
+VERIFICATION
 ```
 
-Browser extension and OAuth installation still require explicit user approval. The project does not silently install extensions or authorize accounts.
+Sebelumnya semua terasa seperti:
 
-## This is not just "plugin + skills" anymore
+> "pokoknya AI bisa ngontrol komputer."
 
-Early versions absolutely started that way:
+Ternyata ya ora sesimpel kuwi.
 
-```text
-existing MCP/plugin
-+ launchers
-+ skills
-+ documentation
-```
+Ada transport.
 
-That was useful, but not distinct enough.
+Ada capability.
 
-The repo now has an **otak-atik-native control layer**:
+Ada security boundary.
 
-```text
-task
-  ↓
-transport router
-  ↓
-operator plan compiler
-  ↓
-capability + skill selection
-  ↓
-risk / approval contract
-  ↓
-execution contract
-  ↓
-evidence contract
-```
+Ada approval.
 
-Try it:
+Ada masalah GUI.
 
-```powershell
-otak-atik route --local
+Ada quota.
 
-otak-atik route --remote --quota 500
+Ada provider yang discovery-nya hidup tapi execution-nya belum tentu.
 
-otak-atik plan "fix failing project and run tests" --local
+Ada tool yang bisa terminal tapi nggak bisa lihat tombol di layar.
 
-otak-atik providers
+Ada remote desktop yang bisa klik-klik tapi nggak ngerti MCP blas.
 
-otak-atik lab
-```
+Dan ada gue di tengah-tengah:
 
-The provider can change.
+> **"lah kok dadi ngene."**
 
-The decision contract should survive.
+---
 
-Native pieces now include:
+## Salah satu eksperimen memang beneran gagal
 
-- **transport router** — chooses local, remote, browser bridge, or GUI-control class;
-- **operator plan compiler** — compiles a task into transport, capabilities, skills, risk, execution and verification;
-- **evidence contract** — PASS / FAIL / CHANGED / COULD_NOT_VERIFY;
-- **provider scorecard** — distinguishes proven, partial failure, and unverified integrations;
-- **failure lab** — failed experiments stay documented instead of disappearing;
-- **benchmark scenarios** — routing behavior is executable and testable.
+Browser bridge lewat **MCP SuperAssistant** pernah dicoba.
 
-Read [What is native to otak-atik?](docs/WHAT-IS-OTAK-ATIK-NATIVE.md).
+Discovery jalan.
 
-### Yep, the extension experiment failed too
+`initialize` jalan.
 
-The author's MCP SuperAssistant experiment is now recorded as:
+`tools/list` muncul.
+
+Puluhan tool kelihatan.
+
+Tapi dari inspection yang gue lakukan, jalur itu **nggak terbukti jadi daily execution path yang reliable**.
+
+Jadi statusnya gue tulis terang-terangan:
 
 ```text
 PARTIAL_FAILURE
 ```
 
-Discovery worked. The inspected bridge saw `initialize`, repeated `tools/list`, and 53 advertised tools.
-
-But reliable daily execution was not proven, and no `tools/call` was found in the inspected proxy history.
-
-That failure has its own report:
+Laporan eksperimennya tetap disimpan:
 
 [Experiment report — MCP SuperAssistant browser bridge](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
 
-That is project data, not an embarrassing file to delete.
+Karena failed experiment yang dibuang cuma bikin kita gagal dua kali.
 
-## Why this repo exists
+Sekali waktu eksperimennya gagal.
 
-Desktop access alone is only the transport.
+Sekali lagi waktu kita lupa **kenapa** dia gagal.
 
-otak-atik adds the operator layer:
+---
 
-```text
-CAPABILITY  → what can be done
-SKILL       → how the work should be done
-POLICY      → where the agent must stop
-VERIFY      → evidence that the result worked
-```
+## Yang sebenarnya gue pakai sekarang
 
-And now also:
+### 1. ChatGPT dari HP / jauh dari komputer
+
+**Remote Desktop Commander**
 
 ```text
-TRANSPORT   → which path should carry the work
+ChatGPT
+→ Remote Desktop Commander
+→ paired Windows machine
 ```
 
-Because routing a local Codex task through a quota-limited hosted relay just because it exists is... technically valid and operationally ngapain.
+Ini paling praktis buat gue sekarang.
 
-## Tested where?
+Remote Desktop Commander punya remote MCP untuk AI web seperti ChatGPT/Claude, sementara Desktop Commander local MCP bisa dipakai lokal oleh Codex dan client MCP lain.
 
-The author's real workflows have primarily been exercised with:
+**Tapi ini juga alasan repo ini gue sebut gagal.**
 
-- **ChatGPT + Remote Desktop Commander**
-- **Codex + local project/engineering workflows**
+Karena ujung-ujungnya:
 
-Other clients are compatibility targets, not magically certified.
+> **gue pakai plugin.**
 
-Claude, Cursor, VS Code, Gemini CLI, etc. are welcome — **semangat, gess** — but report actual behavior so docs can distinguish documented support from battle-tested support.
+Bukan bikin penggantinya sendiri.
 
-## If Remote Desktop Commander quota becomes a problem
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/friday-deploy.jpg" width="300" alt="friday deploy meme" />
+</p>
 
-Do this before paying or panicking:
+### 2. Kerja lokal
+
+Kalau AI dan komputer ada di mesin yang sama:
+
+```powershell
+codex mcp add desktop-commander -- npx -y @wonderwhy-er/desktop-commander@latest
+```
+
+Ini lebih masuk akal daripada memutar kerja lokal lewat remote relay.
+
+Local Desktop Commander MCP sendiri open source.
+
+---
+
+# Gais, gue justru lagi nyari solusi 😭
+
+Nah.
+
+Kalau lu nemu project yang lebih cocok, **please kasih tahu**.
+
+Yang gue cari kurang lebih begini:
 
 ```text
-Is the task local?
-    yes → local MCP / Codex
-
-Are you actually remote?
-    yes → Remote Desktop Commander remote
-
-Do you need browser-only bridging?
-    yes → MCP SuperAssistant optional
-
-Do you need GUI computer-use?
-    yes → evaluate QuickDesk
+FREE / OPEN SOURCE kalau bisa
++
+Windows
++
+bisa remote lewat internet
++
+AI bisa screenshot
++
+AI bisa click / type / scroll
++
+MCP native atau gampang dijadikan MCP
++
+kalau bisa muncul sebagai plugin/connector di ChatGPT
++
+nggak harus bayar API tiap gerak mouse
++
+self-hostable = bonus besar
 ```
 
-Desktop Commander's current published plan lists Free at 10,000 remote tool calls/month and Pro as unlimited; its local MCP server is separately documented as free/open-source with no monthly limit.
+Kalau ada benda yang memenuhi itu semua:
 
-otak-atik does not bypass quotas.
+**mas, mbak, cak, suhu — issue repo ini terbuka.**
 
-It tries to stop wasting them.
+---
 
-## Skills
+## Kandidat yang sejauh ini paling menarik
 
-The registry includes operator skills for:
+### 1. QuickDesk — paling dekat dengan yang gue cari
 
-- transport selection;
-- remote quota optimization;
-- local MCP bootstrap;
-- Remote Desktop bootstrap;
-- browser bridge setup;
-- MCP topology diagnosis;
-- operator health checks;
-- Windows launcher management;
-- repository debugging;
-- safe file editing;
-- dependency repair;
-- Git workflows;
-- document workflows;
-- skill authoring;
-- and more.
+https://github.com/barry-ran/QuickDesk
 
-Use the smallest set that can do the job.
+Ini yang paling bikin gue:
 
-Context is a resource too.
+> **"lah, iki toh sing tak goleki?"**
 
-## CLI
+QuickDesk mendeskripsikan dirinya sebagai AI-native remote desktop yang:
+
+- open source;
+- gratis;
+- punya **built-in MCP Server**;
+- bisa screenshot;
+- click;
+- type;
+- drag;
+- scroll;
+- clipboard;
+- remote ke device lain;
+- punya stdio dan HTTP/SSE MCP transport;
+- bisa self-host signaling/TURN.
+
+Jadi secara konsep:
+
+```text
+AI
+↓ MCP
+QuickDesk
+↓
+remote desktop
+↓
+screenshot / mouse / keyboard
+```
+
+**Ini kandidat nomor satu buat eksperimen berikutnya.**
+
+Belum gue anggap pengganti final sebelum gue tes sendiri.
+
+Karena README orang lain boleh bilang "works".
+
+Gue tetap pengen lihat:
+
+> **works neng komputerku ora?**
+
+---
+
+### 2. RustDesk — remote desktop-nya mantap, MCP-nya belum native
+
+https://github.com/rustdesk/rustdesk
+
+RustDesk itu open-source remote desktop dan bisa self-host server sendiri.
+
+Buat manusia remote komputer:
+
+**bagus banget sebagai kandidat.**
+
+Masalah buat use case repo ini:
+
+> dia bukan MCP-native remote computer-use layer.
+
+Jadi kemungkinan arsitekturnya malah:
+
+```text
+AI
+↓
+MCP computer-use bridge
+↓
+RustDesk / remote transport
+↓
+Windows
+```
+
+Menarik.
+
+Tapi berarti ada satu lapisan lagi yang harus gue otak-atik.
+
+Dan kita tahu biasanya kalimat:
+
+> "cuma tambah satu layer"
+
+berakhir bagaimana.
+
+---
+
+### 3. MCPComputerUse — MCP GUI Windows, tapi bukan remote transport
+
+https://github.com/kblood/MCPComputerUse
+
+Ini menarik karena memang bikin MCP server Windows untuk:
+
+- screenshot;
+- window management;
+- mouse;
+- keyboard;
+- macro/automation.
+
+Jadi buat:
+
+```text
+AI
+↓ MCP
+Windows GUI
+```
+
+masuk.
+
+Tapi problem **remote lewat internet** masih perlu lapisan lain.
+
+Berarti mungkin perlu tunnel/VPN/relay yang aman.
+
+Masih eksperimen territory.
+
+---
+
+### 4. Remote Desktop Commander — yang akhirnya gue pakai 😭
+
+https://github.com/desktop-commander/remote-desktop-commander
+
+Ya.
+
+Ironis memang.
+
+Remote Desktop Commander sekarang adalah jalur harian gue.
+
+Dia bagus untuk:
+
+- file system;
+- terminal;
+- process;
+- editing;
+- development workflow;
+- remote MCP dari ChatGPT.
+
+Tapi dia bukan full graphical remote desktop computer-use.
+
+Jadi untuk:
+
+> "lihat layar → cari tombol → klik → drag → interaksi GUI arbitrary"
+
+gue masih pengen sesuatu yang lebih native.
+
+Hosted Remote MCP-nya juga beda dengan local Desktop Commander MCP: local server-nya open source, sementara hosted remote service implementation-nya bukan open source.
+
+Jadi masih ada alasan buat terus mencari.
+
+---
+
+## Yang gue pengen komunitas bantu jawab
+
+Kalau lu nyasar ke repo ini dan ngerti area beginian, gue pengen jawaban konkret:
+
+### Apakah ada solusi yang:
+
+1. gratis atau open source;
+2. bisa jalan di Windows;
+3. bisa remote lewat internet;
+4. punya screenshot + mouse + keyboard;
+5. MCP-native **atau** gampang dijadikan MCP;
+6. aman buat ditinggal running;
+7. bisa dikontrol ChatGPT/Claude/Codex dari device lain;
+8. nggak butuh lima service tambahan hanya untuk klik Start Menu?
+
+Kalau ada:
+
+**open an issue.**
+
+Serius.
+
+Karena mungkin solusi terbaik repo ini bukan nambah 12 ribu baris code.
+
+Mungkin cukup:
+
+> **"bro, pakai ini aja."**
+
+Dan kalau memang begitu:
+
+ya dipakai.
+
+Gengsi engineering tidak lebih penting dari benda yang bekerja.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/git-force-push.jpg" width="300" alt="git force push meme" />
+</p>
+
+---
+
+## Terus isi repo ini sekarang buat apa?
+
+Walaupun produk awalnya gagal, beberapa bagian masih berguna sebagai bahan eksperimen:
+
+- transport router;
+- operator plan compiler;
+- capability inference;
+- approval/risk contract;
+- evidence contract;
+- provider scorecard;
+- failed-experiment lab;
+- benchmark scenarios;
+- Windows launcher;
+- provider manifests;
+- skill registry;
+- setup decision tree;
+- docs tentang remote/local/browser paths.
+
+CLI-nya juga masih hidup:
 
 ```powershell
 otak-atik doctor
 otak-atik capabilities
 otak-atik skills
-otak-atik recipes
-otak-atik packs
-otak-atik policy
+otak-atik route --local
+otak-atik route --remote
+otak-atik plan "fix failing project and run tests" --local
+otak-atik providers
+otak-atik lab
 ```
 
-## Docs
+Validation:
 
-Start with:
+```powershell
+npm run check
+```
 
-- [Windows setup](docs/SETUP-WINDOWS.md)
-- [Setup decision tree](docs/SETUP-DECISION-TREE.md)
-- [Usage and cost](docs/USAGE-AND-COST.md)
-- [What the original setup actually uses](docs/WHAT-I-ACTUALLY-USE.md)
-- [Remote Desktop Commander](docs/REMOTE-DESKTOP-COMMANDER.md)
-- [MCP SuperAssistant browser bridge](docs/BROWSER-BRIDGE.md)
-- [AI clients](docs/AI-CLIENTS.md)
-- [Alternatives](docs/ALTERNATIVES.md)
-- [What is native to otak-atik?](docs/WHAT-IS-OTAK-ATIK-NATIVE.md)
-- [Research status](docs/RESEARCH-STATUS.md)
-- [Provider matrix](docs/PROVIDER-MATRIX.md)
-- [MCP SuperAssistant failure report](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
-- [PRD](docs/product/PRD.md)
-- [Security](SECURITY.md)
-- [Roadmap](ROADMAP.md)
-
-## Alternatives
-
-otak-atik does not pretend every computer-control problem needs the same provider.
-
-**QuickDesk** is especially interesting for tasks requiring screenshot/mouse/keyboard computer use. It is open source, exposes an MCP server, supports local stdio and HTTP/SSE modes, and can be self-hosted.
-
-For pure remote filesystem/terminal work, Remote Desktop Commander remains the simpler default in this project.
-
-## Rules
+Current package:
 
 ```text
-Evidence > vibes.
-Local work > unnecessary remote relay.
-Clear > clever.
-Recoverable > magical.
-Useful > impressive.
-Traceable > mysterious.
-Safe > ganas tapi ngawur.
+0.1.0-alpha.3
 ```
 
-> **Mutation without verification is incomplete work.**
+Node:
 
-## License
-
-Apache-2.0.
-
-Third-party products keep their own licenses and trademarks.
+```text
+>= 20
+```
 
 ---
 
-If someday the onboarding still starts with:
+## Status project sekarang
 
-> "first open PowerShell and remember this exact command..."
+Gue lebih suka menyebut statusnya:
 
-while seven launchers, three adapters, and twenty skills exist:
+```text
+FAILED AS THE ORIGINAL SOLUTION
+ACTIVE AS A RESEARCH / FAILURE LAB
+```
 
-**berarti kita gagal ngurus UX.**
+Bukan production-ready operator.
 
-**Oke. lanjut otak-atik.**
+Bukan remote desktop replacement.
+
+Bukan pesaing TeamViewer.
+
+Bukan pesaing plugin yang sekarang malah gue pakai.
+
+Repo ini sekarang adalah tempat buat:
+
+> **nyatet apa yang dicoba, apa yang works, apa yang goblok, apa yang gagal, dan apa yang mungkin layak dicoba berikutnya.**
+
+---
+
+## Prinsip yang masih gue pertahankan
+
+```text
+Reality > roadmap.
+Evidence > vibes.
+Working plugin > homemade architecture yang nggak kepakai.
+Local > remote kalau memang task-nya lokal.
+Verification > "harusnya sudah".
+Failure documented > failure dilupakan.
+Useful > gengsi bikin sendiri.
+```
+
+Dan mungkin pelajaran paling mahal dari repo ini:
+
+> **nggak semua masalah perlu diselesaikan dengan bikin produk baru.**
+
+Kadang jawabannya memang:
+
+> "install plugin iki."
+
+😭
+
+---
+
+## Docs yang masih relevan
+
+- [What I actually use](docs/WHAT-I-ACTUALLY-USE.md)
+- [Research status](docs/RESEARCH-STATUS.md)
+- [Alternatives](docs/ALTERNATIVES.md)
+- [Remote Desktop Commander](docs/REMOTE-DESKTOP-COMMANDER.md)
+- [MCP SuperAssistant browser bridge](docs/BROWSER-BRIDGE.md)
+- [Provider matrix](docs/PROVIDER-MATRIX.md)
+- [Failure report](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
+- [Security](SECURITY.md)
+- [Roadmap](ROADMAP.md)
+
+---
+
+<br/>
+
+# For everyone else
+
+**otak-atik is a documented failed experiment that remains active as a research lab for AI-to-computer control, MCP transports, routing, skills, evidence, and verification.**
+
+The original goal was to create a practical operator layer that could help AI clients reach and operate the author's computer without depending on a single third-party plugin or transport.
+
+In real daily use, that goal has not been achieved.
+
+The author's current primary remote workflow is:
+
+```text
+ChatGPT
+→ Remote Desktop Commander
+→ Windows machine
+```
+
+For local MCP work, Desktop Commander is used directly with clients such as Codex.
+
+The repository is retained because it contains useful experiments around transport selection, capability modeling, approval boundaries, evidence contracts, provider evaluation, onboarding, and failure documentation.
+
+## Current research question
+
+The project is particularly interested in a free/open-source path that combines:
+
+- remote desktop transport;
+- graphical computer use;
+- screenshots;
+- mouse and keyboard control;
+- Windows support;
+- MCP compatibility;
+- remote AI-client access;
+- safe user-controlled authorization.
+
+QuickDesk currently appears to be the closest public project to that requirement set and is the next obvious candidate for evaluation.
+
+RustDesk is a strong open-source remote-desktop candidate but does not provide the same built-in MCP computer-use interface.
+
+MCPComputerUse provides a Windows-native MCP GUI-control layer but is not itself the remote transport.
+
+## Contributions
+
+Reports from real usage are more valuable than architecture opinions.
+
+If you know a project that better satisfies the requirements above, open an issue with:
+
+- project/repository link;
+- license;
+- supported operating systems;
+- remote transport model;
+- MCP integration method;
+- screenshot/mouse/keyboard support;
+- self-hosting status;
+- what you personally verified.
+
+---
+
+**The experiment failed to replace the plugin. The documentation does not need to pretend otherwise.**
