@@ -2,255 +2,216 @@
 
 > **AI-ne wes pinter. Saiki tangane sing dirapekno.**
 >
-> A local-first operator kit for giving AI clients structured access to your computer, MCP tools, reusable skills, and repeatable workflows — without making first-time setup a small religious ceremony.
+> A local-first operator kit for connecting AI clients to your computer, MCP tools, reusable skills, and repeatable workflows — with an onboarding path normal humans can actually finish.
 
-```text
-ChatGPT / Codex / Claude / Cursor / VS Code / other MCP clients
-                              │
-                              ▼
-                          otak-atik
-                    ┌─────────┼─────────┐
-                    ▼         ▼         ▼
-                 skills    policy    recipes
-                    │         │         │
-                    └─────────┼─────────┘
-                              ▼
-                           adapters
-                    ┌─────────┼───────────┐
-                    ▼         ▼           ▼
-              Remote MCP   Local MCP   SaaS tools
-                    │
-                    ▼
-               your computer
-```
+## What the author actually uses
 
-## The 30-second answer: what do I install?
+The setup that inspired this project experimented with **two MCP paths**.
 
-For most people, **one path is enough**.
+Today, the author uses **Remote Desktop Commander much more often** for ChatGPT → Windows work.
 
-### Path A — Remote Desktop Commander — recommended
+The old **MCP SuperAssistant** Chrome-extension path is still installed as a fallback/experiment, but it is not the normal daily execution path.
 
-Use this when you want ChatGPT or another remote-MCP-capable AI to reach your computer from web/mobile/another device.
+So for new users:
 
-On the computer you want the AI to reach:
+> **Start with Remote Desktop Commander. Add the browser bridge only if you actually need it.**
+
+Full evidence/history: [What I actually use](docs/WHAT-I-ACTUALLY-USE.md).
+
+## Pick the right mode
+
+| Situation | Recommended path |
+| --- | --- |
+| ChatGPT from phone / away from PC | **Remote Desktop Commander remote MCP** |
+| Codex / local AI on the same PC | **Desktop Commander local MCP** |
+| ChatGPT/Gemini website in Chrome needs local MCP | MCP SuperAssistant, optional |
+| Need screenshot + click + type GUI control | evaluate QuickDesk / Windows UI MCP |
+
+### Remote — easiest for ChatGPT web/mobile
+
+On the target computer:
 
 ```powershell
 npx @wonderwhy-er/desktop-commander@latest remote
 ```
 
-Then connect your AI client to:
+Remote MCP endpoint:
 
 ```text
 https://mcp.desktopcommander.app/mcp
 ```
 
-This is the primary path.
+The Windows installer creates a Desktop launcher so users do not need to retype that command.
 
-### Path B — MCP SuperAssistant browser bridge — optional compatibility mode
+### Local — best for Codex and quota-heavy engineering
 
-Use this when the AI website itself does **not** give you a convenient native MCP connector and you want a browser extension to bridge tool calls into a local MCP proxy.
+Official Codex setup:
 
-Chrome extension:
+```powershell
+codex mcp add desktop-commander -- npx -y @wonderwhy-er/desktop-commander@latest
+```
 
-**MCP SuperAssistant**  
-Extension ID: `kngiafgkdnlkgmefdafaibkibegkcaef`
+This runs Desktop Commander as **local MCP**, not through the hosted Remote MCP service.
 
-This path uses a local proxy and is separate from Remote Desktop Commander's hosted remote relay.
+That matters because the hosted free Remote Desktop Commander plan currently has a monthly tool-call ceiling, while the local MCP server is free/open-source without that monthly ceiling.
 
-### Do I need both?
+See [Usage and cost strategy](docs/USAGE-AND-COST.md).
+
+## Wait — do I need the Chrome extension too?
 
 **No.**
 
-They can coexist, and the original setup that inspired this repo did use both, but they solve different transport problems.
+The installed extension in the original setup is:
+
+**MCP SuperAssistant**  
+Chrome extension ID: `kngiafgkdnlkgmefdafaibkibegkcaef`
+
+It is a separate browser bridge.
 
 ```text
 REMOTE PATH
-AI client
-  → https://mcp.desktopcommander.app/mcp
-  → Remote Desktop Commander device agent
-  → computer
+ChatGPT / remote MCP client
+→ Remote Desktop Commander hosted relay
+→ paired device agent
+→ computer
 
-BROWSER BRIDGE PATH
+OPTIONAL BROWSER PATH
 AI website in Chrome
-  → MCP SuperAssistant extension
-  → local MCP proxy
-  → local MCP server(s)
-  → computer
+→ MCP SuperAssistant
+→ local proxy
+→ local MCP server
+→ computer
 ```
 
-Installing both does not magically stack their power.
+Both can coexist.
 
-It gives you **two ways in**.
+One does not require the other.
 
-See [Which setup should I use?](docs/SETUP-DECISION-TREE.md).
+The original machine's old browser proxy still receives MCP discovery traffic, but an inspection of its current log found repeated `tools/list` requests and no `tools/call` entries in the checked history. In practice, Remote Desktop Commander has become the main path.
 
----
-
-## One-command-ish Windows onboarding
-
-Requirements:
-
-- Windows 10/11
-- Node.js 20+
-- Git recommended
-
-Clone:
+## Windows: install once, click later
 
 ```powershell
 git clone https://github.com/exxrawrrr/otak-atik.git
 cd otak-atik
-```
 
-Preview:
-
-```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -DryRun
-```
-
-Install:
-
-```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
 
 The installer creates:
 
 ```text
-~/.otak-atik/
-└── windows/
-
 Desktop/
 └── OTAK-ATIK/
     ├── 01 - START REMOTE DESKTOP.bat
     ├── 02 - STATUS.bat
     ├── 03 - OPEN SETUP PAGES.bat
     ├── 04 - START BROWSER BRIDGE - OPTIONAL.bat
-    └── 05 - STOP REMOTE DESKTOP.bat
+    ├── 05 - STOP REMOTE DESKTOP.bat
+    ├── 06 - SETUP CODEX LOCAL MCP - NO REMOTE QUOTA.bat
+    └── 07 - WHICH MODE SHOULD I USE.bat
 ```
 
-So after setup, the normal Windows experience is basically:
-
-> double-click **01 - START REMOTE DESKTOP.bat**
-
-Not:
-
-> remember the sacred npm incantation from six Tuesdays ago.
-
-On first install the setup helper can also open the relevant Remote Desktop Commander and MCP SuperAssistant pages. Browser security still requires **you** to approve Chrome extension installation and OAuth pairing; this project does not silently install browser extensions or authorize accounts.
-
-Full guide: [Windows setup](docs/SETUP-WINDOWS.md).
-
----
-
-## What was the original setup behind this repo?
-
-The author originally experimented with two parallel approaches.
-
-### 1. Native/remote Desktop Commander
+The normal remote workflow becomes:
 
 ```text
-ChatGPT
-→ Remote Desktop Commander connector
-→ hosted Remote MCP relay
-→ local device agent
-→ Windows
+double-click 01
+→ authenticate once if needed
+→ connect AI
+→ work
 ```
 
-The local device agent is started with:
-
-```powershell
-npx @wonderwhy-er/desktop-commander@latest remote
-```
-
-### 2. Browser-extension MCP bridge
+The normal Codex/local workflow becomes:
 
 ```text
-ChatGPT/Gemini/etc in Chrome
-→ MCP SuperAssistant
-→ localhost MCP proxy
-→ local agent
-→ Windows
+double-click 06
+→ approve Codex MCP config
+→ use local Desktop Commander
+→ no hosted remote quota for that path
 ```
 
-The experimental private setup used a compatibility proxy because the local agent and browser bridge did not always agree on transport/response details.
+Browser extension and OAuth installation still require explicit user approval. The project does not silently install extensions or authorize accounts.
 
-That historical topology is documented in [Browser bridge notes](docs/BROWSER-BRIDGE.md), but public users do **not** need to reproduce the custom legacy proxy.
+## Why this repo exists
 
-Use the standard paths first.
+Desktop access alone is only the transport.
 
----
-
-## Tested where?
-
-The workflow behind this repository has been exercised primarily with:
-
-- **ChatGPT** — including remote desktop access through Remote Desktop Commander;
-- **Codex** — for local engineering/project workflows.
-
-Other MCP-capable clients are documented as compatibility targets, not claimed as personally battle-tested by the author.
-
-If you use Claude, Cursor, VS Code, Gemini CLI, or something more exotic: semangat, gess. Open an issue with what actually worked instead of pretending every client behaves identically.
-
-See [AI client notes](docs/AI-CLIENTS.md).
-
----
-
-## Why not just use one existing project?
-
-For raw desktop access, you often should.
-
-This repo does not try to reimplement every remote-control stack.
-
-Current integrations/alternatives worth knowing:
-
-| Project | Best fit | otak-atik position |
-| --- | --- | --- |
-| Remote Desktop Commander | remote files + shell from remote-MCP clients | **default remote path** |
-| MCP SuperAssistant | browser AI sites that need a local MCP bridge | optional compatibility path |
-| QuickDesk | AI-driven GUI remote desktop, screenshots/click/type | experimental GUI-control alternative |
-| Windows MCP Server | deep Windows UI/PowerShell/system automation | advanced Windows option |
-
-See [Alternatives](docs/ALTERNATIVES.md).
-
-otak-atik's job is the layer above transport:
+otak-atik adds the operator layer:
 
 ```text
 CAPABILITY  → what can be done
-SKILL       → how work should be done
+SKILL       → how the work should be done
 POLICY      → where the agent must stop
 VERIFY      → evidence that the result worked
 ```
 
----
+And now also:
 
-## Built-in local skills
+```text
+TRANSPORT   → which path should carry the work
+```
 
-The official registry now includes operator-oriented skills such as:
+Because routing a local Codex task through a quota-limited hosted relay just because it exists is... technically valid and operationally ngapain.
 
-- `remote-desktop-bootstrap`
-- `browser-mcp-bridge`
-- `mcp-topology-diagnoser`
-- `operator-healthcheck`
-- `windows-launcher-manager`
-- `desktop-inspector`
-- `safe-file-editor`
-- `mcp-diagnostics`
-- `connector-doctor`
-- `project-bootstrap`
-- `project-debugger`
-- `dependency-doctor`
-- `git-workflow`
-- `document-workflow`
-- `workspace-organizer`
-- `web-project-maintainer`
-- `release-checker`
-- `skill-authoring`
+## Tested where?
 
-Use the smallest relevant set.
+The author's real workflows have primarily been exercised with:
 
-Do not load everything just because everything exists.
+- **ChatGPT + Remote Desktop Commander**
+- **Codex + local project/engineering workflows**
 
----
+Other clients are compatibility targets, not magically certified.
+
+Claude, Cursor, VS Code, Gemini CLI, etc. are welcome — **semangat, gess** — but report actual behavior so docs can distinguish documented support from battle-tested support.
+
+## If Remote Desktop Commander quota becomes a problem
+
+Do this before paying or panicking:
+
+```text
+Is the task local?
+    yes → local MCP / Codex
+
+Are you actually remote?
+    yes → Remote Desktop Commander remote
+
+Do you need browser-only bridging?
+    yes → MCP SuperAssistant optional
+
+Do you need GUI computer-use?
+    yes → evaluate QuickDesk
+```
+
+Desktop Commander's current published plan lists Free at 10,000 remote tool calls/month and Pro as unlimited; its local MCP server is separately documented as free/open-source with no monthly limit.
+
+otak-atik does not bypass quotas.
+
+It tries to stop wasting them.
+
+## Skills
+
+The registry includes operator skills for:
+
+- transport selection;
+- remote quota optimization;
+- local MCP bootstrap;
+- Remote Desktop bootstrap;
+- browser bridge setup;
+- MCP topology diagnosis;
+- operator health checks;
+- Windows launcher management;
+- repository debugging;
+- safe file editing;
+- dependency repair;
+- Git workflows;
+- document workflows;
+- skill authoring;
+- and more.
+
+Use the smallest set that can do the job.
+
+Context is a resource too.
 
 ## CLI
 
@@ -263,22 +224,35 @@ otak-atik packs
 otak-atik policy
 ```
 
-Without global linking:
+## Docs
 
-```powershell
-node .\bin\otak-atik.mjs doctor
-```
+Start with:
 
----
+- [Windows setup](docs/SETUP-WINDOWS.md)
+- [Setup decision tree](docs/SETUP-DECISION-TREE.md)
+- [Usage and cost](docs/USAGE-AND-COST.md)
+- [What the original setup actually uses](docs/WHAT-I-ACTUALLY-USE.md)
+- [Remote Desktop Commander](docs/REMOTE-DESKTOP-COMMANDER.md)
+- [MCP SuperAssistant browser bridge](docs/BROWSER-BRIDGE.md)
+- [AI clients](docs/AI-CLIENTS.md)
+- [Alternatives](docs/ALTERNATIVES.md)
+- [PRD](docs/product/PRD.md)
+- [Security](SECURITY.md)
+- [Roadmap](ROADMAP.md)
 
-## Safety defaults
+## Alternatives
 
-The default profile is `observe`.
+otak-atik does not pretend every computer-control problem needs the same provider.
 
-Broad mutation is not implicitly enabled.
+**QuickDesk** is especially interesting for tasks requiring screenshot/mouse/keyboard computer use. It is open source, exposes an MCP server, supports local stdio and HTTP/SSE modes, and can be self-hosted.
+
+For pure remote filesystem/terminal work, Remote Desktop Commander remains the simpler default in this project.
+
+## Rules
 
 ```text
 Evidence > vibes.
+Local work > unnecessary remote relay.
 Clear > clever.
 Recoverable > magical.
 Useful > impressive.
@@ -286,72 +260,22 @@ Traceable > mysterious.
 Safe > ganas tapi ngawur.
 ```
 
-And:
-
 > **Mutation without verification is incomplete work.**
-
----
-
-## Docs
-
-Start here:
-
-- [Setup decision tree](docs/SETUP-DECISION-TREE.md)
-- [Windows setup](docs/SETUP-WINDOWS.md)
-- [Remote Desktop Commander](docs/REMOTE-DESKTOP-COMMANDER.md)
-- [Browser bridge / MCP SuperAssistant](docs/BROWSER-BRIDGE.md)
-- [AI client compatibility](docs/AI-CLIENTS.md)
-- [Alternatives](docs/ALTERNATIVES.md)
-- [Product vision](docs/product/VISION.md)
-- [PRD](docs/product/PRD.md)
-- [System architecture](docs/architecture/SYSTEM.md)
-- [Security model](SECURITY.md)
-- [Roadmap](ROADMAP.md)
-
----
-
-## Public core, private overlay
-
-Keep personal paths, credentials, company data, and private automation outside this repository.
-
-```text
-public repo
-  → generic skills
-  → generic adapters
-  → generic launchers
-
-~/.otak-atik/
-  → your config
-  → your private skills
-  → your machine-specific state
-```
-
-Simple.
-
----
 
 ## License
 
 Apache-2.0.
 
-Third-party projects retain their own licenses and trademarks.
+Third-party products keep their own licenses and trademarks.
 
 ---
 
-## Pesan buat gue nanti
+If someday the onboarding still starts with:
 
-Kalau suatu hari repo ini punya 300 adapters, 900 skills, empat dashboards, agent swarm, animated hologram, dan user masih harus buka PowerShell buat nginget command pertama:
+> "first open PowerShell and remember this exact command..."
 
-**berarti onboarding-nya gagal.**
+while seven launchers, three adapters, and twenty skills exist:
 
-The user experience should keep moving toward:
-
-```text
-install
-→ click launcher
-→ connect AI
-→ work
-→ verify
-```
+**berarti kita gagal ngurus UX.**
 
 **Oke. lanjut otak-atik.**

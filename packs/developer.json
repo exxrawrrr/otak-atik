@@ -1,6 +1,9 @@
 {
   "name": "developer",
   "skills": [
+    "transport-selector",
+    "remote-usage-optimizer",
+    "local-mcp-bootstrap",
     "project-bootstrap",
     "project-debugger",
     "dependency-doctor",

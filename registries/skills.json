@@ -1,6 +1,9 @@
 {
   "schema_version": 1,
   "skills": [
+    {"name":"transport-selector","status":"stable","scope":"generic","description":"Choose the smallest transport that satisfies locality, GUI, and quota requirements.","path":"skills/core/transport-selector/SKILL.md"},
+    {"name":"remote-usage-optimizer","status":"stable","scope":"generic","description":"Reduce unnecessary remote MCP calls without weakening verification.","path":"skills/core/remote-usage-optimizer/SKILL.md"},
+    {"name":"local-mcp-bootstrap","status":"stable","scope":"provider","description":"Configure Desktop Commander local MCP for local AI clients such as Codex.","path":"skills/core/local-mcp-bootstrap/SKILL.md"},
     {"name":"remote-desktop-bootstrap","status":"stable","scope":"provider","description":"Set up and verify a Remote Desktop Commander remote path.","path":"skills/core/remote-desktop-bootstrap/SKILL.md"},
     {"name":"browser-mcp-bridge","status":"incubating","scope":"provider","description":"Configure and diagnose the optional MCP SuperAssistant browser bridge.","path":"skills/core/browser-mcp-bridge/SKILL.md"},
     {"name":"mcp-topology-diagnoser","status":"stable","scope":"generic","description":"Map multi-hop MCP setups and identify the failing transport layer.","path":"skills/core/mcp-topology-diagnoser/SKILL.md"},

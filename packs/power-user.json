@@ -1,6 +1,9 @@
 {
   "name": "power-user",
   "skills": [
+    "transport-selector",
+    "remote-usage-optimizer",
+    "local-mcp-bootstrap",
     "remote-desktop-bootstrap",
     "browser-mcp-bridge",
     "mcp-topology-diagnoser",

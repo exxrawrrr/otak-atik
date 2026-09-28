@@ -2,34 +2,29 @@
 
 All notable changes will be documented here.
 
-## [0.1.0-alpha.1] - 2026-09-28
+## [Unreleased]
 
 ### Added
 
-- end-to-end Windows onboarding;
-- automatic `Desktop\OTAK-ATIK` launcher folder;
+- end-to-end Windows onboarding and Desktop launchers;
 - Remote Desktop Commander start/status/stop helpers;
-- optional MCP SuperAssistant browser-bridge helper;
+- one-click-assisted Codex local MCP setup;
+- optional MCP SuperAssistant browser bridge;
 - setup decision tree;
-- AI client compatibility notes;
-- QuickDesk and Windows MCP Server alternatives documentation;
-- five operator/bootstrap skills, bringing the official registry to 18 skills;
-- ADR separating native remote MCP from browser-extension transport;
-- Windows-native GitHub Actions onboarding workflow;
-- deterministic onboarding contract tests.
+- usage/cost routing guide;
+- real-world "what the author actually uses" notes;
+- QuickDesk and Windows MCP Server alternatives;
+- transport-selector skill;
+- remote-usage-optimizer skill;
+- local-mcp-bootstrap skill;
+- remote/browser topology skills;
+- ADR separating native remote MCP from browser-extension transport.
 
 ### Changed
 
-- Remote Desktop Commander is now documented as the recommended default remote path.
-- MCP SuperAssistant is explicitly documented as optional, not a required dependency of Remote Desktop Commander.
-- Windows onboarding is treated as a tested product contract instead of documentation-only guidance.
-
-### Verified
-
-- fresh-clone validator: PASS;
-- Node tests: 9/9 PASS;
-- CLI doctor: READY;
-- Windows onboarding GitHub Actions run: SUCCESS.
+- Remote Desktop Commander is documented as the author's primary ChatGPT workflow.
+- MCP SuperAssistant is explicitly optional and identified as a legacy/fallback path in the original setup.
+- local MCP is recommended for Codex/local workloads to avoid unnecessary hosted remote usage.
 
 ## [0.1.0-alpha.0] - 2026-09-28
 
