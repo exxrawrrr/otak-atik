@@ -1,10 +1,14 @@
 {
   "name": "office",
   "skills": [
+    "workspace-cartographer",
+    "ai-handoff-builder",
+    "secret-hygiene-auditor",
     "desktop-inspector",
     "workspace-organizer",
     "document-workflow",
     "connector-doctor",
-    "safe-file-editor"
+    "safe-file-editor",
+    "evidence-verifier"
   ]
 }

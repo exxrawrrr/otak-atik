@@ -23,6 +23,11 @@
     "git-workflow",
     "web-project-maintainer",
     "release-checker",
-    "skill-authoring"
+    "skill-authoring",
+    "workspace-cartographer",
+    "secret-hygiene-auditor",
+    "mcp-config-auditor",
+    "skill-quality-auditor",
+    "ai-handoff-builder"
   ]
 }

@@ -5,6 +5,11 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { chooseTransport } from "../src/transport-router.mjs";
 import { compileOperatorPlan } from "../src/plan-compiler.mjs";
+import { createWorkspaceSnapshot } from "../src/workspace-snapshot.mjs";
+import { scanSecretHygiene } from "../src/hygiene.mjs";
+import { auditMcpConfig } from "../src/mcp-config-audit.mjs";
+import { lintSkill } from "../src/skill-lint.mjs";
+import { createHandoff } from "../src/handoff.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -79,12 +84,21 @@ function parseContextArgs(args) {
   return { context, remaining };
 }
 
+function takeOption(args, name) {
+  const index = args.indexOf(name);
+  if (index === -1) return { args, value: null };
+  if (index === args.length - 1) throw new Error(name + " requires a value.");
+  const next = [...args];
+  const value = next[index + 1];
+  next.splice(index, 2);
+  return { args: next, value };
+}
+
 function doctor() {
   console.log("\notak-atik doctor\n");
-
   const major = Number(process.versions.node.split(".")[0]);
   if (major >= 20) ok("Node.js", process.version);
-  else fail("Node.js", `${process.version}; Node 20+ required`);
+  else fail("Node.js", process.version + "; Node 20+ required");
 
   const git = commandExists("git");
   git.exists ? ok("Git", git.output) : warn("Git", "not detected");
@@ -100,6 +114,11 @@ function doctor() {
     "src/transport-router.mjs",
     "src/plan-compiler.mjs",
     "src/evidence.mjs",
+    "src/workspace-snapshot.mjs",
+    "src/hygiene.mjs",
+    "src/mcp-config-audit.mjs",
+    "src/skill-lint.mjs",
+    "src/handoff.mjs",
     "docs/product/PRD.md",
     "SECURITY.md"
   ];
@@ -119,18 +138,18 @@ function doctor() {
     const providers = readJson("registries/providers.json");
     const experiments = readJson("labs/experiments.json");
 
-    ok("Capability registry", `${capabilities.capabilities.length} capabilities`);
-    ok("Skill registry", `${skills.skills.length} skills`);
-    ok("Recipe registry", `${recipes.recipes.length} recipes`);
-    ok("Pack registry", `${packs.packs.length} packs`);
-    ok("Provider matrix", `${providers.providers.length} providers`);
-    ok("Failure lab", `${experiments.experiments.length} experiments`);
+    ok("Capability registry", capabilities.capabilities.length + " capabilities");
+    ok("Skill registry", skills.skills.length + " skills");
+    ok("Recipe registry", recipes.recipes.length + " recipes");
+    ok("Pack registry", packs.packs.length + " packs");
+    ok("Provider matrix", providers.providers.length + " providers");
+    ok("Failure lab", experiments.experiments.length + " experiments");
   } catch (error) {
     healthy = false;
     fail("Registry parse", error.message);
   }
 
-  console.log(`\nRESULT: ${healthy ? "READY" : "NEEDS_ATTENTION"}\n`);
+  console.log("\nRESULT: " + (healthy ? "READY" : "NEEDS_ATTENTION") + "\n");
   process.exitCode = healthy ? 0 : 1;
 }
 
@@ -158,24 +177,66 @@ function plan(args) {
   const task = remaining.join(" ").trim();
   if (!task) throw new Error("Usage: otak-atik plan <task> [--local|--remote|--browser|--gui]");
 
-  const result = compileOperatorPlan({
+  console.log(JSON.stringify(compileOperatorPlan({
     task,
     context,
     skills: readJson("registries/skills.json").skills,
     capabilityRegistry: readJson("registries/capabilities.json")
-  });
+  }), null, 2));
+}
 
+function snapshot(args) {
+  const target = args[0] || ".";
+  console.log(JSON.stringify(createWorkspaceSnapshot(target), null, 2));
+}
+
+function hygiene(args) {
+  const strict = args.includes("--strict");
+  const target = args.find((x) => x !== "--strict") || ".";
+  const result = scanSecretHygiene(target);
   console.log(JSON.stringify(result, null, 2));
+  if (strict && result.findings.length) process.exitCode = 2;
+}
+
+function mcpCheck(args) {
+  if (!args[0]) throw new Error("Usage: otak-atik mcp-check <config.json>");
+  const result = auditMcpConfig(args[0]);
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.valid) process.exitCode = 2;
+}
+
+function skillCheck(args) {
+  if (!args[0]) throw new Error("Usage: otak-atik skill-check <SKILL.md>");
+  const result = lintSkill(args[0]);
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.valid) process.exitCode = 2;
+}
+
+function handoff(args) {
+  let parsed = takeOption(args, "--task");
+  const task = parsed.value;
+  parsed = takeOption(parsed.args, "--out");
+  const out = parsed.value;
+  const target = parsed.args[0] || ".";
+  const result = createHandoff(target, { task });
+  const serialized = JSON.stringify(result, null, 2) + "\n";
+
+  if (out) {
+    fs.writeFileSync(path.resolve(out), serialized, "utf8");
+    console.log("Wrote handoff: " + path.resolve(out));
+  } else {
+    console.log(serialized.trimEnd());
+  }
 }
 
 function lab() {
   const data = readJson("labs/experiments.json");
   console.log("\nFailure / research lab\n");
   for (const item of data.experiments) {
-    console.log(`- ${item.id}`);
-    console.log(`  status: ${item.status}`);
-    console.log(`  decision: ${item.decision}`);
-    console.log(`  report: ${item.report}`);
+    console.log("- " + item.id);
+    console.log("  status: " + item.status);
+    console.log("  decision: " + item.decision);
+    console.log("  report: " + item.report);
   }
   console.log("");
 }
@@ -184,9 +245,7 @@ function providers() {
   const data = readJson("registries/providers.json");
   console.log("\nProvider matrix\n");
   for (const item of data.providers) {
-    console.log(
-      `- ${item.name.padEnd(32)} ${item.status.padEnd(20)} role=${item.role}`
-    );
+    console.log("- " + item.name.padEnd(32) + " " + item.status.padEnd(20) + " role=" + item.role);
   }
   console.log("");
 }
@@ -195,7 +254,14 @@ function help() {
   console.log(`
 otak-atik
 
-Core:
+Useful without any MCP/plugin:
+  otak-atik snapshot [workspace]
+  otak-atik hygiene [path] [--strict]
+  otak-atik mcp-check <config.json>
+  otak-atik skill-check <SKILL.md>
+  otak-atik handoff [workspace] [--task "<task>"] [--out handoff.json]
+
+Native operator:
   otak-atik doctor
   otak-atik route [--local|--remote|--browser|--gui] [--no-native-mcp] [--quota N]
   otak-atik plan "<task>" [transport flags]
@@ -210,14 +276,13 @@ Registry:
   otak-atik policy
 
 Examples:
-  otak-atik route --local
+  otak-atik snapshot .
+  otak-atik hygiene . --strict
+  otak-atik mcp-check ~/.config/my-client/mcp.json
+  otak-atik skill-check ./skills/my-skill/SKILL.md
+  otak-atik handoff . --task "fix the build" --out handoff.json
   otak-atik route --remote --quota 500
-  otak-atik route --browser --no-native-mcp
   otak-atik plan "fix failing project and run tests" --local
-  otak-atik plan "inspect a file on my office PC" --remote
-
-Author a skill:
-  npm run skill:new -- my-skill category
 `);
 }
 
@@ -226,50 +291,39 @@ const args = process.argv.slice(3);
 
 try {
   switch (command) {
-    case "doctor":
-      doctor();
-      break;
-    case "route":
-      route(args);
-      break;
-    case "plan":
-      plan(args);
-      break;
-    case "providers":
-      providers();
-      break;
-    case "lab":
-      lab();
-      break;
+    case "doctor": doctor(); break;
+    case "route": route(args); break;
+    case "plan": plan(args); break;
+    case "snapshot": snapshot(args); break;
+    case "hygiene": hygiene(args); break;
+    case "mcp-check": mcpCheck(args); break;
+    case "skill-check": skillCheck(args); break;
+    case "handoff": handoff(args); break;
+    case "providers": providers(); break;
+    case "lab": lab(); break;
     case "capabilities":
       listRegistry("registries/capabilities.json", "capabilities",
-        (x) => `- ${x.id.padEnd(28)} risk=${x.risk} mutating=${x.mutating}`);
+        (x) => "- " + x.id.padEnd(28) + " risk=" + x.risk + " mutating=" + x.mutating);
       break;
     case "skills":
       listRegistry("registries/skills.json", "skills",
-        (x) => `- ${x.name.padEnd(28)} ${x.status.padEnd(12)} ${x.description}`);
+        (x) => "- " + x.name.padEnd(28) + " " + x.status.padEnd(12) + " " + x.description);
       break;
     case "recipes":
       listRegistry("registries/recipes.json", "recipes",
-        (x) => `- ${x.name.padEnd(28)} ${x.description}`);
+        (x) => "- " + x.name.padEnd(28) + " " + x.description);
       break;
     case "packs":
       listRegistry("registries/packs.json", "packs",
-        (x) => `- ${x.name.padEnd(16)} ${x.description}`);
+        (x) => "- " + x.name.padEnd(16) + " " + x.description);
       break;
-    case "policy":
-      showPolicy();
-      break;
-    case "version":
-      console.log(readJson("package.json").version);
-      break;
+    case "policy": showPolicy(); break;
+    case "version": console.log(readJson("package.json").version); break;
     case "help":
     case "--help":
-    case "-h":
-      help();
-      break;
+    case "-h": help(); break;
     default:
-      console.error(`Unknown command: ${command}\n`);
+      console.error("Unknown command: " + command + "\n");
       help();
       process.exitCode = 1;
   }

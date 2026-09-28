@@ -1,6 +1,9 @@
 {
   "name": "minimal",
   "skills": [
+    "workspace-cartographer",
+    "ai-handoff-builder",
+    "secret-hygiene-auditor",
     "transport-selector",
     "operator-healthcheck",
     "remote-desktop-bootstrap",
