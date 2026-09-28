@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "experiments": [
+    {
+      "id": "mcp-superassistant-browser-bridge-2026-09-28",
+      "status": "PARTIAL_FAILURE",
+      "title": "MCP SuperAssistant browser bridge on the original GROWTH setup",
+      "report": "labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md",
+      "worked": [
+        "extension installed",
+        "local proxy reachable",
+        "MCP initialize observed",
+        "tools/list observed",
+        "53 tools discovered"
+      ],
+      "failed_or_unproven": [
+        "reliable day-to-day tool execution",
+        "tools/call not observed in inspected proxy history",
+        "browser bridge did not become the author's primary workflow"
+      ],
+      "decision": "Keep as optional/fallback experiment; use Remote Desktop Commander as primary remote path."
+    }
+  ]
+}

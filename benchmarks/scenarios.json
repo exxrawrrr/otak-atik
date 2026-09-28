@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "scenarios": [
+    {
+      "id": "local-code-fix",
+      "task": "Fix a failing local project and run its tests",
+      "context": {
+        "sameMachine": true,
+        "remoteAccess": false,
+        "browserOnly": false,
+        "nativeMcpAvailable": true,
+        "guiRequired": false
+      },
+      "expected_transport": "desktop-commander-local"
+    },
+    {
+      "id": "phone-to-office-pc",
+      "task": "From my phone, inspect a file on my office computer",
+      "context": {
+        "sameMachine": false,
+        "remoteAccess": true,
+        "browserOnly": false,
+        "nativeMcpAvailable": true,
+        "guiRequired": false
+      },
+      "expected_transport": "remote-desktop-commander"
+    },
+    {
+      "id": "browser-no-native-mcp",
+      "task": "Use tools from a browser AI page on this computer",
+      "context": {
+        "sameMachine": true,
+        "remoteAccess": false,
+        "browserOnly": true,
+        "nativeMcpAvailable": false,
+        "guiRequired": false
+      },
+      "expected_transport": "mcp-superassistant"
+    },
+    {
+      "id": "gui-control",
+      "task": "Take a screenshot and click the Save button",
+      "context": {
+        "sameMachine": false,
+        "remoteAccess": true,
+        "browserOnly": false,
+        "nativeMcpAvailable": true,
+        "guiRequired": true
+      },
+      "expected_transport": "gui-control-mcp"
+    }
+  ]
+}

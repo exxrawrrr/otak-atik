@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "otak-atik operator plan",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "plan_id",
+    "task",
+    "transport",
+    "capabilities",
+    "skills",
+    "policy",
+    "execution_contract",
+    "verification"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "plan_id": {"type": "string", "pattern": "^plan_[a-f0-9]{12}$"},
+    "task": {"type": "string", "minLength": 1},
+    "transport": {"type": "object"},
+    "capabilities": {"type": "array"},
+    "skills": {"type": "array"},
+    "policy": {"type": "object"},
+    "execution_contract": {"type": "array", "items": {"type": "string"}},
+    "verification": {"type": "object"}
+  }
+}
