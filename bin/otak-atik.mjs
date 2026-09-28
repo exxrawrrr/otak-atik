@@ -304,7 +304,8 @@ try {
     case "hygiene": hygiene(args); break;
     case "mcp-check": mcpCheck(args); break;
     case "skill-check": skillCheck(args); break;
-    case "handoff": handoff(args); break;\n    case "diff-risk": diffRisk(args); break;
+    case "handoff": handoff(args); break;
+    case "diff-risk": diffRisk(args); break;
     case "providers": providers(); break;
     case "lab": lab(); break;
     case "capabilities":
