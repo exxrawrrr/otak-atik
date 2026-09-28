@@ -1,0 +1,20 @@
+name: Adapter proposal
+description: Propose a provider-to-capability adapter.
+title: "[adapter] "
+body:
+  - type: input
+    id: provider
+    attributes:
+      label: Provider
+    validations:
+      required: true
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Canonical capability mappings
+    validations:
+      required: true
+  - type: textarea
+    id: limitations
+    attributes:
+      label: Known limitations

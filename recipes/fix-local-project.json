@@ -1,0 +1,21 @@
+{
+  "name": "fix-local-project",
+  "version": 1,
+  "description": "Inspect, reproduce, diagnose, patch, verify, and summarize a failing local project.",
+  "skills": [
+    "project-bootstrap",
+    "project-debugger",
+    "safe-file-editor",
+    "git-workflow"
+  ],
+  "steps": [
+    "inspect-workspace",
+    "reproduce-failure",
+    "capture-evidence",
+    "patch-minimally",
+    "rerun-targeted-check",
+    "review-diff",
+    "summarize-result"
+  ],
+  "verification_required": true
+}

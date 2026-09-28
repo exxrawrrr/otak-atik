@@ -1,0 +1,17 @@
+{
+  "name": "workspace-health-check",
+  "version": 1,
+  "description": "Read-only inspection of a workspace and its execution prerequisites.",
+  "skills": [
+    "desktop-inspector",
+    "project-bootstrap"
+  ],
+  "steps": [
+    "inspect-environment",
+    "inspect-workspace",
+    "identify-runtimes",
+    "identify-repository-state",
+    "report-limitations"
+  ],
+  "verification_required": false
+}

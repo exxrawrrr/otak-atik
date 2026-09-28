@@ -1,0 +1,14 @@
+{
+  "id": "desktop-commander",
+  "version": 1,
+  "provider": "Desktop Commander",
+  "transport": "mcp",
+  "status": "reference",
+  "capabilities": [
+    "filesystem.read",
+    "filesystem.write",
+    "terminal.execute",
+    "process.inspect"
+  ],
+  "notes": "Provider capability mapping is intentionally descriptive in V0.1. Runtime adapter execution is not yet implemented."
+}

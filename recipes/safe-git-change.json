@@ -1,0 +1,18 @@
+{
+  "name": "safe-git-change",
+  "version": 1,
+  "description": "Make a scoped change while preserving unrelated Git work and reviewing the final diff.",
+  "skills": [
+    "project-bootstrap",
+    "safe-file-editor",
+    "git-workflow"
+  ],
+  "steps": [
+    "inspect-status",
+    "read-target",
+    "apply-scoped-change",
+    "verify",
+    "review-diff"
+  ],
+  "verification_required": true
+}

@@ -1,0 +1,15 @@
+{
+  "id": "replace-me",
+  "version": 1,
+  "provider": "replace-me",
+  "transport": "mcp",
+  "capabilities": [
+    {
+      "provider_tool": "replace-me",
+      "capability": "filesystem.read"
+    }
+  ],
+  "health_check": {
+    "type": "manual"
+  }
+}

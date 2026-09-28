@@ -1,0 +1,22 @@
+name: Bug report
+description: Report reproducible incorrect behavior.
+title: "[bug] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the smallest reproducible description.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: otak-atik doctor output
+      description: Remove secrets before pasting.
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true

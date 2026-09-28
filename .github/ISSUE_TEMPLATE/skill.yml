@@ -1,0 +1,24 @@
+name: Skill proposal
+description: Propose a reusable skill.
+title: "[skill] "
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Proposed skill name
+    validations:
+      required: true
+  - type: textarea
+    id: trigger
+    attributes:
+      label: When should it be loaded?
+    validations:
+      required: true
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Required capabilities
+  - type: textarea
+    id: verification
+    attributes:
+      label: How should mutating work be verified?

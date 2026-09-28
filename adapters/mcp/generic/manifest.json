@@ -1,0 +1,9 @@
+{
+  "id": "generic-mcp",
+  "version": 1,
+  "provider": "Generic MCP Server",
+  "transport": "mcp",
+  "status": "design",
+  "capabilities": [],
+  "notes": "Generic adapter schema placeholder. Explicit tool-to-capability mapping is required before execution."
+}
