@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "skills": [
+    {
+      "name": "desktop-inspector",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Inspect a desktop or workspace without modifying it.",
+      "path": "skills/core/desktop-inspector/SKILL.md"
+    },
+    {
+      "name": "project-bootstrap",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Understand an unfamiliar software repository before making changes.",
+      "path": "skills/engineering/project-bootstrap/SKILL.md"
+    },
+    {
+      "name": "project-debugger",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Diagnose, fix, and verify software project failures.",
+      "path": "skills/engineering/project-debugger/SKILL.md"
+    },
+    {
+      "name": "safe-file-editor",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Perform controlled file edits with preflight and verification.",
+      "path": "skills/core/safe-file-editor/SKILL.md"
+    },
+    {
+      "name": "git-workflow",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Operate Git conservatively with inspect-before-write behavior.",
+      "path": "skills/engineering/git-workflow/SKILL.md"
+    },
+    {
+      "name": "mcp-diagnostics",
+      "status": "stable",
+      "scope": "generic",
+      "description": "Diagnose MCP connectivity, discovery, auth, and tool availability.",
+      "path": "skills/core/mcp-diagnostics/SKILL.md"
+    },
+    {
+      "name": "skill-authoring",
+      "status": "incubating",
+      "scope": "generic",
+      "description": "Create compact portable SKILL.md modules with explicit boundaries.",
+      "path": "skills/core/skill-authoring/SKILL.md"
+    },
+    {
+      "name": "release-checker",
+      "status": "incubating",
+      "scope": "generic",
+      "description": "Run pre-release checks and summarize release readiness evidence.",
+      "path": "skills/engineering/release-checker/SKILL.md"
+    }
+  ]
+}

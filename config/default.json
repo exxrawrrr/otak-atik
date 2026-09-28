@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "profile": "observe",
+  "workspace": {
+    "roots": [],
+    "deny": [
+      "C:\\Windows",
+      "C:\\Program Files",
+      "C:\\Program Files (x86)"
+    ]
+  },
+  "skills": {
+    "auto_discovery": true,
+    "max_active": 3
+  },
+  "verification": {
+    "required_for_mutation": true
+  },
+  "logging": {
+    "level": "standard",
+    "telemetry": false
+  },
+  "policy": {
+    "profile": "observe",
+    "approval": {
+      "low": "auto",
+      "medium": "confirm",
+      "high": "confirm",
+      "critical": "deny"
+    }
+  }
+}

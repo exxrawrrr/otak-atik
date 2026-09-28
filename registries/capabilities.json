@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "capabilities": [
+    {
+      "id": "filesystem.read",
+      "category": "filesystem",
+      "risk": "low",
+      "mutating": false,
+      "reversible": true,
+      "scopable": true
+    },
+    {
+      "id": "filesystem.write",
+      "category": "filesystem",
+      "risk": "medium",
+      "mutating": true,
+      "reversible": true,
+      "scopable": true
+    },
+    {
+      "id": "filesystem.delete",
+      "category": "filesystem",
+      "risk": "high",
+      "mutating": true,
+      "reversible": false,
+      "scopable": true
+    },
+    {
+      "id": "terminal.execute",
+      "category": "terminal",
+      "risk": "high",
+      "mutating": true,
+      "reversible": false,
+      "scopable": true
+    },
+    {
+      "id": "process.inspect",
+      "category": "process",
+      "risk": "low",
+      "mutating": false,
+      "reversible": true,
+      "scopable": false
+    },
+    {
+      "id": "git.read",
+      "category": "git",
+      "risk": "low",
+      "mutating": false,
+      "reversible": true,
+      "scopable": true
+    },
+    {
+      "id": "git.write",
+      "category": "git",
+      "risk": "medium",
+      "mutating": true,
+      "reversible": true,
+      "scopable": true
+    },
+    {
+      "id": "browser.navigate",
+      "category": "browser",
+      "risk": "medium",
+      "mutating": false,
+      "reversible": true,
+      "scopable": false
+    },
+    {
+      "id": "saas.github",
+      "category": "saas",
+      "risk": "medium",
+      "mutating": true,
+      "reversible": false,
+      "scopable": true
+    },
+    {
+      "id": "saas.drive",
+      "category": "saas",
+      "risk": "medium",
+      "mutating": true,
+      "reversible": false,
+      "scopable": true
+    }
+  ]
+}

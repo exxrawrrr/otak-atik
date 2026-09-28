@@ -1,0 +1,29 @@
+{
+  "name": "otak-atik",
+  "version": "0.1.0-alpha.0",
+  "description": "Local-first operator layer for AI clients, desktop tools, MCP, skills, policies, recipes, and verification.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "bin": {
+    "otak-atik": "./bin/otak-atik.mjs"
+  },
+  "scripts": {
+    "doctor": "node ./bin/otak-atik.mjs doctor",
+    "validate": "node ./scripts/validate.mjs",
+    "test": "node --test ./tests/*.test.mjs",
+    "check": "npm run validate && npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "ai-agent",
+    "agent-skills",
+    "local-first",
+    "desktop-automation",
+    "operator",
+    "chatgpt",
+    "codex"
+  ]
+}

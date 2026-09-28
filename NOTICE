@@ -1,0 +1,12 @@
+otak-atik
+Copyright 2026 contributors
+
+This project is licensed under Apache License 2.0.
+
+The project is designed to interoperate with third-party products and protocols, including MCP-compatible clients, AI clients, desktop providers, and SaaS connectors.
+
+Third-party names and trademarks belong to their respective owners.
+
+No affiliation or endorsement is implied merely by an integration, adapter, example, or documentation reference.
+
+Contributor-provided adaptations must preserve upstream attribution and license obligations.

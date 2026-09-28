@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "recipes": [
+    {
+      "name": "fix-local-project",
+      "description": "Inspect, diagnose, patch, test, and summarize a local project.",
+      "path": "recipes/fix-local-project.json"
+    },
+    {
+      "name": "workspace-health-check",
+      "description": "Read-only inspection of an unfamiliar workspace.",
+      "path": "recipes/workspace-health-check.json"
+    },
+    {
+      "name": "safe-git-change",
+      "description": "Inspect repository state, change files, verify, and review the diff.",
+      "path": "recipes/safe-git-change.json"
+    }
+  ]
+}
