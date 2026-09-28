@@ -2,7 +2,7 @@
 
 **Current milestone:** V0.2 Native operator/control layer  
 **Repository maturity:** active public experiment  
-**Current package:** 0.1.0-alpha.3
+**Current package:** 0.1.0-alpha.4
 
 ## Important honesty
 
@@ -44,9 +44,24 @@ It is now deliberately growing its own provider-neutral control layer.
 - 5 provider states;
 - explicit PARTIAL_FAILURE record for the MCP SuperAssistant experiment.
 
+### Standalone utility pack
+
+Useful without any MCP/plugin:
+
+- workspace snapshot;
+- secret hygiene scanner;
+- MCP config auditor;
+- SKILL.md quality auditor;
+- provider-neutral AI handoff builder;
+- Git diff risk reviewer.
+
+These utilities are zero-runtime-dependency Node tools and are exposed directly through the otak-atik CLI.
+
 ### Quality
 
 - deterministic validators;
+- self-hygiene scan is part of `npm run check`;
+- all registered skills are linted during `npm run check`;
 - Node contract/unit tests;
 - benchmark scenarios;
 - Windows PowerShell smoke validation;

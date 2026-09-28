@@ -4,56 +4,72 @@ All notable changes will be documented here.
 
 ## [Unreleased]
 
-## [0.1.0-alpha.3] - 2026-09-28
+## [0.1.0-alpha.4] - 2026-09-28
 
-### Native engine
+### Standalone Utility Pack
 
-- added provider-neutral transport router;
-- added operator plan compiler;
-- added task-to-capability inference;
-- added explicit risk/approval contract;
-- added evidence states: PASS / FAIL / CHANGED / COULD_NOT_VERIFY;
-- added provider scorecard with real-world status vocabulary;
-- added failed-experiment lab;
-- added executable routing benchmark scenarios;
-- added CLI commands: `route`, `plan`, `providers`, and `lab`.
+Useful without any MCP provider:
 
-### Research honesty
-
-- recorded the author's MCP SuperAssistant experiment as **PARTIAL_FAILURE**;
-- documented what worked: install, proxy, initialize, tools/list, 53 discovered tools;
-- documented what was not proven: reliable daily tools/call execution;
-- explicitly stated that the project is active research and its final shape is not known.
+- `otak-atik snapshot` — compact project map;
+- `otak-atik hygiene` — secret hygiene scan without printing secret values;
+- `otak-atik mcp-check` — MCP JSON config audit;
+- `otak-atik skill-check` — portable SKILL.md lint;
+- `otak-atik handoff` — provider-neutral project handoff;
+- `otak-atik diff-risk` — Git diff review-priority heuristic.
 
 ### Skills
 
-- added `failure-lab-reporter`;
-- added `evidence-verifier`;
-- improved skill matching to reject weak single-token matches;
-- updated developer and power-user packs.
+Added:
 
-### Validation
+- workspace-cartographer
+- secret-hygiene-auditor
+- mcp-config-auditor
+- skill-quality-auditor
+- ai-handoff-builder
+- change-risk-reviewer
 
-- provider matrix is validated;
-- experiment reports are validated;
-- operator-plan/evidence schemas are parsed during validation;
-- tests: **23/23 PASS**;
-- routing benchmark: **4/4 PASS**;
-- doctor: **READY**.
+Total official skills: **29**.
+
+### Dogfooding
+
+`npm run check` now runs:
+
+1. repository validation;
+2. tests;
+3. routing benchmark;
+4. the repo's own secret-hygiene scanner in strict mode;
+5. linting across every registered SKILL.md.
+
+### Verified
+
+Fresh public clone:
+
+- validator: PASS
+- tests: **34/34 PASS**
+- routing benchmark: **4/4 PASS**
+- self hygiene strict: **0 findings**
+- doctor: **READY**
+
+## [0.1.0-alpha.3] - 2026-09-28
+
+- native transport router;
+- operator plan compiler;
+- evidence contract;
+- provider scorecard;
+- failure lab;
+- provider routing benchmarks.
 
 ## [0.1.0-alpha.2] - 2026-09-28
 
 - hybrid local/remote usage strategy;
 - quota-aware Remote Desktop Commander guidance;
-- Codex local MCP setup path;
-- transport and remote-usage skills.
+- Codex local MCP setup path.
 
 ## [0.1.0-alpha.1] - 2026-09-28
 
 - end-to-end Windows onboarding;
 - Desktop launchers;
-- optional browser bridge;
-- Windows validation.
+- optional browser bridge.
 
 ## [0.1.0-alpha.0] - 2026-09-28
 

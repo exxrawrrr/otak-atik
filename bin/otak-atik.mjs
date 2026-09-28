@@ -120,6 +120,8 @@ function doctor() {
     "src/mcp-config-audit.mjs",
     "src/skill-lint.mjs",
     "src/handoff.mjs",
+    "src/diff-risk.mjs",
+    "docs/UTILITY-PACK.md",
     "docs/product/PRD.md",
     "SECURITY.md"
   ];

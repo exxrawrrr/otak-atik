@@ -1,7 +1,7 @@
 {
   "name": "otak-atik",
-  "version": "0.1.0-alpha.3",
-  "description": "Local-first operator control layer for AI clients, MCP transports, skills, routing, policy, evidence, and verification.",
+  "version": "0.1.0-alpha.4",
+  "description": "Local-first AI operator lab with standalone project utilities, MCP routing, skills, policy, evidence, and verification.",
   "type": "module",
   "license": "Apache-2.0",
   "bin": {
@@ -11,9 +11,11 @@
     "doctor": "node ./bin/otak-atik.mjs doctor",
     "validate": "node ./scripts/validate.mjs",
     "test": "node --test ./tests/*.test.mjs",
-    "check": "npm run validate && npm test && npm run benchmark",
+    "check": "npm run validate && npm test && npm run benchmark && npm run hygiene:self && npm run skill:audit",
     "benchmark": "node ./scripts/benchmark.mjs",
-    "skill:new": "node ./scripts/new-skill.mjs"
+    "skill:new": "node ./scripts/new-skill.mjs",
+    "hygiene:self": "node ./bin/otak-atik.mjs hygiene . --strict",
+    "skill:audit": "node ./scripts/audit-skills.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -29,6 +31,10 @@
     "codex",
     "transport-router",
     "verification",
-    "evidence"
+    "evidence",
+    "project-hygiene",
+    "ai-handoff",
+    "mcp-config",
+    "git-risk"
   ]
 }
