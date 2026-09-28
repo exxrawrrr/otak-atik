@@ -1,0 +1,6 @@
+{
+  "remote-desktop-commander": {
+    "transport": "http",
+    "url": "https://mcp.desktopcommander.app/mcp"
+  }
+}

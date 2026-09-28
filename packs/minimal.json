@@ -1,6 +1,8 @@
 {
   "name": "minimal",
   "skills": [
+    "operator-healthcheck",
+    "remote-desktop-bootstrap",
     "desktop-inspector",
     "safe-file-editor",
     "mcp-diagnostics"

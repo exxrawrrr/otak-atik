@@ -1,6 +1,11 @@
 {
   "name": "power-user",
   "skills": [
+    "remote-desktop-bootstrap",
+    "browser-mcp-bridge",
+    "mcp-topology-diagnoser",
+    "operator-healthcheck",
+    "windows-launcher-manager",
     "desktop-inspector",
     "safe-file-editor",
     "mcp-diagnostics",
