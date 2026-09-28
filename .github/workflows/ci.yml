@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  linux-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,3 +25,47 @@ jobs:
 
       - name: Doctor
         run: node ./bin/otak-atik.mjs doctor
+
+  windows-smoke:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate and test
+        run: npm run check
+
+      - name: Installer dry run
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1 -DryRun -NoOpenSetupPages
+
+      - name: Parse Windows helper scripts
+        shell: powershell
+        run: |
+          $errors = @()
+          Get-ChildItem .\scripts\windows\*.ps1 | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$parseErrors
+            ) | Out-Null
+
+            if ($parseErrors.Count -gt 0) {
+              $errors += $parseErrors
+            }
+          }
+
+          if ($errors.Count -gt 0) {
+            $errors | Format-List
+            exit 1
+          }
+
+          Write-Host "Windows PowerShell scripts parsed successfully."

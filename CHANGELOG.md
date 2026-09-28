@@ -4,6 +4,8 @@ All notable changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.1] - 2026-09-28
+
 ### Added
 
 - end-to-end Windows onboarding and Desktop launchers;
@@ -18,13 +20,14 @@ All notable changes will be documented here.
 - remote-usage-optimizer skill;
 - local-mcp-bootstrap skill;
 - remote/browser topology skills;
-- ADR separating native remote MCP from browser-extension transport.
+- Linux + Windows CI validation, including PowerShell parse/dry-run smoke tests.
 
 ### Changed
 
 - Remote Desktop Commander is documented as the author's primary ChatGPT workflow.
 - MCP SuperAssistant is explicitly optional and identified as a legacy/fallback path in the original setup.
 - local MCP is recommended for Codex/local workloads to avoid unnecessary hosted remote usage.
+- browser-bridge documentation now includes current reliability caveats instead of presenting the extension as equivalent to native MCP.
 
 ## [0.1.0-alpha.0] - 2026-09-28
 

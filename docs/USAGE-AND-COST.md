@@ -1,16 +1,22 @@
 # Usage and cost strategy
 
-otak-atik is designed to avoid routing every task through a paid or quota-limited remote transport.
+otak-atik is designed to avoid routing every task through a quota-limited remote transport.
+
+Official current references:
+
+- Desktop Commander pricing: https://desktopcommander.app/pricing/
+- Desktop Commander local MCP: https://github.com/wonderwhy-er/DesktopCommanderMCP
+- Remote Desktop Commander: https://github.com/desktop-commander/remote-desktop-commander
 
 ## Desktop Commander remote limits
 
 As of September 2026, Desktop Commander's published pricing lists:
 
-- Free: 10,000 remote tool calls per month
-- Pro: unlimited remote tool calls
-- Local MCP server: free, open source, no monthly limit
+- **Free:** 10,000 remote tool calls per month
+- **Pro:** $20/month, unlimited remote tool calls
+- **Local MCP server:** free/open-source, no account and no monthly tool-call limit
 
-Always verify the current pricing page before making a purchasing decision.
+Pricing can change. Check the official page before purchasing.
 
 ## Recommended hybrid model
 
@@ -25,45 +31,40 @@ Browser AI with no convenient MCP connector
 → optional MCP SuperAssistant bridge
 
 GUI/screenshot/mouse automation
-→ evaluate QuickDesk or a Windows UI MCP provider
+→ evaluate QuickDesk or another computer-use MCP provider
 ```
-
-## Why this matters
-
-Remote tool calls are most valuable when locality is the problem.
-
-If both the AI client and the target project are already on the same computer, relaying every file read, directory listing, or test command through a hosted remote service is unnecessary overhead.
-
-Use remote access for remote work.
-
-Use local MCP for local work.
 
 ## Author's current practice
 
-The setup that inspired this repository currently uses **Remote Desktop Commander much more often** than the older browser-extension bridge.
+The original setup now uses **Remote Desktop Commander more often** than the browser-extension route.
 
-The browser bridge remains installed as an experimental/fallback path, but the cleaner Remote Desktop Commander flow became the normal ChatGPT workflow.
+That convenience has a tradeoff: the hosted free remote path has a monthly tool-call ceiling.
 
-## Practical quota-saving rules
+So the recommended evolution is not to abandon Remote Desktop Commander.
 
-1. Use Codex/local MCP for repository-heavy work.
-2. Use Remote Desktop Commander for phone/web access when you are away from the machine.
-3. Avoid repeatedly listing huge folders remotely when one targeted search will do.
-4. Read only the relevant file range instead of rereading entire large files.
-5. Batch independent file reads when the provider supports it.
-6. Prefer local scripts for repeated deterministic processing.
-7. Do not keep an optional transport polling merely because it is installed.
-8. Use skills to reduce exploratory tool-call thrashing.
+It is to stop using remote relay for work that is already local.
 
-## When Pro may be worth it
+## Quota-saving rules
 
-The paid remote tier becomes rational when:
+1. **Codex/local client → local MCP.**
+2. **Phone/outside PC → remote MCP.**
+3. Prefer targeted search over giant recursive listings.
+4. Read relevant ranges instead of repeatedly rereading whole large files.
+5. Batch independent reads when available.
+6. Run deterministic bulk processing locally in one script.
+7. Avoid repeated status checks without a state change.
+8. Use skill routing so the agent explores less blindly.
+9. Keep the browser bridge off unless you actually need it.
+10. Do not weaken verification just to save calls.
 
-- most work starts from web/mobile;
-- 10,000 calls is routinely exhausted;
-- the time saved is worth more than the subscription;
-- a local-client workflow is not practical.
+## What this does not do
 
-The project does not attempt to bypass provider limits.
+otak-atik does not bypass, spoof, or evade provider quotas.
 
-It makes transport selection explicit so the limited remote path is used where it creates actual value.
+It chooses a more appropriate transport.
+
+## When Pro makes sense
+
+Pro can be rational when most of your real work begins from ChatGPT/Claude web or mobile and remote access itself is the value.
+
+If the majority of the workload is coding on the same PC, local MCP is usually the first optimization to make.

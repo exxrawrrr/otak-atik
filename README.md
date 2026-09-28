@@ -24,7 +24,7 @@ Full evidence/history: [What I actually use](docs/WHAT-I-ACTUALLY-USE.md).
 | --- | --- |
 | ChatGPT from phone / away from PC | **Remote Desktop Commander remote MCP** |
 | Codex / local AI on the same PC | **Desktop Commander local MCP** |
-| ChatGPT/Gemini website in Chrome needs local MCP | MCP SuperAssistant, optional |
+| ChatGPT/Gemini website in Chrome needs local MCP | MCP SuperAssistant browser bridge — optional |
 | Need screenshot + click + type GUI control | evaluate QuickDesk / Windows UI MCP |
 
 ### Remote — easiest for ChatGPT web/mobile
@@ -57,7 +57,11 @@ That matters because the hosted free Remote Desktop Commander plan currently has
 
 See [Usage and cost strategy](docs/USAGE-AND-COST.md).
 
-## Wait — do I need the Chrome extension too?
+## Do I need both?
+
+**No.**
+
+### So do I need the Chrome extension too?
 
 **No.**
 
