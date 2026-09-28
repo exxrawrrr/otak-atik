@@ -4,6 +4,18 @@
 >
 > A local-first operator kit for connecting AI clients to your computer, MCP tools, reusable skills, and repeatable workflows — with an onboarding path normal humans can actually finish.
 
+## Project status — this is still an experiment
+
+**otak-atik is in active progress.**
+
+The author is literally building this from real experiments, including experiments that fail.
+
+The final shape is **not known yet**. The project may evolve toward an operator CLI, transport router, evidence layer, Agent Skills runtime, local control plane, or some combination learned from actual use.
+
+That uncertainty is intentional and documented in [Research status](docs/RESEARCH-STATUS.md).
+
+> If reality proves an architecture wrong, the architecture changes. The README does not get to win an argument against the machine.
+
 ## What the author actually uses
 
 The setup that inspired this project experimented with **two MCP paths**.
@@ -137,6 +149,84 @@ double-click 06
 
 Browser extension and OAuth installation still require explicit user approval. The project does not silently install extensions or authorize accounts.
 
+## This is not just "plugin + skills" anymore
+
+Early versions absolutely started that way:
+
+```text
+existing MCP/plugin
++ launchers
++ skills
++ documentation
+```
+
+That was useful, but not distinct enough.
+
+The repo now has an **otak-atik-native control layer**:
+
+```text
+task
+  ↓
+transport router
+  ↓
+operator plan compiler
+  ↓
+capability + skill selection
+  ↓
+risk / approval contract
+  ↓
+execution contract
+  ↓
+evidence contract
+```
+
+Try it:
+
+```powershell
+otak-atik route --local
+
+otak-atik route --remote --quota 500
+
+otak-atik plan "fix failing project and run tests" --local
+
+otak-atik providers
+
+otak-atik lab
+```
+
+The provider can change.
+
+The decision contract should survive.
+
+Native pieces now include:
+
+- **transport router** — chooses local, remote, browser bridge, or GUI-control class;
+- **operator plan compiler** — compiles a task into transport, capabilities, skills, risk, execution and verification;
+- **evidence contract** — PASS / FAIL / CHANGED / COULD_NOT_VERIFY;
+- **provider scorecard** — distinguishes proven, partial failure, and unverified integrations;
+- **failure lab** — failed experiments stay documented instead of disappearing;
+- **benchmark scenarios** — routing behavior is executable and testable.
+
+Read [What is native to otak-atik?](docs/WHAT-IS-OTAK-ATIK-NATIVE.md).
+
+### Yep, the extension experiment failed too
+
+The author's MCP SuperAssistant experiment is now recorded as:
+
+```text
+PARTIAL_FAILURE
+```
+
+Discovery worked. The inspected bridge saw `initialize`, repeated `tools/list`, and 53 advertised tools.
+
+But reliable daily execution was not proven, and no `tools/call` was found in the inspected proxy history.
+
+That failure has its own report:
+
+[Experiment report — MCP SuperAssistant browser bridge](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
+
+That is project data, not an embarrassing file to delete.
+
 ## Why this repo exists
 
 Desktop access alone is only the transport.
@@ -240,6 +330,10 @@ Start with:
 - [MCP SuperAssistant browser bridge](docs/BROWSER-BRIDGE.md)
 - [AI clients](docs/AI-CLIENTS.md)
 - [Alternatives](docs/ALTERNATIVES.md)
+- [What is native to otak-atik?](docs/WHAT-IS-OTAK-ATIK-NATIVE.md)
+- [Research status](docs/RESEARCH-STATUS.md)
+- [Provider matrix](docs/PROVIDER-MATRIX.md)
+- [MCP SuperAssistant failure report](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
 - [PRD](docs/product/PRD.md)
 - [Security](SECURITY.md)
 - [Roadmap](ROADMAP.md)

@@ -1,52 +1,105 @@
 # Project State
 
-**Current milestone:** V0.1 Foundation / onboarding hardening  
-**Repository maturity:** public alpha  
+**Current milestone:** V0.2 Native operator/control layer  
+**Repository maturity:** active public experiment  
 **Current package:** 0.1.0-alpha.2
+
+## Important honesty
+
+otak-atik is **not finished**, and its final destination is not locked.
+
+It began as a practical wrapper around existing MCP providers, launchers, and skills.
+
+It is now deliberately growing its own provider-neutral control layer.
 
 ## Implemented
 
-- repository identity and product documentation;
-- zero-dependency CLI baseline;
-- doctor command;
-- capability/skill/recipe/pack registries;
-- conservative default policy;
-- Windows installer with dry-run;
+### Onboarding / transports
+
+- Windows installer + dry-run;
 - automatic Desktop launcher generation;
 - Remote Desktop Commander remote start/status/stop helpers;
 - optional MCP SuperAssistant browser bridge;
 - Codex local Desktop Commander MCP setup helper;
-- transport-selection and remote-usage optimization skills;
-- setup decision tree and cost/usage documentation;
-- Linux tests plus Windows PowerShell smoke validation;
-- 21 official skills;
-- 10 passing contract/unit tests;
-- security, contribution, ADR, and roadmap documentation.
+- quota-aware local/remote transport guidance.
 
-## Real-world transport status
+### Native otak-atik engine
 
-The original setup currently uses Remote Desktop Commander as the primary ChatGPT → Windows route.
+- transport router;
+- operator plan compiler;
+- capability inference;
+- risk/approval contract;
+- evidence contract;
+- provider scorecard;
+- failure/research lab;
+- executable routing benchmark;
+- CLI commands: route, plan, providers, lab.
 
-The older MCP SuperAssistant browser bridge remains available as an optional/fallback path.
+### Registry / skills
 
-For local engineering work, especially Codex, the recommended direction is local Desktop Commander MCP so hosted remote quota is reserved for genuinely remote access.
+- 10 canonical capabilities;
+- 23 official skills;
+- 4 skill packs;
+- 3 recipes;
+- 5 provider states;
+- explicit PARTIAL_FAILURE record for the MCP SuperAssistant experiment.
 
-## Next
+### Quality
 
-1. executable adapter interface;
-2. automatic user/project skill discovery;
-3. declarative recipe executor;
-4. local audit ledger + checkpoints;
-5. stronger local/remote transport discovery;
-6. macOS/Linux installers;
-7. optional GUI-control adapter experiments.
+- deterministic validators;
+- Node contract/unit tests;
+- benchmark scenarios;
+- Windows PowerShell smoke validation;
+- security/contribution/ADR documentation.
 
-## Deliberately deferred
+## Real-world evidence
 
-- dashboard;
-- cloud control plane;
-- marketplace;
-- autonomous scheduling;
-- large dependency graph.
+Primary current route:
 
-The architecture continues to expand from contracts and real operator workflows outward, not from UI inward.
+```text
+ChatGPT
+→ Remote Desktop Commander
+→ GROWTH
+```
+
+Local engineering direction:
+
+```text
+Codex / local AI
+→ Desktop Commander local MCP
+→ GROWTH
+```
+
+Browser-extension experiment:
+
+```text
+MCP SuperAssistant
+→ discovery works
+→ reliable daily tool execution not proven
+→ PARTIAL_FAILURE
+```
+
+## Next native milestones
+
+1. executable adapter runtime;
+2. provider capability health probing;
+3. automatic user/project skill discovery;
+4. declarative recipe executor;
+5. persistent evidence/audit ledger;
+6. checkpoints/rollback contract;
+7. stronger provider benchmark harness;
+8. optional GUI-control adapter experiments.
+
+## Possible future shapes
+
+The project may become:
+
+- an operator CLI;
+- a transport router;
+- an Agent Skills runtime;
+- an evidence/verification layer;
+- a provider benchmark lab;
+- a local control plane;
+- or a hybrid of those.
+
+The roadmap is a direction, not a promise that today's architecture survives unchanged.

@@ -17,6 +17,21 @@ const skills = [
     description: "debug failing software project"
   },
   {
+    name: "safe-file-editor",
+    status: "stable",
+    description: "controlled file edits"
+  },
+  {
+    name: "evidence-verifier",
+    status: "stable",
+    description: "verify execution evidence"
+  },
+  {
+    name: "mcp-topology-diagnoser",
+    status: "stable",
+    description: "identify failing MCP transport layer"
+  },
+  {
     name: "desktop-inspector",
     status: "stable",
     description: "inspect machine workspace"
@@ -40,6 +55,10 @@ test("compiler produces a deterministic operator plan", () => {
   assert.equal(a.verification.required, true);
   assert.ok(a.capabilities.some((x) => x.id === "filesystem.write"));
   assert.ok(a.capabilities.some((x) => x.id === "terminal.execute"));
+  assert.equal(a.skills[0].name, "project-debugger");
+  assert.ok(a.skills.some((x) => x.name === "safe-file-editor"));
+  assert.ok(a.skills.some((x) => x.name === "evidence-verifier"));
+  assert.ok(!a.skills.some((x) => x.name === "mcp-topology-diagnoser"));
 });
 
 test("read-only plan does not require mutation verification", () => {
