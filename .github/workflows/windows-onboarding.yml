@@ -1,0 +1,91 @@
+name: windows-onboarding
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/install.ps1"
+      - "scripts/windows/**"
+      - "config/browser-bridge/**"
+      - ".github/workflows/windows-onboarding.yml"
+  pull_request:
+    paths:
+      - "scripts/install.ps1"
+      - "scripts/windows/**"
+      - "config/browser-bridge/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  onboarding:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Parse PowerShell scripts
+        shell: pwsh
+        run: |
+          $errors = @()
+          Get-ChildItem -Path scripts -Filter *.ps1 -Recurse | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$parseErrors
+            )
+            if ($parseErrors) {
+              $errors += $parseErrors
+            }
+          }
+          if ($errors.Count -gt 0) {
+            $errors | Format-List
+            throw "PowerShell parse errors detected."
+          }
+
+      - name: Installer dry run
+        shell: powershell
+        run: |
+          .\scripts\install.ps1 -DryRun -NoOpenSetupPages
+
+      - name: Install into ephemeral runner
+        shell: powershell
+        run: |
+          .\scripts\install.ps1 -NoOpenSetupPages
+
+      - name: Verify generated launchers
+        shell: powershell
+        run: |
+          $desktop = [Environment]::GetFolderPath("Desktop")
+          $folder = Join-Path $desktop "OTAK-ATIK"
+          if (-not (Test-Path $folder)) {
+            throw "OTAK-ATIK Desktop launcher folder was not created."
+          }
+          $expected = @(
+            "01 - START REMOTE DESKTOP.bat",
+            "02 - STATUS.bat",
+            "03 - OPEN SETUP PAGES.bat",
+            "04 - START BROWSER BRIDGE - OPTIONAL.bat",
+            "05 - STOP REMOTE DESKTOP.bat",
+            "README.txt"
+          )
+          foreach ($name in $expected) {
+            $path = Join-Path $folder $name
+            if (-not (Test-Path $path)) {
+              throw "Missing generated launcher: $path"
+            }
+          }
+
+      - name: CLI doctor
+        shell: powershell
+        run: |
+          otak-atik doctor
