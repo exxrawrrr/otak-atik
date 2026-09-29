@@ -212,9 +212,8 @@ if ($ownerPid -and -not (Test-RafdiWindowsMcpIdentity -Port $Port -AuthKey $auth
 
 if (-not (Test-RafdiWindowsMcpIdentity -Port $Port -AuthKey $authKey)) {
     if ($PSCmdlet.ShouldProcess($supervisorPath, 'Start supervisor')) {
-        Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @(
-            '-NoProfile','-ExecutionPolicy','Bypass','-File',$supervisorPath
-        )
+        $supervisorArgs = "-NoProfile -ExecutionPolicy Bypass -File `"$supervisorPath`""
+        Start-Process powershell.exe -WindowStyle Hidden -ArgumentList $supervisorArgs
     }
 
     $healthy = $false
