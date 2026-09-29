@@ -76,7 +76,7 @@ function Test-Identity([string]$AuthKey) {
     }
 }
 
-$mutex = New-Object Threading.Mutex($false, 'Local\OtakAtikRafdiRemoteSupervisor')
+$mutex = New-Object System.Threading.Mutex($false, 'Local\OtakAtikRafdiRemoteSupervisor')
 if (-not $mutex.WaitOne(0, $false)) { exit 0 }
 
 Write-RemoteLog 'Supervisor started.'
