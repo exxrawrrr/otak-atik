@@ -1,0 +1,156 @@
+$ErrorActionPreference = 'SilentlyContinue'
+$InstallRoot = '{{INSTALL_ROOT}}'
+$LogDir = Join-Path $InstallRoot 'logs'
+$SupervisorLog = Join-Path $LogDir 'supervisor.log'
+$StdOutLog = Join-Path $LogDir 'windows-mcp.out.log'
+$StdErrLog = Join-Path $LogDir 'windows-mcp.err.log'
+$AuthFile = Join-Path $InstallRoot 'auth.key'
+$Port = {{PORT}}
+$WindowsMcpExe = '{{WINDOWS_MCP_EXE}}'
+$AllowedHostsJson = '{{ALLOWED_HOSTS_JSON}}'
+$Tools = '{{TOOLS}}'
+
+New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
+
+function Write-RemoteLog([string]$Message) {
+    Add-Content -LiteralPath $SupervisorLog -Value ("{0}  {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Message)
+}
+
+function Trim-RemoteLog([string]$Path, [int]$MaxBytes = 1048576) {
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+    $item = Get-Item -LiteralPath $Path -ErrorAction SilentlyContinue
+    if (-not $item -or $item.Length -le $MaxBytes) { return }
+    $tail = Get-Content -LiteralPath $Path -Tail 500 -ErrorAction SilentlyContinue
+    $tail | Set-Content -LiteralPath $Path -Encoding UTF8
+}
+
+function Test-Port {
+    try {
+        $client = New-Object Net.Sockets.TcpClient
+        $async = $client.BeginConnect('127.0.0.1', $Port, $null, $null)
+        if (-not $async.AsyncWaitHandle.WaitOne(800)) {
+            $client.Close()
+            return $false
+        }
+        $client.EndConnect($async)
+        $client.Close()
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+function Test-Identity([string]$AuthKey) {
+    if (-not (Test-Port)) { return $false }
+
+    $payload = @{
+        jsonrpc = '2.0'
+        id = 1
+        method = 'initialize'
+        params = @{
+            protocolVersion = '2025-06-18'
+            capabilities = @{}
+            clientInfo = @{
+                name = 'otak-atik-supervisor'
+                version = '1.0'
+            }
+        }
+    } | ConvertTo-Json -Depth 8 -Compress
+
+    try {
+        $headers = @{
+            Authorization = "Bearer $AuthKey"
+            Accept = 'application/json, text/event-stream'
+            Host = 'localhost'
+        }
+        $response = Invoke-WebRequest `
+            -Uri "http://127.0.0.1:$Port/mcp" `
+            -Method Post `
+            -Headers $headers `
+            -ContentType 'application/json' `
+            -Body $payload `
+            -TimeoutSec 8
+        return ([string]$response.Content -match 'windows-mcp')
+    } catch {
+        return $false
+    }
+}
+
+$mutex = New-Object Threading.Mutex($false, 'Local\OtakAtikRafdiRemoteSupervisor')
+if (-not $mutex.WaitOne(0, $false)) { exit 0 }
+
+Write-RemoteLog 'Supervisor started.'
+
+while ($true) {
+    Trim-RemoteLog -Path $SupervisorLog
+    Trim-RemoteLog -Path $StdOutLog
+    Trim-RemoteLog -Path $StdErrLog
+
+    if (-not (Test-Path -LiteralPath $AuthFile)) {
+        Write-RemoteLog 'ERROR: auth.key missing; refusing to start Windows-MCP.'
+        Start-Sleep -Seconds 15
+        continue
+    }
+
+    $authKey = (Get-Content -Raw -LiteralPath $AuthFile).Trim()
+
+    if (Test-Port) {
+        if (-not (Test-Identity -AuthKey $authKey)) {
+            Write-RemoteLog "ERROR: port $Port is occupied but service identity is not Windows-MCP. Refusing to kill or replace it."
+            Start-Sleep -Seconds 30
+            continue
+        }
+        Start-Sleep -Seconds 15
+        continue
+    }
+
+    if (-not (Test-Path -LiteralPath $WindowsMcpExe)) {
+        Write-RemoteLog "ERROR: Windows-MCP executable missing: $WindowsMcpExe"
+        Start-Sleep -Seconds 30
+        continue
+    }
+
+    $env:WINDOWS_MCP_AUTH_KEY = $authKey
+    $env:WINDOWS_MCP_STATELESS_HTTP = 'true'
+    $env:ANONYMIZED_TELEMETRY = 'false'
+    $env:FASTMCP_HTTP_HOST_ORIGIN_PROTECTION = 'true'
+    $env:FASTMCP_HTTP_ALLOWED_HOSTS = $AllowedHostsJson
+
+    $args = @(
+        'serve',
+        '--transport','streamable-http',
+        '--host','127.0.0.1',
+        '--port',"$Port",
+        '--tools',$Tools
+    )
+
+    Write-RemoteLog "Starting Windows-MCP on 127.0.0.1:$Port."
+    $child = Start-Process `
+        -FilePath $WindowsMcpExe `
+        -ArgumentList $args `
+        -WindowStyle Hidden `
+        -RedirectStandardOutput $StdOutLog `
+        -RedirectStandardError $StdErrLog `
+        -PassThru
+
+    $healthy = $false
+    for ($i = 0; $i -lt 10; $i++) {
+        Start-Sleep -Seconds 2
+        if (Test-Identity -AuthKey $authKey) {
+            $healthy = $true
+            break
+        }
+        if ($child.HasExited) { break }
+    }
+
+    if ($healthy) {
+        Write-RemoteLog "Windows-MCP is online (PID $($child.Id))."
+    } else {
+        Write-RemoteLog 'ERROR: Windows-MCP failed identity verification after start.'
+        if (-not $child.HasExited) {
+            Stop-Process -Id $child.Id -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    Start-Sleep -Seconds 15
+}
