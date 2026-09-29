@@ -1,3 +1,4 @@
+﻿
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -21,16 +22,13 @@ function Resolve-RafdiExecutable {
         [Parameter(Mandatory)][string]$Name,
         [string[]]$Fallbacks = @()
     )
-
     $cmd = Get-Command $Name -ErrorAction SilentlyContinue
     if ($cmd) { return $cmd.Source }
-
     foreach ($candidate in $Fallbacks) {
         if ($candidate -and (Test-Path -LiteralPath $candidate)) {
             return (Resolve-Path -LiteralPath $candidate).Path
         }
     }
-
     return $null
 }
 
@@ -43,15 +41,8 @@ function Get-RafdiUvPath {
         (Join-Path $env:USERPROFILE '.local\bin\uv.exe'),
         (Join-Path $env:APPDATA 'Python\Scripts\uv.exe')
     )
-
-    $pythonRoot = Join-Path $env:APPDATA 'Python'
-    if (Test-Path -LiteralPath $pythonRoot) {
-        $discovered = Get-ChildItem -LiteralPath $pythonRoot -Filter 'uv.exe' -File -Recurse -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-        if ($discovered) { $fallbacks += $discovered.FullName }
-    }
-
+    $versioned = Get-ChildItem -Path (Join-Path $env:APPDATA 'Python\Python*\Scripts\uv.exe') -File -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1
+    if ($versioned) { $fallbacks += $versioned.FullName }
     return Resolve-RafdiExecutable -Name 'uv.exe' -Fallbacks $fallbacks
 }
 
@@ -83,7 +74,6 @@ function New-RafdiBearerKey {
 
 function Protect-RafdiSecretFile {
     param([Parameter(Mandatory)][string]$Path)
-
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent().Name
     $acl = New-Object Security.AccessControl.FileSecurity
     $acl.SetAccessRuleProtection($true, $false)
@@ -98,7 +88,6 @@ function Protect-RafdiSecretFile {
 
 function Test-RafdiTcpPort {
     param([int]$Port, [int]$TimeoutMs = 800)
-
     try {
         $client = New-Object Net.Sockets.TcpClient
         $async = $client.BeginConnect('127.0.0.1', $Port, $null, $null)
@@ -116,16 +105,15 @@ function Test-RafdiTcpPort {
 
 function Get-RafdiPortOwnerPid {
     param([int]$Port)
-    $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
-        Select-Object -First 1
+    $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($conn) { return [int]$conn.OwningProcess }
     return $null
 }
 
 function Get-RafdiProcessCommandLine {
     param([int]$ProcessId)
-    $p = Get-CimInstance Win32_Process -Filter "ProcessId=$ProcessId" -ErrorAction SilentlyContinue
-    if ($p) { return [string]$p.CommandLine }
+    $process = Get-CimInstance Win32_Process -Filter "ProcessId=$ProcessId" -ErrorAction SilentlyContinue
+    if ($process) { return [string]$process.CommandLine }
     return ''
 }
 
@@ -134,8 +122,11 @@ function Test-RafdiWindowsMcpIdentity {
         [Parameter(Mandatory)][int]$Port,
         [Parameter(Mandatory)][string]$AuthKey
     )
-
     if (-not (Test-RafdiTcpPort -Port $Port)) { return $false }
+    $ownerPid = Get-RafdiPortOwnerPid -Port $Port
+    if (-not $ownerPid) { return $false }
+    $ownerCommand = Get-RafdiProcessCommandLine -ProcessId $ownerPid
+    if ($ownerCommand -notmatch 'windows-mcp') { return $false }
 
     $payload = @{
         jsonrpc = '2.0'
@@ -151,35 +142,23 @@ function Test-RafdiWindowsMcpIdentity {
         }
     } | ConvertTo-Json -Depth 8 -Compress
 
-    Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
-    $client = [System.Net.Http.HttpClient]::new()
-    $request = [System.Net.Http.HttpRequestMessage]::new(
-        [System.Net.Http.HttpMethod]::Post,
-        "http://127.0.0.1:$Port/mcp"
-    )
-    $response = $null
-
     try {
-        $request.Headers.Authorization = [System.Net.Http.Headers.AuthenticationHeaderValue]::new('Bearer', $AuthKey)
-        $request.Headers.Accept.ParseAdd('application/json')
-        $request.Headers.Accept.ParseAdd('text/event-stream')
-        $request.Headers.Host = 'localhost'
-        $request.Content = [System.Net.Http.StringContent]::new(
-            $payload,
-            [Text.Encoding]::UTF8,
-            'application/json'
-        )
-
+        Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
+        $client = New-Object System.Net.Http.HttpClient
+        $client.Timeout = [TimeSpan]::FromSeconds(8)
+        $request = New-Object System.Net.Http.HttpRequestMessage([System.Net.Http.HttpMethod]::Post, "http://127.0.0.1:$Port/mcp")
+        $request.Headers.Authorization = New-Object System.Net.Http.Headers.AuthenticationHeaderValue('Bearer', $AuthKey)
+        $request.Headers.Accept.Add((New-Object System.Net.Http.Headers.MediaTypeWithQualityHeaderValue('application/json')))
+        $request.Headers.Accept.Add((New-Object System.Net.Http.Headers.MediaTypeWithQualityHeaderValue('text/event-stream')))
+        $request.Content = New-Object System.Net.Http.StringContent($payload, [Text.Encoding]::UTF8, 'application/json')
         $response = $client.SendAsync($request).GetAwaiter().GetResult()
-        $body = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-
-        return ($response.IsSuccessStatusCode -and $body -match 'windows-mcp')
-    } catch {
-        return $false
-    } finally {
-        if ($response) { $response.Dispose() }
+        $ok = [int]$response.StatusCode -eq 200
+        $response.Dispose()
         $request.Dispose()
         $client.Dispose()
+        return $ok
+    } catch {
+        return $false
     }
 }
 
@@ -207,13 +186,15 @@ function Get-RafdiPublicMcpUrl {
         [Parameter(Mandatory)][int]$PublicHttpsPort
     )
     if ($PublicHttpsPort -eq 443) { return "https://$DnsName/mcp" }
-    return "https://$DnsName`:$PublicHttpsPort/mcp"
+    return "https://$($DnsName):$PublicHttpsPort/mcp"
 }
 
 function Read-RafdiConfig {
     param([Parameter(Mandatory)][string]$InstallRoot)
     $path = Join-Path $InstallRoot 'config.json'
-    if (-not (Test-Path -LiteralPath $path)) { throw "Config not found: $path" }
+    if (-not (Test-Path -LiteralPath $path)) {
+        throw "Config not found: $path"
+    }
     return (Get-Content -Raw -LiteralPath $path | ConvertFrom-Json)
 }
 
@@ -230,7 +211,9 @@ function Write-RafdiConfig {
 function Get-RafdiAuthKey {
     param([Parameter(Mandatory)][string]$InstallRoot)
     $path = Join-Path $InstallRoot 'auth.key'
-    if (-not (Test-Path -LiteralPath $path)) { throw "Auth key not found: $path" }
+    if (-not (Test-Path -LiteralPath $path)) {
+        throw "Auth key not found: $path"
+    }
     return (Get-Content -Raw -LiteralPath $path).Trim()
 }
 
@@ -243,49 +226,63 @@ function Get-RafdiFunnelStatusText {
     }
 }
 
-function Test-RafdiFunnelPortInUse {
+function Test-RafdiFunnelPublicPortInUse {
     param(
         [Parameter(Mandatory)][string]$TailscaleExe,
         [Parameter(Mandatory)][int]$PublicHttpsPort
     )
-
     $text = Get-RafdiFunnelStatusText -TailscaleExe $TailscaleExe
     if ($text -match 'No serve config') { return $false }
-    if ($PublicHttpsPort -eq 443) { return ($text -match 'https://[^\s/]+(?:/|\s)') }
+    if ($PublicHttpsPort -eq 443) {
+        return ($text -match 'https://[^\s/]+(?:/|\s)')
+    }
     return ($text -match [regex]::Escape(":$PublicHttpsPort"))
+}
+
+function Get-RafdiHttpStatusCode {
+    param(
+        [Parameter(Mandatory)][string]$Url,
+        [ValidateSet('GET','POST')][string]$Method = 'GET',
+        [string]$BearerToken = '',
+        [string]$Body = ''
+    )
+    try {
+        Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
+        $client = New-Object System.Net.Http.HttpClient
+        $client.Timeout = [TimeSpan]::FromSeconds(20)
+        $httpMethod = if ($Method -eq 'POST') { [System.Net.Http.HttpMethod]::Post } else { [System.Net.Http.HttpMethod]::Get }
+        $request = New-Object System.Net.Http.HttpRequestMessage($httpMethod, $Url)
+        if ($BearerToken) {
+            $request.Headers.Authorization = New-Object System.Net.Http.Headers.AuthenticationHeaderValue('Bearer', $BearerToken)
+        }
+        $request.Headers.Accept.Add((New-Object System.Net.Http.Headers.MediaTypeWithQualityHeaderValue('application/json')))
+        $request.Headers.Accept.Add((New-Object System.Net.Http.Headers.MediaTypeWithQualityHeaderValue('text/event-stream')))
+        if ($Method -eq 'POST') {
+            $request.Content = New-Object System.Net.Http.StringContent($Body, [Text.Encoding]::UTF8, 'application/json')
+        }
+        $response = $client.SendAsync($request).GetAwaiter().GetResult()
+        $status = [int]$response.StatusCode
+        $response.Dispose()
+        $request.Dispose()
+        $client.Dispose()
+        return $status
+    } catch {
+        return $null
+    }
 }
 
 function Test-RafdiPublicAuthGuard {
     param([Parameter(Mandatory)][string]$Url)
-
-    Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
-    $client = [System.Net.Http.HttpClient]::new()
-    $request = [System.Net.Http.HttpRequestMessage]::new(
-        [System.Net.Http.HttpMethod]::Get,
-        $Url
-    )
-    $response = $null
-
-    try {
-        $response = $client.SendAsync($request).GetAwaiter().GetResult()
-        return ([int]$response.StatusCode -eq 401)
-    } catch {
-        return $false
-    } finally {
-        if ($response) { $response.Dispose() }
-        $request.Dispose()
-        $client.Dispose()
-    }
+    $status = Get-RafdiHttpStatusCode -Url $Url -Method GET
+    return ($status -eq 401)
 }
 
 function Get-RafdiSupervisorProcesses {
     param([Parameter(Mandatory)][string]$SupervisorPath)
     $escaped = [regex]::Escape($SupervisorPath)
-    return @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
-        Where-Object {
-            $_.Name -eq 'powershell.exe' -and
-            [string]$_.CommandLine -match $escaped
-        })
+    return @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+        $_.Name -eq 'powershell.exe' -and [string]$_.CommandLine -match $escaped
+    })
 }
 
 function Register-RafdiAutoStartTask {
@@ -293,30 +290,13 @@ function Register-RafdiAutoStartTask {
         [Parameter(Mandatory)][string]$TaskName,
         [Parameter(Mandatory)][string]$StartScript
     )
-
     $identity = Get-RafdiCurrentIdentity
-    $argument = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$StartScript`""
+    $argument = '-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $StartScript + '"'
     $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $argument
     $trigger = New-ScheduledTaskTrigger -AtLogOn -User $identity
-    $settings = New-ScheduledTaskSettingsSet `
-        -StartWhenAvailable `
-        -AllowStartIfOnBatteries `
-        -DontStopIfGoingOnBatteries `
-        -RestartCount 3 `
-        -RestartInterval (New-TimeSpan -Minutes 1)
-    $principal = New-ScheduledTaskPrincipal `
-        -UserId $identity `
-        -LogonType Interactive `
-        -RunLevel Limited
-
-    Register-ScheduledTask `
-        -TaskName $TaskName `
-        -Action $action `
-        -Trigger $trigger `
-        -Settings $settings `
-        -Principal $principal `
-        -Description 'Starts the otak-atik Rafdi Remote MCP bridge at Windows logon.' `
-        -Force | Out-Null
+    $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+    $principal = New-ScheduledTaskPrincipal -UserId $identity -LogonType Interactive -RunLevel Limited
+    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description 'Starts the otak-atik Rafdi Remote MCP bridge at Windows logon.' -Force | Out-Null
 }
 
 function Write-RafdiHeading {

@@ -1,199 +1,256 @@
-# Rafdi Remote GROWTH — reusable experiment
+# Rafdi Remote GROWTH — Experimental Windows Installer
 
-> **Experimental. Real-world verified on one Windows machine; clean-machine reproducibility is still being proven.**
+> Status: **Phase 2A installer core — dogfooded on one real Windows machine.**
+>
+> This package is not claiming universal production readiness yet. It is the sanitized, reusable version of the real experiment documented in `docs/RAFDI-REMOTE-GROWTH.md`.
 
-This package turns the successful `Rafdi Remote GROWTH` experiment into a safer reusable setup.
+## What this installs
 
-Architecture:
+The target architecture is:
 
 ```text
 ChatGPT
   ↓
 Composio Custom MCP
   ↓
-Tailscale Funnel (stable HTTPS)
+Tailscale Funnel (stable HTTPS endpoint)
   ↓
 Windows-MCP on 127.0.0.1
   ↓
 PowerShell / files / processes / GUI tools
 ```
 
-## Why this exists
-
-The original problem was not "how do I remote desktop like a human?"
-
-It was:
-
-> how can ChatGPT reach my Windows machine, run terminal commands, inspect files/processes, and optionally control the GUI without spending my hosted remote-plugin quota on every tiny operation?
-
-The final experiment worked with:
-
-- Windows-MCP as the local tool engine;
-- Tailscale Funnel as the stable public HTTPS transport;
-- Composio Custom MCP as the ChatGPT integration layer;
-- a local bearer key;
-- explicit host allowlisting;
-- an auto-restarting supervisor;
-- a per-user Scheduled Task at logon.
+The installer creates only the local Windows side. First-time Tailscale login/Funnel approval and Composio Custom MCP connection still require explicit user action.
 
 ## Safety choices
 
-This public installer deliberately differs from the author's live setup in a few places.
+This installer intentionally:
 
-### Public HTTPS defaults to 8443
+- binds Windows-MCP to `127.0.0.1` only;
+- generates a fresh bearer key locally;
+- never prints the bearer key during normal setup;
+- locks `auth.key` to the current Windows user;
+- enables FastMCP host-origin protection;
+- allowlists only the discovered Tailscale hostname plus localhost;
+- refuses to replace an unknown process already using the requested local port;
+- refuses to overwrite an existing Tailscale Funnel public port;
+- never runs global `tailscale funnel reset`;
+- does not uninstall Tailscale or Windows-MCP because another workflow may use them;
+- uses a narrowly named per-user Scheduled Task;
+- uses a supervisor that only stops a listener after authenticated identity verification.
 
-Tailscale Funnel currently supports public ports `443`, `8443`, and `10000`.
+## Requirements
 
-This package defaults to **8443** so it is less likely to overwrite an existing Funnel already using 443.
+- Windows
+- PowerShell 5.1+
+- `winget` if you want automatic prerequisite installation
+- a Tailscale account
+- Composio Custom MCP if you want to use the endpoint from ChatGPT exactly like the original experiment
 
-If 8443 already appears occupied by a Funnel, setup refuses to continue.
+The setup can install:
 
-### MCP stays on loopback
+- `uv` from winget package `astral-sh.uv`;
+- Tailscale from winget package `Tailscale.Tailscale`;
+- Windows-MCP as a persistent `uv tool`.
 
-Windows-MCP binds to:
+## 0. Dry run first
+
+From this directory:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup.ps1 -InstallPrerequisites -WhatIf
+```
+
+This must make no changes.
+
+## 1. Install the local runtime
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup.ps1 -InstallPrerequisites
+```
+
+Default runtime directory:
 
 ```text
-127.0.0.1:18765
+%LOCALAPPDATA%\OtakAtik\RafdiRemote
 ```
 
-It is not opened directly to the LAN.
+Defaults:
 
-### Bearer secret is machine-local
+- local MCP port: `18765`
+- public Tailscale HTTPS port: `8443`
+- logon task: `OtakAtik Rafdi Remote AutoStart`
 
-`setup.ps1` generates a fresh random key and stores it under:
+Port `8443` is used instead of `443` by default to reduce the chance of colliding with an existing Funnel on the machine.
+
+## 2. If Tailscale is not logged in
+
+Setup stops and prints the exact local `tailscale up` command.
+
+Run it, finish browser login yourself, then rerun setup.
+
+The installer will not attempt to automate account authentication.
+
+## 3. Enable Funnel once
+
+For safety, the installer does **not** silently publish the machine the first time.
+
+After local setup succeeds it prints an exact command similar to:
+
+```powershell
+& "C:\Program Files\Tailscale\tailscale.exe" funnel --bg --yes --https=8443 18765
+```
+
+Run that command yourself.
+
+If Tailscale gives you a one-time Funnel approval URL, approve it in your account, run the command again, then rerun `setup.ps1`.
+
+On the second setup run, the installer verifies:
+
+- expected Funnel hostname;
+- expected local target;
+- unauthenticated public request is rejected with HTTP 401.
+
+## 4. Connect it to Composio
+
+Setup prints the discovered MCP endpoint, for example:
 
 ```text
-%LOCALAPPDATA%\OtakAtik\RafdiRemote\auth.key
+https://<your-machine>.<your-tailnet>.ts.net:8443/mcp
 ```
 
-The value is not printed during setup.
+Create a **new Custom MCP** in Composio with:
 
-### Unknown port owners are not killed
+- URL: the endpoint printed by setup;
+- authentication: Bearer token;
+- token: contents of the local `auth.key`.
 
-If the chosen local port is occupied but the service does not authenticate and identify as Windows-MCP, setup/repair abort.
-
-That rule exists because the real experiment once tunneled the wrong local MCP service. Yes. Jancok.
-
-## Quick start
-
-Open PowerShell in this folder.
-
-First, inspect what setup would do:
+To put the token on the Windows clipboard without printing it:
 
 ```powershell
-.\setup.ps1 -InstallPrerequisites -WhatIf
+Get-Content -Raw "$env:LOCALAPPDATA\OtakAtik\RafdiRemote\auth.key" | Set-Clipboard
 ```
 
-Then install:
+Do not paste the token into issues, README screenshots, chat logs, or GitHub.
+
+## Commands
+
+### Status
 
 ```powershell
-.\setup.ps1 -InstallPrerequisites
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\OtakAtik\RafdiRemote\status.ps1"
 ```
 
-`-InstallPrerequisites` may install:
+Reports:
 
-- `uv` via winget;
-- Tailscale via winget;
-- Windows-MCP via `uv tool install windows-mcp`.
+- local authenticated MCP state;
+- supervisor state;
+- Scheduled Task state;
+- Tailscale backend state;
+- Funnel mapping;
+- public 401 auth guard;
+- stable MCP URL.
 
-The script does **not** create your Tailscale account for you.
-
-If Tailscale is not logged in, setup stops and tells you to run:
+### Test
 
 ```powershell
-tailscale up
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\OtakAtik\RafdiRemote\test.ps1"
 ```
 
-Finish login in your browser, then run setup again.
+Checks:
 
-If Funnel needs one-time approval, setup captures the prompt/approval URL, stops safely, and asks you to approve Funnel before running setup again.
+- local MCP identity;
+- supervisor;
+- Scheduled Task;
+- Tailscale;
+- Funnel mapping;
+- public unauthenticated rejection;
+- authenticated public MCP initialize.
 
-## Composio step
+The bearer token is kept in memory and is not printed.
 
-After setup succeeds, it prints a stable URL shaped like:
-
-```text
-https://your-machine.your-tailnet.ts.net:8443/mcp
-```
-
-Create a **Custom MCP** in Composio:
-
-- transport: HTTP / Streamable HTTP;
-- URL: the stable URL printed by setup;
-- authentication: Bearer;
-- token: contents of the local `auth.key` file.
-
-Do not paste the key into GitHub issues, screenshots, logs, or this repository.
-
-See [`examples/composio-custom-mcp.example.md`](examples/composio-custom-mcp.example.md).
-
-## Operations
-
-Status:
+### Repair
 
 ```powershell
-.\status.ps1
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\OtakAtik\RafdiRemote\repair.ps1"
 ```
 
-Machine-readable status:
+Repair is conservative.
+
+It can restore:
+
+- missing supervisor;
+- missing package Scheduled Task.
+
+If Funnel is missing, repair prints the exact command for you to run manually instead of silently modifying global Tailscale Funnel state.
+
+If the local port belongs to an unknown/unverified process, repair stops with an error.
+
+### Safe disable / uninstall
 
 ```powershell
-.\status.ps1 -Json
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\OtakAtik\RafdiRemote\uninstall.ps1"
 ```
 
-Repair:
+This:
+
+- creates a cooperative `disabled.flag`;
+- unregisters only this package's Scheduled Task;
+- waits for the supervisor to stop its authenticated listener;
+- preserves runtime files for inspection;
+- leaves Tailscale installed;
+- leaves Windows-MCP installed;
+- leaves global Funnel configuration untouched.
+
+Why not automatically call `tailscale funnel reset`?
+
+Because the current CLI exposes `reset` as a global Funnel cleanup operation and the machine may have unrelated Funnel mappings. Nuking those would be a jancok installer design.
+
+To re-enable, rerun `setup.ps1`.
+
+## Diagnostic local-only mode
+
+Maintainers can test local lifecycle without public exposure:
 
 ```powershell
-.\repair.ps1
+powershell -ExecutionPolicy Bypass -File .\setup.ps1 \
+  -Port 28767 \
+  -PublicHttpsPort 10000 \
+  -InstallRoot "$env:LOCALAPPDATA\OtakAtik\RafdiRemoteDogfood" \
+  -TaskName "OtakAtik Rafdi Remote Dogfood" \
+  -SkipFunnel
 ```
 
-Verify:
+In this mode public/Funnel assertions are explicitly reported as skipped.
 
-```powershell
-.\test.ps1
-```
+## What Phase 2A has actually proven
 
-Uninstall only this bridge:
+On the real GROWTH Windows machine:
 
-```powershell
-.\uninstall.ps1
-```
+- all public PowerShell artifacts parsed successfully;
+- dry-run produced no mutations;
+- fresh isolated install succeeded;
+- generated bearer key had one ACL rule for the current user;
+- authenticated local Windows-MCP identity check succeeded;
+- rerunning setup preserved the same bearer key;
+- rerunning setup kept one Scheduled Task;
+- rerunning setup kept one supervisor;
+- `status.ps1` passed;
+- `test.ps1` passed in local-only diagnostic mode;
+- `repair.ps1` passed without killing anything;
+- safe uninstall removed the task and cooperatively stopped listener/supervisor;
+- rerunning setup after uninstall re-enabled the install with the same key;
+- real Stable endpoint on port `18765` remained online throughout dogfood testing.
 
-The uninstall script intentionally leaves Tailscale itself and Windows-MCP itself installed. It removes only the task, owned listener/supervisor, owned Funnel port, and local bridge files.
+## Still reserved for Phase 2B
 
-## What the supervisor does
+Before claiming this installer broadly reproducible:
 
-The supervisor:
+- exercise the **public Funnel path** with the sanitized installer;
+- verify unauthenticated HTTP 401 on that isolated public endpoint;
+- verify authenticated MCP initialize through the public endpoint;
+- test restart/login recovery using the sanitized installer;
+- run final repo hygiene/full CI;
+- document the final Composio screenshots/flow without leaking credentials.
 
-- watches the local MCP endpoint;
-- authenticates to verify the service identity;
-- refuses to kill an unknown process on the configured port;
-- starts Windows-MCP when it is missing;
-- requires bearer auth;
-- uses stateless HTTP;
-- keeps FastMCP host-origin protection enabled;
-- allowlists only the discovered Tailscale hostname + localhost;
-- disables Windows-MCP anonymous telemetry for this runtime;
-- bounds log growth by trimming large logs.
-
-## Supported public Funnel ports
-
-Use one of:
-
-```text
-443
-8443
-10000
-```
-
-Default: `8443`.
-
-## Current status
-
-```text
-REAL-WORLD VERIFIED: one Windows machine
-PUBLIC INSTALLER: implemented
-CLEAN-MACHINE REPRODUCIBILITY: not yet proven
-```
-
-Do not upgrade that last line to "production ready" until the Phase 4 clean-machine test actually passes.
+Until then: **experimental, but not bullshit.**

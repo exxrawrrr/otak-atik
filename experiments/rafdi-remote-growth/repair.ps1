@@ -1,7 +1,6 @@
-[CmdletBinding(SupportsShouldProcess = $true)]
+[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 param(
-    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote'),
-    [switch]$SkipFunnel
+    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote')
 )
 
 . (Join-Path $PSScriptRoot 'lib\common.ps1')
@@ -9,52 +8,30 @@ Assert-RafdiWindows
 
 $config = Read-RafdiConfig -InstallRoot $InstallRoot
 $authKey = Get-RafdiAuthKey -InstallRoot $InstallRoot
-$port = [int]$config.port
 $supervisorPath = Join-Path $InstallRoot 'supervisor.ps1'
 $startPath = Join-Path $InstallRoot 'start.ps1'
-$tailscale = [string]$config.tailscaleExe
+$port = [int]$config.port
 
-Write-RafdiHeading 'Repair'
+if (Test-Path -LiteralPath (Join-Path $InstallRoot 'disabled.flag')) {
+    throw 'This installation is disabled. Re-run setup.ps1 to explicitly re-enable it.'
+}
+
+Write-RafdiHeading 'Rafdi Remote repair'
 
 $ownerPid = Get-RafdiPortOwnerPid -Port $port
 if ($ownerPid -and -not (Test-RafdiWindowsMcpIdentity -Port $port -AuthKey $authKey)) {
-    $cmdLine = Get-RafdiProcessCommandLine -ProcessId $ownerPid
-    throw "Port $port is occupied by an unknown service (PID $ownerPid). Refusing destructive repair. Command line: $cmdLine"
+    $cmd = Get-RafdiProcessCommandLine -ProcessId $ownerPid
+    throw "Port $port is occupied by an unverified process. Repair refuses to touch it. PID=$ownerPid CommandLine=$cmd"
 }
 
-if ($ownerPid -and (Test-RafdiWindowsMcpIdentity -Port $port -AuthKey $authKey)) {
-    if ($PSCmdlet.ShouldProcess("PID $ownerPid", 'Restart owned Windows-MCP listener')) {
-        Stop-Process -Id $ownerPid -Force
-    }
-}
-
-foreach ($proc in (Get-RafdiSupervisorProcesses -SupervisorPath $supervisorPath)) {
-    if ($PSCmdlet.ShouldProcess("PID $($proc.ProcessId)", 'Restart owned supervisor')) {
-        Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
-    }
-}
-
-Start-Sleep -Seconds 2
-if ($PSCmdlet.ShouldProcess($supervisorPath, 'Start supervisor')) {
-    $supervisorArgs = "-NoProfile -ExecutionPolicy Bypass -File `"$supervisorPath`""
-    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList $supervisorArgs
-}
-
-if ($PSCmdlet.ShouldProcess([string]$config.taskName, 'Re-register auto-start task')) {
-    Register-RafdiAutoStartTask -TaskName ([string]$config.taskName) -StartScript $startPath
-}
-
-if (-not $SkipFunnel -and (Test-Path -LiteralPath $tailscale)) {
-    $status = Get-RafdiTailscaleStatus -TailscaleExe $tailscale
-    if ($status -and [string]$status.BackendState -eq 'Running') {
-        if ($PSCmdlet.ShouldProcess([string]$config.publicMcpUrl, 'Re-assert owned Funnel configuration')) {
-            $httpsArg = "--https=$([int]$config.publicHttpsPort)"
-            $backendPort = "$([int]$config.port)"
-            & $tailscale funnel --bg $httpsArg $backendPort
-            if ($LASTEXITCODE -ne 0) { throw "tailscale funnel failed with exit code $LASTEXITCODE." }
-        }
-    } else {
-        Write-Warning 'Tailscale is not running/logged in; Funnel was not changed.'
+$supervisors = @(Get-RafdiSupervisorProcesses -SupervisorPath $supervisorPath)
+if ($supervisors.Count -eq 0) {
+    if ($PSCmdlet.ShouldProcess($supervisorPath, 'Start Rafdi Remote supervisor')) {
+        Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @(
+            '-NoProfile',
+            '-ExecutionPolicy','Bypass',
+            '-File',$supervisorPath
+        )
     }
 }
 
@@ -66,6 +43,36 @@ for ($i = 0; $i -lt 12; $i++) {
         break
     }
 }
+if (-not $healthy) {
+    throw 'Windows-MCP did not become healthy. Check logs before retrying.'
+}
 
-if (-not $healthy) { throw 'Repair completed but local Windows-MCP identity check still fails.' }
-Write-Host 'Local Windows-MCP recovered.' -ForegroundColor Green
+if (-not (Get-ScheduledTask -TaskName $config.taskName -ErrorAction SilentlyContinue)) {
+    if ($PSCmdlet.ShouldProcess($config.taskName, 'Recreate logon Scheduled Task')) {
+        Register-RafdiAutoStartTask -TaskName $config.taskName -StartScript $startPath
+    }
+}
+
+$tailscaleStatus = Get-RafdiTailscaleStatus -TailscaleExe $config.tailscaleExe
+if (-not $tailscaleStatus -or [string]$tailscaleStatus.BackendState -ne 'Running') {
+    throw 'Tailscale is not running/logged in. Repair will not attempt account login.'
+}
+
+$skipFunnel = ($config.PSObject.Properties.Name -contains 'skipFunnel') -and [bool]$config.skipFunnel
+if (-not $skipFunnel) {
+    $funnelText = Get-RafdiFunnelStatusText -TailscaleExe $config.tailscaleExe
+    $expectedBase = $config.publicMcpUrl -replace '/mcp$',''
+    $funnelOk = ($funnelText -match [regex]::Escape($expectedBase)) -and
+        ($funnelText -match [regex]::Escape("127.0.0.1:$port"))
+
+    if (-not $funnelOk) {
+        Write-Warning 'Local runtime is healthy, but the expected Tailscale Funnel mapping is missing.'
+        Write-Host 'For safety, repair.ps1 will not create or reset Funnel configuration automatically.'
+        Write-Host 'Run the exact command below yourself, then rerun repair.ps1:'
+        Write-Host ('  & "' + $config.tailscaleExe + '" funnel --bg --yes --https=' + $config.publicHttpsPort + ' ' + $port)
+        exit 2
+    }
+}
+
+Write-Host 'Repair complete. No unknown process or global Funnel configuration was modified.' -ForegroundColor Green
+exit 0

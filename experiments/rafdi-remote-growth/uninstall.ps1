@@ -1,70 +1,53 @@
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 param(
-    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote'),
-    [switch]$KeepLocalFiles
+    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote')
 )
 
 . (Join-Path $PSScriptRoot 'lib\common.ps1')
 Assert-RafdiWindows
 
 $config = Read-RafdiConfig -InstallRoot $InstallRoot
-$authKey = Get-RafdiAuthKey -InstallRoot $InstallRoot
-$port = [int]$config.port
+$disableFlag = Join-Path $InstallRoot 'disabled.flag'
 $supervisorPath = Join-Path $InstallRoot 'supervisor.ps1'
-$tailscale = [string]$config.tailscaleExe
 
-Write-RafdiHeading 'Uninstall Rafdi Remote'
+Write-RafdiHeading 'Safe disable / uninstall'
 
-$ownerPid = Get-RafdiPortOwnerPid -Port $port
-if ($ownerPid) {
-    if (Test-RafdiWindowsMcpIdentity -Port $port -AuthKey $authKey) {
-        if ($PSCmdlet.ShouldProcess("PID $ownerPid", 'Stop owned Windows-MCP listener')) {
-            Stop-Process -Id $ownerPid -Force -ErrorAction SilentlyContinue
-        }
-    } else {
-        Write-Warning "Port $port is occupied by an unknown service. It will NOT be terminated."
+if ($PSCmdlet.ShouldProcess($disableFlag, 'Create cooperative disable marker')) {
+    'disabled' | Set-Content -LiteralPath $disableFlag -Encoding ASCII
+}
+
+$task = Get-ScheduledTask -TaskName $config.taskName -ErrorAction SilentlyContinue
+if ($task -and $PSCmdlet.ShouldProcess($config.taskName, 'Unregister this package Scheduled Task')) {
+    Unregister-ScheduledTask -TaskName $config.taskName -Confirm:$false
+}
+
+Write-Host 'Waiting for the package supervisor to observe disabled.flag and stop its verified listener...'
+$listenerStopped = $false
+for ($i = 0; $i -lt 12; $i++) {
+    Start-Sleep -Seconds 2
+    $supervisors = @(Get-RafdiSupervisorProcesses -SupervisorPath $supervisorPath)
+    $listenerAlive = Test-RafdiTcpPort -Port ([int]$config.port)
+    if ($supervisors.Count -eq 0 -and -not $listenerAlive) {
+        $listenerStopped = $true
+        break
     }
 }
 
-foreach ($proc in (Get-RafdiSupervisorProcesses -SupervisorPath $supervisorPath)) {
-    if ($PSCmdlet.ShouldProcess("PID $($proc.ProcessId)", 'Stop owned supervisor')) {
-        Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
-    }
-}
-
-$task = Get-ScheduledTask -TaskName ([string]$config.taskName) -ErrorAction SilentlyContinue
-if ($task -and $PSCmdlet.ShouldProcess([string]$config.taskName, 'Remove owned Scheduled Task')) {
-    Unregister-ScheduledTask -TaskName ([string]$config.taskName) -Confirm:$false
-}
-
-if (Test-Path -LiteralPath $tailscale) {
-    $baseUrl = [string]$config.publicMcpUrl -replace '/mcp$',''
-    $funnelText = Get-RafdiFunnelStatusText -TailscaleExe $tailscale
-    if ($funnelText -match [regex]::Escape($baseUrl)) {
-        if ($PSCmdlet.ShouldProcess($baseUrl, 'Disable owned Tailscale Funnel HTTPS listener')) {
-            $httpsArg = "--https=$([int]$config.publicHttpsPort)"
-            & $tailscale funnel $httpsArg off
-            if ($LASTEXITCODE -ne 0) {
-                Write-Warning "Could not disable Funnel cleanly (exit $LASTEXITCODE). Tailscale account/config was otherwise left untouched."
-            }
-        }
-    } else {
-        Write-Host 'Owned Funnel URL not present; no Funnel configuration changed.' -ForegroundColor DarkGray
-    }
-}
-
-if (-not $KeepLocalFiles) {
-    if ($PSCmdlet.ShouldProcess($InstallRoot, 'Remove Rafdi Remote local files including bearer key')) {
-        $parent = Split-Path -Parent $InstallRoot
-        $leaf = Split-Path -Leaf $InstallRoot
-        Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @(
-            '-NoProfile','-Command',
-            "Start-Sleep -Seconds 2; Remove-Item -LiteralPath '$($InstallRoot.Replace("'","''"))' -Recurse -Force -ErrorAction SilentlyContinue"
-        )
-        Write-Host "Local removal scheduled for: $InstallRoot"
-    }
+if ($listenerStopped) {
+    Write-Host 'Supervisor/listener stopped cooperatively: PASS' -ForegroundColor Green
 } else {
-    Write-Host "Local files preserved: $InstallRoot"
+    Write-Warning 'Supervisor or listener is still present. Runtime files were preserved for inspection.'
 }
 
-Write-Host 'Tailscale itself and Windows-MCP itself were NOT uninstalled.' -ForegroundColor Green
+$skipFunnel = ($config.PSObject.Properties.Name -contains 'skipFunnel') -and [bool]$config.skipFunnel
+if (-not $skipFunnel) {
+    Write-Host ''
+    Write-Warning 'Tailscale Funnel configuration was intentionally left unchanged.'
+    Write-Host 'The current Tailscale CLI exposes a global "funnel reset" command; this package will not run it because it could remove unrelated Funnel mappings.'
+    Write-Host 'If this machine uses Funnel only for Rafdi Remote and you intentionally want to clear ALL Funnel config, review "tailscale funnel reset" yourself.'
+}
+
+Write-Host ''
+Write-Host "Runtime files are preserved at: $InstallRoot"
+Write-Host 'Tailscale and Windows-MCP packages are intentionally left installed because other workflows may use them.'
+Write-Host 'To re-enable, run setup.ps1 again from the repository.'

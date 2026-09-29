@@ -1,7 +1,5 @@
-[CmdletBinding()]
 param(
-    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote'),
-    [switch]$Json
+    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote')
 )
 
 . (Join-Path $PSScriptRoot 'lib\common.ps1')
@@ -9,35 +7,39 @@ Assert-RafdiWindows
 
 $config = Read-RafdiConfig -InstallRoot $InstallRoot
 $authKey = Get-RafdiAuthKey -InstallRoot $InstallRoot
-$tailscale = [string]$config.tailscaleExe
 $supervisorPath = Join-Path $InstallRoot 'supervisor.ps1'
-$task = Get-ScheduledTask -TaskName ([string]$config.taskName) -ErrorAction SilentlyContinue
-$taskInfo = if ($task) { Get-ScheduledTaskInfo -TaskName ([string]$config.taskName) -ErrorAction SilentlyContinue } else { $null }
-$tsStatus = if (Test-Path -LiteralPath $tailscale) { Get-RafdiTailscaleStatus -TailscaleExe $tailscale } else { $null }
-$funnelText = if (Test-Path -LiteralPath $tailscale) { Get-RafdiFunnelStatusText -TailscaleExe $tailscale } else { '' }
 
-$result = [ordered]@{
-    installRoot = $InstallRoot
-    localMcpPort = [int]$config.port
-    localIdentityOk = Test-RafdiWindowsMcpIdentity -Port ([int]$config.port) -AuthKey $authKey
-    supervisorRunning = (Get-RafdiSupervisorProcesses -SupervisorPath $supervisorPath).Count -gt 0
-    tailscaleInstalled = Test-Path -LiteralPath $tailscale
-    tailscaleState = if ($tsStatus) { [string]$tsStatus.BackendState } else { 'Unavailable' }
-    tailscaleDnsName = if ($tsStatus) { Get-RafdiTailscaleDnsName -StatusObject $tsStatus } else { $null }
-    publicMcpUrl = [string]$config.publicMcpUrl
-    publicAuthGuardOk = Test-RafdiPublicAuthGuard -Url ([string]$config.publicMcpUrl)
-    funnelConfigured = $funnelText -match [regex]::Escape(([string]$config.publicMcpUrl -replace '/mcp$',''))
-    taskInstalled = [bool]$task
-    taskState = if ($task) { [string]$task.State } else { 'Missing' }
-    lastTaskResult = if ($taskInfo) { [int]$taskInfo.LastTaskResult } else { $null }
-}
+$task = Get-ScheduledTask -TaskName $config.taskName -ErrorAction SilentlyContinue
+$supervisors = @(Get-RafdiSupervisorProcesses -SupervisorPath $supervisorPath)
+$tailscaleStatus = Get-RafdiTailscaleStatus -TailscaleExe $config.tailscaleExe
+$skipFunnel = ($config.PSObject.Properties.Name -contains 'skipFunnel') -and [bool]$config.skipFunnel
 
-if ($Json) {
-    $result | ConvertTo-Json -Depth 5
-    return
+$localOk = Test-RafdiWindowsMcpIdentity -Port ([int]$config.port) -AuthKey $authKey
+$funnelOk = $true
+$publicGuard = $true
+
+if (-not $skipFunnel) {
+    $funnelText = Get-RafdiFunnelStatusText -TailscaleExe $config.tailscaleExe
+    $expectedBase = $config.publicMcpUrl -replace '/mcp$',''
+    $funnelOk = ($funnelText -match [regex]::Escape($expectedBase)) -and
+        ($funnelText -match [regex]::Escape("127.0.0.1:$($config.port)"))
+    $publicGuard = Test-RafdiPublicAuthGuard -Url $config.publicMcpUrl
 }
 
 Write-RafdiHeading 'Rafdi Remote status'
-$result.GetEnumerator() | ForEach-Object {
-    '{0,-22} {1}' -f ($_.Key + ':'), $_.Value
+[pscustomobject]@{
+    LocalWindowsMcp = if ($localOk) { 'ONLINE / VERIFIED' } else { 'OFFLINE OR UNVERIFIED' }
+    Supervisor = if ($supervisors.Count -gt 0) { "RUNNING ($($supervisors.Count))" } else { 'OFFLINE' }
+    ScheduledTask = if ($task) { [string]$task.State } else { 'MISSING' }
+    TailscaleBackend = if ($tailscaleStatus) { [string]$tailscaleStatus.BackendState } else { 'UNKNOWN' }
+    FunnelMapping = if ($skipFunnel) { 'SKIPPED BY CONFIG' } elseif ($funnelOk) { 'CONFIGURED' } else { 'MISSING OR DIFFERENT' }
+    PublicAuthGuard = if ($skipFunnel) { 'SKIPPED BY CONFIG' } elseif ($publicGuard) { 'HTTP 401 / PROTECTED' } else { 'NOT VERIFIED' }
+    StableUrl = [string]$config.publicMcpUrl
+    InstallRoot = [string]$config.installRoot
+} | Format-List
+
+$tailscaleOk = $tailscaleStatus -and [string]$tailscaleStatus.BackendState -eq 'Running'
+if ($localOk -and $supervisors.Count -gt 0 -and $task -and $tailscaleOk -and $funnelOk -and $publicGuard) {
+    exit 0
 }
+exit 2
