@@ -1,4 +1,4 @@
-﻿
+
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 param(
     [int]$Port = 18765,
@@ -178,8 +178,7 @@ if ($ownerPid -and -not (Test-RafdiWindowsMcpIdentity -Port $Port -AuthKey $auth
 }
 
 $tools = 'PowerShell,FileSystem,Process,Snapshot,Screenshot,DisplayInventory,App,Clipboard,Click,Type,Scroll,Move,Shortcut,Wait,WaitFor'
-$allowedHostItems = @($dnsName,'localhost','127.0.0.1')
-if ($PublicHttpsPort -ne 443) { $allowedHostItems += ($dnsName + ':' + $PublicHttpsPort) }
+$allowedHostItems = @($dnsName, ($dnsName + ':*'), 'localhost', 'localhost:*', '127.0.0.1', '127.0.0.1:*')
 $allowedHosts = $allowedHostItems | ConvertTo-Json -Compress
 
 $templatePath = Join-Path $PSScriptRoot 'templates\supervisor.ps1.tmpl'
@@ -190,6 +189,7 @@ $rendered = $rendered.Replace('{{PORT}}', [string]$Port)
 $rendered = $rendered.Replace('{{WINDOWS_MCP_EXE}}', $windowsMcp.Replace("'","''"))
 $rendered = $rendered.Replace('{{ALLOWED_HOSTS_JSON}}', $allowedHosts.Replace("'","''"))
 $rendered = $rendered.Replace('{{TOOLS}}', $tools)
+$rendered = $rendered.Replace('{{ALLOW_PROXY_HOST_OVERRIDE}}', $(if ($SkipFunnel) { '$false' } else { '$true' }))
 $rendered = $rendered.Replace('{{MUTEX_NAME}}', ('Local\OtakAtikRafdiRemoteSupervisor-' + $Port))
 
 $supervisorPath = Join-Path $InstallRoot 'supervisor.ps1'

@@ -1,6 +1,6 @@
 # Rafdi Remote GROWTH — Experimental Windows Installer
 
-> Status: **Phase 2A installer core — dogfooded on one real Windows machine.**
+> Status: **Phase 2B public path verified on one real Windows machine; clean-machine reproducibility is still pending.**
 >
 > This package is not claiming universal production readiness yet. It is the sanitized, reusable version of the real experiment documented in `docs/RAFDI-REMOTE-GROWTH.md`.
 
@@ -31,13 +31,38 @@ This installer intentionally:
 - never prints the bearer key during normal setup;
 - locks `auth.key` to the current Windows user;
 - enables FastMCP host-origin protection;
-- allowlists only the discovered Tailscale hostname plus localhost;
+- allowlists only the discovered Tailscale hostname plus loopback hosts, including explicit wildcard-port forms required by reverse-proxy traffic;
+- uses Windows-MCP's `--allow-insecure-remote` only in public/Funnel mode as a reverse-proxy compatibility shim while the server still binds to `127.0.0.1` and still requires bearer authentication;
 - refuses to replace an unknown process already using the requested local port;
 - refuses to overwrite an existing Tailscale Funnel public port;
 - never runs global `tailscale funnel reset`;
 - does not uninstall Tailscale or Windows-MCP because another workflow may use them;
 - uses a narrowly named per-user Scheduled Task;
 - uses a supervisor that only stops a listener after authenticated identity verification.
+
+## Why `--allow-insecure-remote` appears here
+
+Phase 2B found a real compatibility bug with the installed stack used for testing:
+
+```text
+Windows-MCP 0.8.6
+FastMCP 4.0.10
+MCP 2.2.0
+```
+
+Windows-MCP 0.8.6 automatically adds its own Trusted Host middleware for loopback binds and limits that middleware to loopback hostnames. Tailscale Funnel correctly preserves the external public `Host` header, so valid reverse-proxy requests were rejected with `Invalid host header` before MCP auth/session handling.
+
+The package therefore launches Windows-MCP with its official `--allow-insecure-remote` flag **without changing the bind address**. The actual listener remains:
+
+```text
+127.0.0.1:<local-port>
+```
+
+Bearer authentication remains enabled, and FastMCP host-origin protection remains explicitly enabled with a narrow allowlist for the discovered Tailscale hostname plus loopback hosts.
+
+In this recipe the flag means: *do not install Windows-MCP's hardcoded loopback TrustedHost middleware in front of the reverse proxy*. It does **not** mean: bind to `0.0.0.0`, expose an unauthenticated LAN service, or disable the package's FastMCP host checks.
+
+If a future Windows-MCP release exposes a first-class public/reverse-proxy host allowlist, prefer that and remove this compatibility shim.
 
 ## Requirements
 
@@ -242,15 +267,34 @@ On the real GROWTH Windows machine:
 - rerunning setup after uninstall re-enabled the install with the same key;
 - real Stable endpoint on port `18765` remained online throughout dogfood testing.
 
-## Still reserved for Phase 2B
+## What Phase 2B has actually proven
 
-Before claiming this installer broadly reproducible:
+On an isolated public test path, while the live Stable endpoint stayed online:
 
-- exercise the **public Funnel path** with the sanitized installer;
-- verify unauthenticated HTTP 401 on that isolated public endpoint;
-- verify authenticated MCP initialize through the public endpoint;
-- test restart/login recovery using the sanitized installer;
-- run final repo hygiene/full CI;
-- document the final Composio screenshots/flow without leaking credentials.
+- the first installer run prepared local runtime but did not silently publish the machine;
+- the exact Funnel command printed by setup successfully published only the isolated port;
+- setup verified the expected Funnel mapping;
+- unauthenticated public access was rejected with HTTP 401;
+- authenticated MCP initialize through the public endpoint passed;
+- an external Hyperbrowser cloud session reached the endpoint and was rejected without a bearer token;
+- the registered Scheduled Task restored the runtime after a cooperative stop;
+- the supervisor restarted a deliberately terminated, verified Windows-MCP child with a new PID;
+- a `tailscale down` / `tailscale up` cycle restored both Stable and isolated Funnel mappings from stored state;
+- the complete public test suite passed from Remote Desktop Commander after Windows-host detection was hardened for PowerShell hosts that do not populate `$env:OS`;
+- the full package `test.ps1` suite passed again after recovery.
 
-Until then: **experimental, but not bullshit.**
+The existing Rafdi Remote GROWTH Stable connection already proves the same ChatGPT → Composio Custom MCP → Tailscale Funnel → Windows-MCP architecture in real daily use.
+
+Creating a **second temporary Composio Custom MCP entry** for the isolated Phase 2B endpoint is not automated here because the Composio tools currently available in chat do not expose creation/editing of Composio's own Custom MCP entries. The package ships the exact dashboard setup fields instead of pretending that UI step happened.
+
+## Still not claimed
+
+Before calling this universally reproducible or release-hardened, the project still needs:
+
+- a clean-machine install on another Windows PC/profile;
+- explicit version-compatibility testing against newer Windows-MCP releases;
+- a decision on whether to pin Windows-MCP/FastMCP versions;
+- optional manual creation of a second Composio Custom MCP test entry if a UI-level duplicate test is desired;
+- broader security review if this graduates beyond personal/experimental use.
+
+Status: **public path proven; still experimental, but no longer local-only.**
