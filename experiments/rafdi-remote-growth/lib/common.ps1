@@ -39,10 +39,20 @@ function Get-RafdiWingetPath {
 }
 
 function Get-RafdiUvPath {
-    return Resolve-RafdiExecutable -Name 'uv.exe' -Fallbacks @(
+    $fallbacks = @(
         (Join-Path $env:USERPROFILE '.local\bin\uv.exe'),
         (Join-Path $env:APPDATA 'Python\Scripts\uv.exe')
     )
+
+    $pythonRoot = Join-Path $env:APPDATA 'Python'
+    if (Test-Path -LiteralPath $pythonRoot) {
+        $discovered = Get-ChildItem -LiteralPath $pythonRoot -Filter 'uv.exe' -File -Recurse -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+        if ($discovered) { $fallbacks += $discovered.FullName }
+    }
+
+    return Resolve-RafdiExecutable -Name 'uv.exe' -Fallbacks $fallbacks
 }
 
 function Get-RafdiWindowsMcpPath {
@@ -113,8 +123,8 @@ function Get-RafdiPortOwnerPid {
 }
 
 function Get-RafdiProcessCommandLine {
-    param([int]$Pid)
-    $p = Get-CimInstance Win32_Process -Filter "ProcessId=$Pid" -ErrorAction SilentlyContinue
+    param([int]$ProcessId)
+    $p = Get-CimInstance Win32_Process -Filter "ProcessId=$ProcessId" -ErrorAction SilentlyContinue
     if ($p) { return [string]$p.CommandLine }
     return ''
 }
