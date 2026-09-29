@@ -35,9 +35,8 @@ foreach ($proc in (Get-RafdiSupervisorProcesses -SupervisorPath $supervisorPath)
 
 Start-Sleep -Seconds 2
 if ($PSCmdlet.ShouldProcess($supervisorPath, 'Start supervisor')) {
-    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @(
-        '-NoProfile','-ExecutionPolicy','Bypass','-File',$supervisorPath
-    )
+    $supervisorArgs = "-NoProfile -ExecutionPolicy Bypass -File `"$supervisorPath`""
+    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList $supervisorArgs
 }
 
 if ($PSCmdlet.ShouldProcess([string]$config.taskName, 'Re-register auto-start task')) {
