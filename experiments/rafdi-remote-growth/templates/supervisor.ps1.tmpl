@@ -57,22 +57,35 @@ function Test-Identity([string]$AuthKey) {
         }
     } | ConvertTo-Json -Depth 8 -Compress
 
+    Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
+    $client = [System.Net.Http.HttpClient]::new()
+    $request = [System.Net.Http.HttpRequestMessage]::new(
+        [System.Net.Http.HttpMethod]::Post,
+        "http://127.0.0.1:$Port/mcp"
+    )
+    $response = $null
+
     try {
-        $headers = @{
-            Authorization = "Bearer $AuthKey"
-            Accept = 'application/json, text/event-stream'
-            Host = 'localhost'
-        }
-        $response = Invoke-WebRequest `
-            -Uri "http://127.0.0.1:$Port/mcp" `
-            -Method Post `
-            -Headers $headers `
-            -ContentType 'application/json' `
-            -Body $payload `
-            -TimeoutSec 8
-        return ([string]$response.Content -match 'windows-mcp')
+        $request.Headers.Authorization = [System.Net.Http.Headers.AuthenticationHeaderValue]::new('Bearer', $AuthKey)
+        $request.Headers.Accept.ParseAdd('application/json')
+        $request.Headers.Accept.ParseAdd('text/event-stream')
+        $request.Headers.Host = 'localhost'
+        $request.Content = [System.Net.Http.StringContent]::new(
+            $payload,
+            [Text.Encoding]::UTF8,
+            'application/json'
+        )
+
+        $response = $client.SendAsync($request).GetAwaiter().GetResult()
+        $body = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+
+        return ($response.IsSuccessStatusCode -and $body -match 'windows-mcp')
     } catch {
         return $false
+    } finally {
+        if ($response) { $response.Dispose() }
+        $request.Dispose()
+        $client.Dispose()
     }
 }
 
