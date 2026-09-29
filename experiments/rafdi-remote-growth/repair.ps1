@@ -1,6 +1,7 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
-    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote')
+    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'OtakAtik\RafdiRemote'),
+    [switch]$SkipFunnel
 )
 
 . (Join-Path $PSScriptRoot 'lib\common.ps1')
@@ -17,7 +18,7 @@ Write-RafdiHeading 'Repair'
 
 $ownerPid = Get-RafdiPortOwnerPid -Port $port
 if ($ownerPid -and -not (Test-RafdiWindowsMcpIdentity -Port $port -AuthKey $authKey)) {
-    $cmdLine = Get-RafdiProcessCommandLine -Pid $ownerPid
+    $cmdLine = Get-RafdiProcessCommandLine -ProcessId $ownerPid
     throw "Port $port is occupied by an unknown service (PID $ownerPid). Refusing destructive repair. Command line: $cmdLine"
 }
 
@@ -43,7 +44,7 @@ if ($PSCmdlet.ShouldProcess([string]$config.taskName, 'Re-register auto-start ta
     Register-RafdiAutoStartTask -TaskName ([string]$config.taskName) -StartScript $startPath
 }
 
-if (Test-Path -LiteralPath $tailscale) {
+if (-not $SkipFunnel -and (Test-Path -LiteralPath $tailscale)) {
     $status = Get-RafdiTailscaleStatus -TailscaleExe $tailscale
     if ($status -and [string]$status.BackendState -eq 'Running') {
         if ($PSCmdlet.ShouldProcess([string]$config.publicMcpUrl, 'Re-assert owned Funnel configuration')) {
