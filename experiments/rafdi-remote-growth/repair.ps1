@@ -48,7 +48,9 @@ if (Test-Path -LiteralPath $tailscale) {
     $status = Get-RafdiTailscaleStatus -TailscaleExe $tailscale
     if ($status -and [string]$status.BackendState -eq 'Running') {
         if ($PSCmdlet.ShouldProcess([string]$config.publicMcpUrl, 'Re-assert owned Funnel configuration')) {
-            & $tailscale funnel --bg --https=([int]$config.publicHttpsPort) ([int]$config.port)
+            $httpsArg = "--https=$([int]$config.publicHttpsPort)"
+            $backendPort = "$([int]$config.port)"
+            & $tailscale funnel --bg $httpsArg $backendPort
             if ($LASTEXITCODE -ne 0) { throw "tailscale funnel failed with exit code $LASTEXITCODE." }
         }
     } else {
