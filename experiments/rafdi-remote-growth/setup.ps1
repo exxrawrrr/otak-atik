@@ -206,7 +206,7 @@ if ($PSCmdlet.ShouldProcess($TaskName, 'Register per-user logon auto-start task'
 $authKey = Get-RafdiAuthKey -InstallRoot $InstallRoot
 $ownerPid = Get-RafdiPortOwnerPid -Port $Port
 if ($ownerPid -and -not (Test-RafdiWindowsMcpIdentity -Port $Port -AuthKey $authKey)) {
-    $cmdLine = Get-RafdiProcessCommandLine -Pid $ownerPid
+    $cmdLine = Get-RafdiProcessCommandLine -ProcessId $ownerPid
     throw "Local port $Port is already owned by PID $ownerPid and did not identify as this Windows-MCP instance. Refusing to kill or replace it. Command line: $cmdLine"
 }
 
