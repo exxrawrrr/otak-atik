@@ -1,4 +1,4 @@
-﻿
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -8,7 +8,16 @@ $script:RafdiRemoteDefaultPort = 18765
 $script:RafdiRemoteDefaultPublicHttpsPort = 8443
 
 function Assert-RafdiWindows {
-    if ($env:OS -ne 'Windows_NT') {
+    $isWindowsHost = $false
+
+    $isWindowsVariable = Get-Variable -Name IsWindows -ErrorAction SilentlyContinue
+    if ($isWindowsVariable) {
+        $isWindowsHost = [bool]$isWindowsVariable.Value
+    } elseif ($env:OS -eq 'Windows_NT' -or $PSVersionTable.PSEdition -eq 'Desktop') {
+        $isWindowsHost = $true
+    }
+
+    if (-not $isWindowsHost) {
         throw 'Rafdi Remote currently supports Windows only.'
     }
 }

@@ -1,4 +1,4 @@
-﻿
+
 $ErrorActionPreference = 'SilentlyContinue'
 $InstallRoot = '{{INSTALL_ROOT}}'
 $LogDir = Join-Path $InstallRoot 'logs'
@@ -10,6 +10,7 @@ $Port = {{PORT}}
 $WindowsMcpExe = '{{WINDOWS_MCP_EXE}}'
 $AllowedHostsJson = '{{ALLOWED_HOSTS_JSON}}'
 $Tools = '{{TOOLS}}'
+$AllowProxyHostOverride = {{ALLOW_PROXY_HOST_OVERRIDE}}
 
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
@@ -144,6 +145,9 @@ while ($true) {
         '--port',"$Port",
         '--tools',$Tools
     )
+    if ($AllowProxyHostOverride) {
+        $arguments += '--allow-insecure-remote'
+    }
 
     Write-RemoteLog "Starting Windows-MCP on 127.0.0.1:$Port."
     $child = Start-Process -FilePath $WindowsMcpExe -ArgumentList $arguments -WindowStyle Hidden -RedirectStandardOutput $StdOutLog -RedirectStandardError $StdErrLog -PassThru

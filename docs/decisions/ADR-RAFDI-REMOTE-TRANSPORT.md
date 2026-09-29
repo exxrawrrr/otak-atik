@@ -119,6 +119,33 @@ Windows-MCP on 127.0.0.1
 Windows tools
 ```
 
+## Reverse-proxy host validation decision (Phase 2B)
+
+Public Funnel testing exposed a layered host-validation conflict in the installed Windows-MCP stack.
+
+Observed test stack:
+
+```text
+Windows-MCP 0.8.6
+FastMCP 4.0.10
+MCP 2.2.0
+```
+
+Windows-MCP 0.8.6 computes a loopback-only Trusted Host allowlist when the server binds to loopback. A one-request probe behind Tailscale Funnel confirmed that Funnel preserves the real external `Host` header, including the public HTTPS port. That valid public host was rejected by Windows-MCP's own Trusted Host middleware before the explicit FastMCP host allowlist could handle the request.
+
+Decision:
+
+- keep Windows-MCP bound to `127.0.0.1`;
+- keep bearer authentication mandatory;
+- launch Windows-MCP with its official `--allow-insecure-remote` flag only to suppress its hardcoded loopback Trusted Host middleware;
+- keep FastMCP host-origin protection explicitly enabled;
+- explicitly allow only the discovered Tailscale DNS hostname and loopback hostnames, including wildcard-port forms;
+- never pair this compatibility flag with an unauthenticated `0.0.0.0` bind in this recipe.
+
+This is a compatibility shim, not a relaxation of the architecture's authentication or loopback-binding requirements.
+
+Revisit this decision when Windows-MCP exposes a first-class configurable public/reverse-proxy host allowlist.
+
 ## Required security properties
 
 The recipe is invalid if any of these are removed without an explicit new ADR:
@@ -127,6 +154,7 @@ The recipe is invalid if any of these are removed without an explicit new ADR:
 - bearer authentication remains enabled;
 - bearer key is generated per machine;
 - host-origin protection remains enabled;
+- if `--allow-insecure-remote` is used for Windows-MCP reverse-proxy compatibility, loopback binding + bearer authentication + explicit FastMCP host allowlisting remain mandatory;
 - allowed hosts are discovered/configured explicitly;
 - credentials stay outside the repository;
 - setup verifies service identity before declaring success;
