@@ -76,7 +76,16 @@ function Test-Identity([string]$AuthKey) {
     }
 }
 
-$mutex = New-Object System.Threading.Mutex($false, 'Local\OtakAtikRafdiRemoteSupervisor')
+$mutexMaterial = "$InstallRoot|$Port"
+$sha256 = [Security.Cryptography.SHA256]::Create()
+try {
+    $mutexBytes = [Text.Encoding]::UTF8.GetBytes($mutexMaterial)
+    $mutexHash = ([BitConverter]::ToString($sha256.ComputeHash($mutexBytes))).Replace('-','')
+} finally {
+    $sha256.Dispose()
+}
+$mutexName = "Local\OtakAtikRafdiRemoteSupervisor-$($mutexHash.Substring(0,16))"
+$mutex = New-Object System.Threading.Mutex($false, $mutexName)
 if (-not $mutex.WaitOne(0, $false)) { exit 0 }
 
 Write-RemoteLog 'Supervisor started.'
