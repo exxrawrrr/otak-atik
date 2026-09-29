@@ -175,7 +175,8 @@ if (Test-Path -LiteralPath `$tailscale) {
     `$raw = (& `$tailscale status --json 2>`$null) -join [Environment]::NewLine
     try { `$state = (`$raw | ConvertFrom-Json).BackendState } catch { `$state = '' }
     if (`$state -eq 'Running') {
-        & `$tailscale funnel --bg --https=`$publicHttpsPort `$port *> `$null
+        `$httpsArg = "--https=`$publicHttpsPort"
+        & `$tailscale funnel --bg `$httpsArg "`$port" *> `$null
     }
 }
 "@
