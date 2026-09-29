@@ -42,7 +42,8 @@ if (Test-Path -LiteralPath $tailscale) {
     $funnelText = Get-RafdiFunnelStatusText -TailscaleExe $tailscale
     if ($funnelText -match [regex]::Escape($baseUrl)) {
         if ($PSCmdlet.ShouldProcess($baseUrl, 'Disable owned Tailscale Funnel HTTPS listener')) {
-            & $tailscale funnel --https=([int]$config.publicHttpsPort) off
+            $httpsArg = "--https=$([int]$config.publicHttpsPort)"
+            & $tailscale funnel $httpsArg off
             if ($LASTEXITCODE -ne 0) {
                 Write-Warning "Could not disable Funnel cleanly (exit $LASTEXITCODE). Tailscale account/config was otherwise left untouched."
             }
