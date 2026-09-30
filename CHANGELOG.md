@@ -59,7 +59,8 @@ Current release-candidate validation target:
 - skill audit: **29 skills, 0 errors, 0 warnings**;
 - Windows PowerShell parse checks include the Rafdi Remote scripts and rendered supervisor template;
 - removed the unnecessary `shell: true` Git probe so `doctor` no longer emits Node `DEP0190`, with a regression test covering it;
-- packed-tarball smoke install verifies `doctor` and `version` from the distributable artifact.
+- packed-tarball smoke install verifies `doctor` and `version` from the distributable artifact;
+- switched the test script to cross-platform `node --test` discovery after GitHub Windows CI showed shell globs were not expanded.
 
 ## [0.1.0-alpha.4] - 2026-09-28
 
