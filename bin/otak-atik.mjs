@@ -33,8 +33,7 @@ function fail(label, value = "") {
 
 function commandExists(command, args = ["--version"]) {
   const res = spawnSync(command, args, {
-    encoding: "utf8",
-    shell: process.platform === "win32"
+    encoding: "utf8"
   });
   return {
     exists: !res.error && res.status === 0,

@@ -34,7 +34,7 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
+# Compiled binary addons (https://nodejs.org/api/addons)
 build/Release
 
 # Dependency directories
@@ -70,6 +70,26 @@ web_modules/
 .env.*
 !.env.example
 
+# Rafdi Remote / remote MCP machine-local secrets and runtime artifacts
+auth.key
+**/auth.key
+*.tailnet.key
+*.tunnel-token
+*.tunnel-token.*
+RAFDI_REMOTE_MCP_SETUP.txt
+**/RAFDI_REMOTE_MCP_SETUP.txt
+rafdi-remote.local.json
+**/rafdi-remote.local.json
+tailscale-funnel.out.txt
+tailscale-funnel.err.txt
+**/tailscale-funnel.out.txt
+**/tailscale-funnel.err.txt
+
+# Private-key / certificate material
+*.pem
+*.p12
+*.pfx
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -86,7 +106,7 @@ dist
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js
-# https://nextjs.org/blog/next-9-1#public-directory-support
+# https://nextjs.org/blog/en/next-9-1
 # public
 
 # vuepress build output

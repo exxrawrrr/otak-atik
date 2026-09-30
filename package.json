@@ -1,6 +1,6 @@
 {
   "name": "otak-atik",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "description": "Local-first AI operator lab with standalone project utilities, MCP routing, skills, policy, evidence, and verification.",
   "type": "module",
   "license": "Apache-2.0",
@@ -10,12 +10,14 @@
   "scripts": {
     "doctor": "node ./bin/otak-atik.mjs doctor",
     "validate": "node ./scripts/validate.mjs",
-    "test": "node --test ./tests/*.test.mjs",
+    "test": "node --test",
     "check": "npm run validate && npm test && npm run benchmark && npm run hygiene:self && npm run skill:audit",
     "benchmark": "node ./scripts/benchmark.mjs",
     "skill:new": "node ./scripts/new-skill.mjs",
     "hygiene:self": "node ./bin/otak-atik.mjs hygiene . --strict",
-    "skill:audit": "node ./scripts/audit-skills.mjs"
+    "skill:audit": "node ./scripts/audit-skills.mjs",
+    "release:check": "npm run check && npm pack --dry-run",
+    "prepublishOnly": "npm run check"
   },
   "engines": {
     "node": ">=20"
@@ -36,5 +38,13 @@
     "ai-handoff",
     "mcp-config",
     "git-risk"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exxrawrrr/otak-atik.git"
+  },
+  "bugs": {
+    "url": "https://github.com/exxrawrrr/otak-atik/issues"
+  },
+  "homepage": "https://github.com/exxrawrrr/otak-atik#readme"
 }

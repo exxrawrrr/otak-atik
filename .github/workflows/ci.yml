@@ -69,3 +69,49 @@ jobs:
           }
 
           Write-Host "Windows PowerShell scripts parsed successfully."
+
+
+      - name: Parse Rafdi Remote PowerShell
+        shell: powershell
+        run: |
+          $errors = @()
+          Get-ChildItem .\experiments\rafdi-remote-growth -Filter *.ps1 -Recurse | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$parseErrors
+            ) | Out-Null
+            if ($parseErrors.Count -gt 0) {
+              $errors += $parseErrors
+            }
+          }
+
+          $templatePath = ".\experiments\rafdi-remote-growth\templates\supervisor.ps1.tmpl"
+          $rendered = Get-Content -Raw -LiteralPath $templatePath
+          $rendered = $rendered.Replace('{{INSTALL_ROOT}}', 'C:\Temp\OtakAtikRafdiRemote')
+          $rendered = $rendered.Replace('{{PORT}}', '28765')
+          $rendered = $rendered.Replace('{{WINDOWS_MCP_EXE}}', 'C:\Users\Example\.local\bin\windows-mcp.exe')
+          $rendered = $rendered.Replace('{{ALLOWED_HOSTS_JSON}}', '["example.ts.net","example.ts.net:*","localhost","localhost:*","127.0.0.1","127.0.0.1:*"]')
+          $rendered = $rendered.Replace('{{TOOLS}}', 'PowerShell,FileSystem,Process')
+          $rendered = $rendered.Replace('{{ALLOW_PROXY_HOST_OVERRIDE}}', '$true')
+          $rendered = $rendered.Replace('{{MUTEX_NAME}}', 'Local\OtakAtikRafdiRemoteSupervisor-28765')
+
+          $tokens = $null
+          $templateErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseInput(
+            $rendered,
+            [ref]$tokens,
+            [ref]$templateErrors
+          ) | Out-Null
+          if ($templateErrors.Count -gt 0) {
+            $errors += $templateErrors
+          }
+
+          if ($errors.Count -gt 0) {
+            $errors | Format-List
+            exit 1
+          }
+
+          Write-Host "Rafdi Remote PowerShell parsed successfully."

@@ -1,24 +1,71 @@
 # otak-atik
 
-> **Status: gagal. Iyo, gagal.**
+> **Status: gagal sebagai tujuan awal. Berhasil sebagai eksperimen.**
 >
-> Bukan repo rusak.
+> Awalnya gue pengen bikin jalur sendiri supaya AI bisa remote komputer gue tanpa akhirnya bergantung ke plugin orang lain.
 >
-> Bukan karena test merah semua.
+> Kenyataannya?
 >
-> Tapi kalau tujuan awalnya adalah:
+> Untuk kerja harian, **Remote Desktop Commander masih paling praktis**.
 >
-> **"bikin jalur sendiri supaya AI bisa remote komputer gue tanpa akhirnya bergantung ke plugin orang lain"**
+> Tapi karena kesel sama limit, eksperimen, tunnel, MCP, dan segala tetek bengek itu, akhirnya lahir juga jalur sendiri yang sekarang beneran jalan:
 >
-> ...ya kenyataannya sekarang gue malah paling sering pakai **Remote Desktop Commander**.
+> **Rafdi Remote.**
 >
-> Jadi secara tujuan awal:
+> Jadi repo ini bukan cerita "gue bikin produk sempurna".
 >
-> **wes, kalah. 😭**
+> Ini cerita:
+>
+> **gagal â†’ nyatet kegagalan â†’ kesel â†’ otak-atik lagi â†’ djiancok wes limit cok â†’ ternyata jadi sesuatu yang kepake.**
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/feels-bad-man.jpg" width="290" alt="feels bad man meme" />
 </p>
+
+## TL;DR
+
+Kalau cuma mau tahu hasil akhirnya:
+
+```text
+DAILY / PALING PRAKTIS
+ChatGPT
+  â†“
+Remote Desktop Commander
+  â†“
+GROWTH
+```
+
+Kalau mau jalur buatan sendiri yang sekarang sudah terbukti bekerja:
+
+```text
+ChatGPT
+  â†“
+Composio Custom MCP
+  â†“
+Tailscale Funnel
+  â†“
+Windows-MCP on 127.0.0.1
+  â†“
+PowerShell / files / processes / selected GUI tools
+```
+
+Dan kalau kerja lokal:
+
+```text
+Codex / local AI
+  â†“
+Desktop Commander local MCP
+  â†“
+Windows
+```
+
+Jadi jawabannya bukan "satu tool mengalahkan semuanya".
+
+Jawabannya sekarang:
+
+> **pakai jalur yang paling waras buat konteksnya.**
+
+---
 
 ## Rencanane awal e iki
 
@@ -34,507 +81,361 @@ Terus kepikiran:
 
 Dari situ mulai otak-atik:
 
-- MCP;
-- remote MCP;
-- local MCP;
+- MCP, remote MCP, local MCP;
 - browser bridge;
 - launcher;
-- skill;
-- capability;
-- approval;
-- evidence;
-- verification;
-- router;
-- CLI;
-- dan tentu saja...
-
-**kebanyakan ide.**
+- skill dan capability;
+- approval dan security boundary;
+- evidence dan verification;
+- router dan CLI;
+- tunnel;
+- remote desktop;
+- dan tentu saja: **kebanyakan ide**.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/disaster-girl.jpg" width="300" alt="disaster girl meme" />
 </p>
 
-Rencana kasarnya waktu itu:
+Di kepala, diagramnya cakep:
 
 ```text
 ChatGPT / AI
-      ↓
+      â†“
 otak-atik
-      ↓
+      â†“
 pilih transport
-      ↓
+      â†“
 pilih capability
-      ↓
-pilih skill
-      ↓
-jalanin kerjaan
-      ↓
+      â†“
+jalankan kerjaan
+      â†“
 verify
-      ↓
+      â†“
 done
 ```
 
-Cakep.
+Di dunia nyata?
 
-Di diagram.
+Ya nggak sebersih itu, cak.
 
 ---
 
 ## Terus kenyataannya gimana?
 
-Kenyataannya:
+Versi pertama dari kenyataan:
 
 ```text
 ChatGPT
-   ↓
-Remote Desktop Commander plugin
-   ↓
+   â†“
+Remote Desktop Commander
+   â†“
 komputer gue
 ```
 
-😭
-
-Dan buat kerja lokal:
-
-```text
-Codex / local AI
-   ↓
-Desktop Commander local MCP
-   ↓
-komputer gue
-```
-
-Jadi setelah bikin router, adapter concept, launcher, skill registry, benchmark, provider scorecard, failure lab, dan tetek bengek lainnya...
+Setelah bikin router, adapter concept, launcher, skill registry, benchmark, provider scorecard, failure lab, dan macam-macam...
 
 **jalur yang paling sering gue pakai justru plugin yang sudah ada.**
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/ship-your-machine.jpg" width="305" alt="ship your machine meme" />
-</p>
 
 Kalau ukuran suksesnya:
 
 > "apakah otak-atik menggantikan plugin?"
 
-Jawabannya:
+Jawabannya tetap:
 
 ## **nggak.**
 
-Setidaknya belum.
+Dan itu gue biarin tertulis.
+
+Karena repo yang pura-pura sukses cuma bikin orang lain ngulang kesalahan yang sama.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/ship-your-machine.jpg" width="305" alt="ship your machine meme" />
+</p>
 
 ---
 
-## Jadi repo ini gagal total?
+# Plot twist: terus quota mulai bikin emosi
 
-Nggak juga.
+Remote Desktop Commander enak.
 
-Ini justru salah satu alasan gue nggak hapus repo ini.
+Masalahnya, remote call itu bukan sumber daya tak terbatas.
 
-Karena dari eksperimen ini gue jadi ngerti bedanya:
+Sampai pada titik workflow gue mulai terasa seperti:
+
+> **"djiancok wes limit cok, masa cuma mau nyentuh PowerShell kudu mikir sisa call."**
+
+Nah, dari sini arah repo berubah.
+
+Bukan lagi:
+
+> "gue harus mengganti plugin."
+
+Tapi:
+
+> **"gue butuh jalur cadangan yang beneran usable, bisa auto-start, bisa direcover, dan nggak bikin gue setup ulang tunnel tiap laptop restart."**
+
+Dari situlah eksperimen **Rafdi Remote GROWTH** mulai serius.
+
+---
+
+# Rafdi Remote: eksperimen yang akhirnya beneran hidup
+
+Arsitektur final yang diuji:
 
 ```text
-REMOTE DESKTOP
-≠
-REMOTE MCP
-≠
-LOCAL MCP
-≠
-BROWSER BRIDGE
-≠
-GUI COMPUTER USE
-≠
-SKILL
-≠
-PERMISSION
-≠
-VERIFICATION
+ChatGPT
+  â†“
+Composio Custom MCP
+  â†“
+Tailscale Funnel
+  â†“
+Windows-MCP
+  â†“
+127.0.0.1 on GROWTH
+  â†“
+PowerShell / FileSystem / Process / selected computer-use tools
 ```
 
-Sebelumnya semua terasa seperti:
+Bukan sekadar diagram.
 
-> "pokoknya AI bisa ngontrol komputer."
+Di GROWTH, jalur ini sudah diuji terhadap:
 
-Ternyata ya ora sesimpel kuwi.
+- bearer authentication;
+- public HTTPS Funnel;
+- rejection untuk request tanpa token;
+- authenticated MCP initialize;
+- supervisor recovery;
+- Scheduled Task recovery;
+- Tailscale reconnect;
+- actual Windows reboot;
+- dan command nyata dari ChatGPT sesudah reboot.
 
-Ada transport.
+Bukti lengkapnya ada di:
 
-Ada capability.
-
-Ada security boundary.
-
-Ada approval.
-
-Ada masalah GUI.
-
-Ada quota.
-
-Ada provider yang discovery-nya hidup tapi execution-nya belum tentu.
-
-Ada tool yang bisa terminal tapi nggak bisa lihat tombol di layar.
-
-Ada remote desktop yang bisa klik-klik tapi nggak ngerti MCP blas.
-
-Dan ada gue di tengah-tengah:
-
-> **"lah kok dadi ngene."**
+- [Rafdi Remote overview](docs/RAFDI-REMOTE-GROWTH.md)
+- [Phase 2A checkpoint](docs/RAFDI-REMOTE-GROWTH-PHASE-2A-CHECKPOINT.md)
+- [Phase 2B reality test](docs/RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md)
+- [Transport/security ADR](docs/decisions/ADR-RAFDI-REMOTE-TRANSPORT.md)
+- [Reusable installer](experiments/rafdi-remote-growth/README.md)
 
 ---
 
-## Salah satu eksperimen memang beneran gagal
+## Yang paling penting: survive restart beneran
 
-Browser bridge lewat **MCP SuperAssistant** pernah dicoba.
+Bukan cuma "task kelihatannya ada".
 
-Discovery jalan.
+GROWTH benar-benar restart.
+
+Sesudah boot:
+
+```text
+Windows boot
+  â†“
+Scheduled Task
+  â†“
+Rafdi Remote supervisor
+  â†“
+Windows-MCP 127.0.0.1:18765
+  â†“
+Tailscale Funnel restored
+  â†“
+ChatGPT via Composio
+  â†“
+PowerShell on GROWTH
+```
+
+Dan itu terbukti jalan.
+
+Jadi sekarang gue punya dua kenyataan yang sama-sama benar:
+
+```text
+Remote Desktop Commander
+= masih paling praktis
+```
+
+dan:
+
+```text
+Rafdi Remote
+= jalur buatan sendiri yang sudah terbukti bekerja
+```
+
+Itu jauh lebih berguna daripada maksa satu pihak jadi "pemenang".
+
+---
+
+## Bug paling nyebelin yang ketemu
+
+Public Funnel sempat hidup, request sampai ke Windows, tapi MCP balas:
+
+```text
+400 Invalid host header
+```
+
+Awalnya keliatan kayak masalah Tailscale.
+
+Ternyata bukan.
+
+Kita sampai pasang one-request HTTP probe di belakang Funnel buat lihat Host header yang benar-benar datang.
+
+Tailscale ternyata meneruskan host yang benar.
+
+Root cause-nya ada di **Windows-MCP 0.8.6** yang memasang Trusted Host middleware loopback sendiri.
+
+Akhirnya public mode pakai compatibility shim resmi Windows-MCP:
+
+```text
+--allow-insecure-remote
+```
+
+Tapi ini **bukan** berarti service dibuka ngawur.
+
+Recipe repo ini tetap mensyaratkan:
+
+```text
+bind = 127.0.0.1
+bearer auth = ON
+FastMCP host-origin protection = ON
+allowed hosts = explicit
+public transport = Tailscale Funnel
+```
+
+Kalau salah satu boundary itu dibuang, itu bukan lagi recipe yang diuji di repo ini.
+
+---
+
+## Hal-hal yang gagal di jalan
+
+### MCP SuperAssistant browser bridge
+
+Discovery pernah jalan.
 
 `initialize` jalan.
 
 `tools/list` muncul.
 
-Puluhan tool kelihatan.
+Tapi jalur itu **nggak terbukti jadi daily execution path yang reliable**.
 
-Tapi dari inspection yang gue lakukan, jalur itu **nggak terbukti jadi daily execution path yang reliable**.
-
-Jadi statusnya gue tulis terang-terangan:
+Statusnya tetap:
 
 ```text
 PARTIAL_FAILURE
 ```
 
-Laporan eksperimennya tetap disimpan:
+Laporan tetap disimpan:
 
-[Experiment report — MCP SuperAssistant browser bridge](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
+[Experiment report â€” MCP SuperAssistant browser bridge](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
 
-Karena failed experiment yang dibuang cuma bikin kita gagal dua kali.
+### Installer Rafdi Remote versi awal
 
-Sekali waktu eksperimennya gagal.
+Dogfood nangkep banyak hal yang kalau langsung dipublish bakal ngeselin:
 
-Sekali lagi waktu kita lupa **kenapa** dia gagal.
+- resolver `uv.exe` terlalu sempit;
+- health check SSE false-negative;
+- parameter `$Pid` bentrok dengan `$PID` bawaan PowerShell;
+- mutex supervisor terlalu global;
+- patch substring sempat merusak empat script;
+- output local-only sempat misleading;
+- Windows detection lama terlalu bergantung pada `$env:OS`;
+- test residue sempat ikut auto-start setelah reboot.
+
+Semua itu alasan kenapa gue sekarang lebih percaya:
+
+> **dogfood dulu, baru ngoceh "works".**
 
 ---
 
 ## Yang sebenarnya gue pakai sekarang
 
-### 1. ChatGPT dari HP / jauh dari komputer
+### Remote harian dari ChatGPT / HP
 
 **Remote Desktop Commander**
 
+Masih paling gampang ketika gue cuma pengen:
+
+- buka file;
+- jalanin PowerShell;
+- inspect process;
+- edit project;
+- troubleshooting mesin secara langsung.
+
+### Backup / jalur buatan sendiri
+
+**Rafdi Remote GROWTH**
+
+Dipakai lewat:
+
 ```text
-ChatGPT
-→ Remote Desktop Commander
-→ paired Windows machine
+ChatGPT â†’ Composio Custom MCP â†’ Tailscale â†’ Windows-MCP
 ```
 
-Ini paling praktis buat gue sekarang.
+Ini sekarang bukan lagi konsep doang.
 
-Remote Desktop Commander punya remote MCP untuk AI web seperti ChatGPT/Claude, sementara Desktop Commander local MCP bisa dipakai lokal oleh Codex dan client MCP lain.
+Tapi statusnya tetap **experimental**, bukan produk remote-access universal.
 
-**Tapi ini juga alasan repo ini gue sebut gagal.**
+### Kerja lokal
 
-Karena ujung-ujungnya:
+**Desktop Commander local MCP**
 
-> **gue pakai plugin.**
-
-Bukan bikin penggantinya sendiri.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/friday-deploy.jpg" width="300" alt="friday deploy meme" />
-</p>
-
-### 2. Kerja lokal
-
-Kalau AI dan komputer ada di mesin yang sama:
+Kalau AI dan Windows ada di mesin yang sama, muter lewat internet ya ngapain.
 
 ```powershell
 codex mcp add desktop-commander -- npx -y @wonderwhy-er/desktop-commander@latest
 ```
 
-Ini lebih masuk akal daripada memutar kerja lokal lewat remote relay.
-
-Local Desktop Commander MCP sendiri open source.
-
 ---
 
-# Gais, gue justru lagi nyari solusi 😭
+## Jadi repo ini gagal total?
 
-Nah.
+Nggak.
 
-Kalau lu nemu project yang lebih cocok, **please kasih tahu**.
+Tapi gue juga nggak mau rewrite sejarah seolah dari awal semuanya sesuai roadmap.
 
-Yang gue cari kurang lebih begini:
+Status paling jujurnya:
 
 ```text
-FREE / OPEN SOURCE kalau bisa
-+
-Windows
-+
-bisa remote lewat internet
-+
-AI bisa screenshot
-+
-AI bisa click / type / scroll
-+
-MCP native atau gampang dijadikan MCP
-+
-kalau bisa muncul sebagai plugin/connector di ChatGPT
-+
-nggak harus bayar API tiap gerak mouse
-+
-self-hostable = bonus besar
+FAILED AS THE ORIGINAL "REPLACE THE PLUGIN" IDEA
+
+BUT
+
+SUCCESSFUL AS:
+- a research lab
+- a failure log
+- a routing/operator experiment
+- a standalone utility pack
+- a real remote-MCP backup path
 ```
 
-Kalau ada benda yang memenuhi itu semua:
-
-**mas, mbak, cak, suhu — issue repo ini terbuka.**
+Repo ini sekarang lebih berharga karena ada bagian yang gagal **dan** ada bagian yang akhirnya works.
 
 ---
 
-## Kandidat yang sejauh ini paling menarik
+## Biar mampir nggak cuma bawa cerita gagal
 
-### 1. QuickDesk — paling dekat dengan yang gue cari
+Walaupun lu nggak pakai remote setup apa pun, CLI repo ini tetap punya utilitas standalone.
 
-https://github.com/barry-ran/QuickDesk
-
-Ini yang paling bikin gue:
-
-> **"lah, iki toh sing tak goleki?"**
-
-QuickDesk mendeskripsikan dirinya sebagai AI-native remote desktop yang:
-
-- open source;
-- gratis;
-- punya **built-in MCP Server**;
-- bisa screenshot;
-- click;
-- type;
-- drag;
-- scroll;
-- clipboard;
-- remote ke device lain;
-- punya stdio dan HTTP/SSE MCP transport;
-- bisa self-host signaling/TURN.
-
-Jadi secara konsep:
-
-```text
-AI
-↓ MCP
-QuickDesk
-↓
-remote desktop
-↓
-screenshot / mouse / keyboard
-```
-
-**Ini kandidat nomor satu buat eksperimen berikutnya.**
-
-Belum gue anggap pengganti final sebelum gue tes sendiri.
-
-Karena README orang lain boleh bilang "works".
-
-Gue tetap pengen lihat:
-
-> **works neng komputerku ora?**
-
----
-
-### 2. RustDesk — remote desktop-nya mantap, MCP-nya belum native
-
-https://github.com/rustdesk/rustdesk
-
-RustDesk itu open-source remote desktop dan bisa self-host server sendiri.
-
-Buat manusia remote komputer:
-
-**bagus banget sebagai kandidat.**
-
-Masalah buat use case repo ini:
-
-> dia bukan MCP-native remote computer-use layer.
-
-Jadi kemungkinan arsitekturnya malah:
-
-```text
-AI
-↓
-MCP computer-use bridge
-↓
-RustDesk / remote transport
-↓
-Windows
-```
-
-Menarik.
-
-Tapi berarti ada satu lapisan lagi yang harus gue otak-atik.
-
-Dan kita tahu biasanya kalimat:
-
-> "cuma tambah satu layer"
-
-berakhir bagaimana.
-
----
-
-### 3. MCPComputerUse — MCP GUI Windows, tapi bukan remote transport
-
-https://github.com/kblood/MCPComputerUse
-
-Ini menarik karena memang bikin MCP server Windows untuk:
-
-- screenshot;
-- window management;
-- mouse;
-- keyboard;
-- macro/automation.
-
-Jadi buat:
-
-```text
-AI
-↓ MCP
-Windows GUI
-```
-
-masuk.
-
-Tapi problem **remote lewat internet** masih perlu lapisan lain.
-
-Berarti mungkin perlu tunnel/VPN/relay yang aman.
-
-Masih eksperimen territory.
-
----
-
-### 4. Remote Desktop Commander — yang akhirnya gue pakai 😭
-
-https://github.com/desktop-commander/remote-desktop-commander
-
-Ya.
-
-Ironis memang.
-
-Remote Desktop Commander sekarang adalah jalur harian gue.
-
-Dia bagus untuk:
-
-- file system;
-- terminal;
-- process;
-- editing;
-- development workflow;
-- remote MCP dari ChatGPT.
-
-Tapi dia bukan full graphical remote desktop computer-use.
-
-Jadi untuk:
-
-> "lihat layar → cari tombol → klik → drag → interaksi GUI arbitrary"
-
-gue masih pengen sesuatu yang lebih native.
-
-Hosted Remote MCP-nya juga beda dengan local Desktop Commander MCP: local server-nya open source, sementara hosted remote service implementation-nya bukan open source.
-
-Jadi masih ada alasan buat terus mencari.
-
----
-
-## Yang gue pengen komunitas bantu jawab
-
-Kalau lu nyasar ke repo ini dan ngerti area beginian, gue pengen jawaban konkret:
-
-### Apakah ada solusi yang:
-
-1. gratis atau open source;
-2. bisa jalan di Windows;
-3. bisa remote lewat internet;
-4. punya screenshot + mouse + keyboard;
-5. MCP-native **atau** gampang dijadikan MCP;
-6. aman buat ditinggal running;
-7. bisa dikontrol ChatGPT/Claude/Codex dari device lain;
-8. nggak butuh lima service tambahan hanya untuk klik Start Menu?
-
-Kalau ada:
-
-**open an issue.**
-
-Serius.
-
-Karena mungkin solusi terbaik repo ini bukan nambah 12 ribu baris code.
-
-Mungkin cukup:
-
-> **"bro, pakai ini aja."**
-
-Dan kalau memang begitu:
-
-ya dipakai.
-
-Gengsi engineering tidak lebih penting dari benda yang bekerja.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/git-force-push.jpg" width="300" alt="git force push meme" />
-</p>
-
----
-
-## Biar mampir nggak cuma bawa cerita gagal 🙏🏼😭
-
-Nah ini yang sekarang gue paksa ada di repo.
-
-Walaupun lu **nggak install Remote Desktop Commander**, **nggak pakai MCP SuperAssistant**, dan bahkan belum punya MCP client sama sekali, clone repo ini tetap harus ngasih sesuatu yang kepake.
-
-Cukup Node.js 20+.
-
-### Peta project buat AI
+### Snapshot project
 
 ```powershell
 otak-atik snapshot .
 ```
 
-Bikin ringkasan project tanpa nge-dump semua source:
+Bikin peta project tanpa nge-dump semua source.
 
-- jumlah file/folder;
-- file penting;
-- extension dominan;
-- top-level structure;
-- branch Git;
-- working tree dirty atau nggak.
-
-Berguna sebelum AI kalap baca 200 file satu-satu.
-
-### Cek kemungkinan secret sebelum publish
+### Secret hygiene
 
 ```powershell
 otak-atik hygiene .
 otak-atik hygiene . --strict
 ```
 
-Scanner ini nyari pola credential berisiko dan cuma laporan:
+Nilai secret sengaja tidak dicetak.
 
-```text
-file
-line
-jenis credential
-severity
-```
-
-**Nilai secret-nya sengaja nggak dicetak.**
-
-### Audit config MCP
+### Audit MCP config
 
 ```powershell
 otak-atik mcp-check path\to\mcp.json
 ```
-
-Bisa nangkep hal-hal receh tapi ngeselin:
-
-- JSON invalid;
-- `mcpServers` hilang;
-- command/url nggak jelas;
-- args/env bentuknya salah;
-- URL invalid;
-- remote MCP masih plain HTTP;
-- kemungkinan token ditulis inline di config.
 
 ### Lint SKILL.md
 
@@ -542,37 +443,11 @@ Bisa nangkep hal-hal receh tapi ngeselin:
 otak-atik skill-check path\to\SKILL.md
 ```
 
-Buat ngecek skill sebelum dilempar ke repo publik:
-
-- frontmatter;
-- name;
-- description;
-- kebab-case;
-- status/scope;
-- file terlalu gendut;
-- folder/name mismatch;
-- path Windows pribadi nyangkut.
-
-### Bikin handoff ke AI lain
+### Handoff ke AI lain
 
 ```powershell
 otak-atik handoff . --task "lanjut benerin project ini" --out handoff.json
 ```
-
-Jadi kalau mau pindah:
-
-```text
-ChatGPT
-→ Codex
-→ Claude
-→ AI lain
-```
-
-nggak harus mulai dari:
-
-> "jadi gini bro dari awal ya..."
-
-Handoff-nya bawa snapshot project, Git state, package scripts, task, hygiene counts, dan operating notes — **tanpa embed nilai secret**.
 
 ### Review risiko Git diff
 
@@ -580,47 +455,13 @@ Handoff-nya bawa snapshot project, Git state, package scripts, task, hygiene cou
 otak-atik diff-risk .
 ```
 
-Buat kasih perhatian ekstra kalau diff nyentuh:
-
-- delete file;
-- auth/security;
-- `.env`;
-- migration;
-- workflow GitHub Actions;
-- dependency/lockfile;
-- config/schema;
-- perubahan teks gede;
-- binary.
-
-Ini **bukan vonis** bahwa perubahan HIGH itu jelek.
-
-Maksudnya:
-
-> **"cak, sing iki ojo asal pencet commit."**
-
-Detail lengkap: [Standalone Utility Pack](docs/UTILITY-PACK.md).
+Detail: [Standalone Utility Pack](docs/UTILITY-PACK.md).
 
 ---
 
-## Terus isi repo ini sekarang buat apa?
+## Native engine / lab
 
-Walaupun produk awalnya gagal, beberapa bagian masih berguna sebagai bahan eksperimen:
-
-- transport router;
-- operator plan compiler;
-- capability inference;
-- approval/risk contract;
-- evidence contract;
-- provider scorecard;
-- failed-experiment lab;
-- benchmark scenarios;
-- Windows launcher;
-- provider manifests;
-- skill registry;
-- setup decision tree;
-- docs tentang remote/local/browser paths.
-
-CLI-nya juga masih hidup:
+Bagian eksperimen native masih ada:
 
 ```powershell
 otak-atik doctor
@@ -633,7 +474,7 @@ otak-atik providers
 otak-atik lab
 ```
 
-Validation:
+Validation penuh:
 
 ```powershell
 npm run check
@@ -642,7 +483,7 @@ npm run check
 Current package:
 
 ```text
-0.1.0-alpha.3
+0.1.0-alpha.5
 ```
 
 Node:
@@ -653,123 +494,124 @@ Node:
 
 ---
 
-## Status project sekarang
+## Kandidat yang masih menarik buat dieksplor
 
-Gue lebih suka menyebut statusnya:
+Repo ini tetap nyimpen pertanyaan yang belum selesai:
 
-```text
-FAILED AS THE ORIGINAL SOLUTION
-ACTIVE AS A RESEARCH / FAILURE LAB
-```
+> bisakah kita punya remote graphical computer-use yang open source, Windows-friendly, MCP-native, aman, dan nggak bikin lima service cuma untuk klik Start Menu?
 
-Bukan production-ready operator.
+Beberapa kandidat yang pernah dicatat:
 
-Bukan remote desktop replacement.
+- [QuickDesk](https://github.com/barry-ran/QuickDesk)
+- [RustDesk](https://github.com/rustdesk/rustdesk)
+- [MCPComputerUse](https://github.com/kblood/MCPComputerUse)
+- [Remote Desktop Commander](https://github.com/desktop-commander/remote-desktop-commander)
 
-Bukan pesaing TeamViewer.
-
-Bukan pesaing plugin yang sekarang malah gue pakai.
-
-Repo ini sekarang adalah tempat buat:
-
-> **nyatet apa yang dicoba, apa yang works, apa yang goblok, apa yang gagal, dan apa yang mungkin layak dicoba berikutnya.**
+Gue nggak menganggap kandidat sebagai solusi final sebelum ada bukti real usage di mesin sendiri.
 
 ---
 
-## Prinsip yang masih gue pertahankan
+## Prinsip repo ini sekarang
 
 ```text
 Reality > roadmap.
 Evidence > vibes.
 Working plugin > homemade architecture yang nggak kepakai.
-Local > remote kalau memang task-nya lokal.
+Homemade path yang sudah terbukti > homemade path yang cuma cakep di diagram.
+Local > remote kalau task-nya memang lokal.
 Verification > "harusnya sudah".
 Failure documented > failure dilupakan.
 Useful > gengsi bikin sendiri.
 ```
 
-Dan mungkin pelajaran paling mahal dari repo ini:
+Pelajaran paling mahalnya:
 
 > **nggak semua masalah perlu diselesaikan dengan bikin produk baru.**
 
-Kadang jawabannya memang:
+Tapi kadang, setelah cukup banyak gagal, sesuatu yang awalnya cuma "otak-atik" malah berubah jadi backup system yang beneran hidup.
 
-> "install plugin iki."
-
-😭
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/friday-deploy.jpg" width="300" alt="friday deploy meme" />
+</p>
 
 ---
 
-## Docs yang masih relevan
+## Docs yang paling relevan
+
+### Remote / transport
 
 - [What I actually use](docs/WHAT-I-ACTUALLY-USE.md)
-- [Research status](docs/RESEARCH-STATUS.md)
-- [Alternatives](docs/ALTERNATIVES.md)
+- [Rafdi Remote overview](docs/RAFDI-REMOTE-GROWTH.md)
+- [Rafdi Remote Phase 2B](docs/RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md)
 - [Remote Desktop Commander](docs/REMOTE-DESKTOP-COMMANDER.md)
-- [MCP SuperAssistant browser bridge](docs/BROWSER-BRIDGE.md)
+- [Alternatives](docs/ALTERNATIVES.md)
+
+### Engineering / research
+
+- [Research status](docs/RESEARCH-STATUS.md)
 - [Provider matrix](docs/PROVIDER-MATRIX.md)
-- [Failure report](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
-- [Security](SECURITY.md)
+- [Browser bridge](docs/BROWSER-BRIDGE.md)
+- [Setup decision tree](docs/SETUP-DECISION-TREE.md)
+- [Project state](PROJECT_STATE.md)
 - [Roadmap](ROADMAP.md)
+
+### Security / contribution
+
+- [Security](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+- [Rafdi Remote transport ADR](docs/decisions/ADR-RAFDI-REMOTE-TRANSPORT.md)
 
 ---
 
-<br/>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/git-force-push.jpg" width="300" alt="git force push meme" />
+</p>
 
 # For everyone else
 
-**otak-atik is a documented failed experiment that remains active as a research lab for AI-to-computer control, MCP transports, routing, skills, evidence, and verification.**
+**otak-atik is a public AI-to-computer control research lab that started as a failed attempt to replace a convenient remote plugin and evolved into a mix of routing experiments, standalone developer utilities, documented failures, and a working experimental remote-MCP backup path.**
 
-The original goal was to create a practical operator layer that could help AI clients reach and operate the author's computer without depending on a single third-party plugin or transport.
-
-In real daily use, that goal has not been achieved.
-
-The author's current primary remote workflow is:
+The primary daily remote route is still:
 
 ```text
 ChatGPT
-→ Remote Desktop Commander
-→ Windows machine
+â†’ Remote Desktop Commander
+â†’ Windows
 ```
 
-For local MCP work, Desktop Commander is used directly with clients such as Codex.
+A separately built experimental path has also been verified:
 
-The repository is retained because it contains useful experiments around transport selection, capability modeling, approval boundaries, evidence contracts, provider evaluation, onboarding, and failure documentation.
+```text
+ChatGPT
+â†’ Composio Custom MCP
+â†’ Tailscale Funnel
+â†’ Windows-MCP
+â†’ Windows
+```
 
-## Current research question
+That path survived authentication tests, public reachability tests, supervisor recovery, Tailscale reconnect, and an actual Windows restart on the original GROWTH machine.
 
-The project is particularly interested in a free/open-source path that combines:
+This does **not** make the repository a production remote-desktop replacement.
 
-- remote desktop transport;
-- graphical computer use;
-- screenshots;
-- mouse and keyboard control;
-- Windows support;
-- MCP compatibility;
-- remote AI-client access;
-- safe user-controlled authorization.
-
-QuickDesk currently appears to be the closest public project to that requirement set and is the next obvious candidate for evaluation.
-
-RustDesk is a strong open-source remote-desktop candidate but does not provide the same built-in MCP computer-use interface.
-
-MCPComputerUse provides a Windows-native MCP GUI-control layer but is not itself the remote transport.
+It does make the failure story more interesting than "we gave up."
 
 ## Contributions
 
-Reports from real usage are more valuable than architecture opinions.
+Real usage reports are more valuable than architecture opinions.
 
-If you know a project that better satisfies the requirements above, open an issue with:
+If you know a better approach, open an issue with what you personally verified.
 
-- project/repository link;
+Especially useful:
+
+- remote transport model;
 - license;
 - supported operating systems;
-- remote transport model;
-- MCP integration method;
+- MCP integration;
 - screenshot/mouse/keyboard support;
-- self-hosting status;
-- what you personally verified.
+- self-hosting model;
+- authentication/security boundary;
+- actual test evidence.
 
 ---
 
-**The experiment failed to replace the plugin. The documentation does not need to pretend otherwise.**
+**The original idea failed to replace the plugin. The experiment did not stop there.**
