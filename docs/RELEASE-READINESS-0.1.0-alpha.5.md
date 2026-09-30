@@ -1,7 +1,7 @@
-# Release Readiness — v0.1.0-alpha.5
+# Release Readiness â€” v0.1.0-alpha.5
 
-Date: 2026-09-30  
-Candidate branch: `feat/rafdi-remote-growth-stable`  
+Date: 2026-09-30
+Candidate branch: `feat/rafdi-remote-growth-stable`
 Target branch: `main`
 
 ## Release intent
