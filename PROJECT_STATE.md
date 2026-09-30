@@ -2,7 +2,7 @@
 
 **Current milestone:** V0.2 native operator/control layer + Rafdi Remote experimental transport
 **Repository maturity:** active public experiment / research lab
-**Current package:** 0.1.0-alpha.4
+**Current package:** 0.1.0-alpha.5
 
 ## Honest status
 

@@ -4,6 +4,63 @@ All notable changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.5] - 2026-09-30
+
+### Rafdi Remote experiment
+
+Added a reusable Windows remote-MCP experiment built around:
+
+- Composio Custom MCP;
+- Tailscale Funnel;
+- Windows-MCP bound to loopback;
+- locally generated bearer authentication;
+- FastMCP host-origin protection;
+- per-user Scheduled Task startup;
+- a supervisor with bounded logs and conservative recovery;
+- status, test, repair, and safe-disable scripts.
+
+### Reality testing
+
+Verified on the original GROWTH Windows machine:
+
+- public Funnel reachability;
+- unauthenticated public requests rejected with HTTP 401;
+- authenticated MCP initialize through the public endpoint;
+- supervisor recovery;
+- Scheduled Task/logon-style recovery;
+- Tailscale reconnect persistence;
+- actual Windows reboot persistence;
+- post-reboot ChatGPT -> Composio -> Windows-MCP command execution.
+
+### Safety / hardening
+
+- Windows-MCP remains bound to `127.0.0.1`;
+- bearer keys are generated locally and not printed by normal setup;
+- setup refuses ambiguous local-port ownership;
+- first-time Funnel publication remains explicit;
+- repair avoids broad process termination;
+- uninstall does not run global `tailscale funnel reset`;
+- proxy compatibility is enabled only for public mode while bearer auth and FastMCP host checks remain active.
+
+### Documentation
+
+- rewrote the main README around the real failure-to-working-backup story;
+- documented the current daily, backup, and local workflows;
+- added Phase 1.5, Phase 2A, and Phase 2B evidence checkpoints;
+- added the Rafdi Remote transport/security ADR and public manifest/gate.
+
+### Quality
+
+Current release-candidate validation target:
+
+- Node tests: **39/39 PASS**;
+- routing benchmark: **4/4 PASS**;
+- strict self-hygiene: **0 findings**;
+- skill audit: **29 skills, 0 errors, 0 warnings**;
+- Windows PowerShell parse checks include the Rafdi Remote scripts and rendered supervisor template;
+- removed the unnecessary `shell: true` Git probe so `doctor` no longer emits Node `DEP0190`, with a regression test covering it;
+- packed-tarball smoke install verifies `doctor` and `version` from the distributable artifact.
+
 ## [0.1.0-alpha.4] - 2026-09-28
 
 ### Standalone Utility Pack
