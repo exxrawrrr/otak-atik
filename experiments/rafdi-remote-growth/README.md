@@ -280,6 +280,7 @@ On an isolated public test path, while the live Stable endpoint stayed online:
 - the registered Scheduled Task restored the runtime after a cooperative stop;
 - the supervisor restarted a deliberately terminated, verified Windows-MCP child with a new PID;
 - a `tailscale down` / `tailscale up` cycle restored both Stable and isolated Funnel mappings from stored state;
+- a real Windows restart on 2026-09-30 restored the Stable listener, Tailscale Funnel, and ChatGPT -> Composio -> Windows-MCP command path automatically;
 - the complete public test suite passed from Remote Desktop Commander after Windows-host detection was hardened for PowerShell hosts that do not populate `$env:OS`;
 - the full package `test.ps1` suite passed again after recovery.
 

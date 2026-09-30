@@ -193,6 +193,42 @@ The shared helper now detects Windows using:
 
 After refreshing the runtime helper, the complete public `test.ps1` suite passed from Remote Desktop Commander as well.
 
+## Actual Windows restart proof — 2026-09-30
+
+After the machine-maintenance checkpoint, GROWTH was genuinely restarted. This was not a simulated task restart.
+
+Observed after Windows boot:
+
+```text
+Windows boot time: 2026-09-30 07:48:09 +07:00
+Stable listener 127.0.0.1:18765: online
+Rafdi Remote GROWTH AutoStart last task result: 0
+Tailscale backend: Running
+Stable Funnel 443 -> 127.0.0.1:18765: restored
+```
+
+A command was then executed from ChatGPT through the existing Composio Custom MCP / Rafdi Remote Stable connection. The remote command reported the restarted GROWTH host, the same boot timestamp, repository availability, and the Stable listener online.
+
+This is stronger than the earlier simulated logon-task exercise: the full real-world chain survived an actual Windows restart.
+
+Post-restart housekeeping also found one old local-only Phase 2 test installation that was not part of the Stable endpoint:
+
+```text
+runtime: %LOCALAPPDATA%\OtakAtik\RafdiRemotePhase2Test
+local port: 18766
+Scheduled Task: OtakAtik Rafdi Remote Phase2 Test
+public Funnel mapping: none
+```
+
+That stale test task/runtime was removed after confirming it was isolated from Stable. Its orphaned Windows-MCP child on port `18766` was terminated only after verifying its exact command line. Final state:
+
+```text
+Phase2 Test Scheduled Task: absent
+listener 18766: absent
+Phase2 Test runtime folder: absent
+Stable listener 18765: online
+Stable Funnel 443 -> 18765: online
+```
 ## Composio boundary
 
 The existing Rafdi Remote GROWTH Stable connection already proves the production architecture:
