@@ -1,4 +1,4 @@
-# Release Readiness â€” v0.1.0-alpha.5
+# Release Readiness Ã¢â‚¬â€ v0.1.0-alpha.5
 
 Date: 2026-09-30
 Candidate branch: `feat/rafdi-remote-growth-stable`
@@ -20,18 +20,18 @@ The release does not claim:
 ## Required gates before tagging
 
 - [x] feature branch is not behind `main`;
-- [ ] working tree is clean;
+- [x] working tree is clean;
 - [x] `npm run check` passes;
 - [x] `npm run release:check` passes;
-- [ ] Linux GitHub Actions job passes on the PR;
-- [ ] Windows GitHub Actions job passes on the PR;
-- [ ] Rafdi Remote PowerShell files parse on Windows CI;
-- [ ] rendered Rafdi Remote supervisor template parses on Windows CI;
+- [x] Linux GitHub Actions job passes on the PR;
+- [x] Windows GitHub Actions job passes on the PR;
+- [x] Rafdi Remote PowerShell files parse on Windows CI;
+- [x] rendered Rafdi Remote supervisor template parses on Windows CI;
 - [x] secret hygiene returns zero high/medium findings;
 - [x] package version and changelog agree on `0.1.0-alpha.5`;
 - [x] packed tarball installs into an empty consumer project and its CLI reports `0.1.0-alpha.5`;
 - [x] packaged `doctor` reports `READY` without Node `DEP0190`;
-- [ ] PR review confirms no private hostname, bearer token, personal email, or local user path leaked;
+- [x] PR diff/private-value review confirms no bearer token, personal email, private tailnet hostname, or local user path leaked;
 - [ ] merge to `main` completes without rewriting existing tags.
 
 ## Package audit
@@ -76,4 +76,16 @@ If the PR or post-merge CI fails:
 
 ## Current release decision
 
-**LOCAL RELEASE GATES PASS. READY FOR PR/CI, NOT YET READY TO TAG.**
+**LOCAL + PR CI GATES PASS. READY FOR REVIEW/MERGE, NOT YET READY TO TAG.**
+
+## PR CI evidence
+
+PR: `#9`
+GitHub Actions run: `22` (`validate`)
+
+- Linux `linux-check`: PASS
+- Windows `windows-smoke`: PASS
+- Windows `Validate and test`: PASS
+- Windows installer dry run: PASS
+- Windows helper PowerShell parse: PASS
+- Windows Rafdi Remote PowerShell + rendered supervisor parse: PASS
