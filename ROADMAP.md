@@ -1,5 +1,7 @@
 # Roadmap
 
+Updated: **2026-10-01**
+
 ## V0.1 — Foundation / onboarding
 
 - [x] public repository
@@ -9,19 +11,14 @@
 - [x] recipe registry
 - [x] conservative default policy
 - [x] Windows installer + dry-run
-- [x] automatic Desktop launcher folder
-- [x] Remote Desktop Commander click-to-run launcher
-- [x] MCP SuperAssistant optional browser-bridge launcher
+- [x] Remote Desktop Commander onboarding
+- [x] optional browser-bridge experiments
 - [x] setup decision tree
-- [x] doctor command
-- [x] validator
-- [x] 23 official starter/operator skills
-- [x] Linux-side contract tests
+- [x] doctor / validators
+- [x] official starter/operator skills
 - [x] Windows-native onboarding CI
-- [x] Desktop Commander reference adapter manifest
-- [x] generic MCP reference adapter manifest
 
-## V0.2 — Native operator engine
+## V0.2 — Native operator research engine
 
 - [x] transport router
 - [x] quota-aware route selection
@@ -30,54 +27,128 @@
 - [x] risk / approval contract
 - [x] evidence status contract
 - [x] provider scorecard
-- [x] failed-experiment lab
+- [x] failure / research lab
 - [x] routing benchmark scenarios
 - [x] CLI route / plan / providers / lab commands
-- [ ] executable adapter interface
-- [ ] provider health probing
-- [ ] user skill discovery from `~/.otak-atik/skills`
-- [ ] project skill discovery from `.otak-atik/skills`
-- [ ] declarative recipe executor
-- [ ] persistent local evidence/audit ledger
-- [ ] checkpoint model
+- [ ] stabilize executable adapter interface as a public package
+- [ ] portable user/project skill discovery
+- [ ] portable declarative recipe executor
+- [ ] portable persistent audit ledger
 
-## V0.3 — Provider lab + portability
+## Remote GROWTH — real-machine operator track
 
-- stronger provider benchmark harness
-- execution/discovery/verification compatibility matrix
-- macOS installer
-- Linux installer
-- client adapter generators
-- Claude/Cursor/VS Code/Gemini verification matrix
-- optional GUI-control provider experiments
+### Historical transport milestone
 
-## V0.4 — Ecosystem
+- [x] Windows-MCP loopback binding
+- [x] bearer authentication
+- [x] Tailscale Funnel transport
+- [x] supervisor recovery
+- [x] Scheduled Task recovery
+- [x] Tailscale reconnect
+- [x] actual Windows reboot test
+- [x] post-reboot ChatGPT command execution
 
-- community registry
-- signed skill packages
-- trust metadata
-- adapter SDK stabilization
-- import/exportable operator plans
-- reproducible experiment bundles
+### Gateway / engines
 
-## V1.0
+- [x] gateway compatibility layer
+- [x] preserve 15 Windows primitive tools
+- [x] Fast Local persistent search/index engine
+- [x] Document Engine
+- [x] Developer / Git Engine
+- [x] Safe File & Workspace Operations Engine
+- [x] System / Process / Network Operations Engine
+- [x] Smart Workflow / Batch Orchestrator
+- [x] gateway v0.7.0
+- [x] 64-tool server inventory
+- [x] Composio catalog synced to 64 available actions
 
-Requires:
+### Safety
 
-- stable config format;
-- stable capability and plan schemas;
-- stable evidence contract;
-- migration strategy;
-- Windows/macOS/Linux support;
+- [x] protected runtime targets
+- [x] plan-before-mutation model
+- [x] irreversible-action gate
+- [x] precondition verification
+- [x] FileOps receipts / rollback
+- [x] SystemOps receipts / rollback
+- [x] workflow receipts
+- [x] workflow rollback
+- [x] duplicate workflow execution guard
+- [x] no arbitrary shell inside workflow specs
+
+## Native ChatGPT plugin track
+
+### Prepared
+
+- [x] focused native facade
+- [x] 12-tool native inventory
+- [x] raw operator primitives excluded
+- [x] read/write/destructive tool annotations
+- [x] loopback-only native listener
+- [x] five plugin skills
+- [x] plugin manifest
+- [x] pre-registration plugin ZIP
+- [x] secret scan
+- [x] ZIP integrity verification
+- [x] official OpenAI tunnel-client installed and checksum verified
+- [x] secure helper scripts prepared
+
+### Phase 10 — final private registration / acceptance
+
+- [ ] establish the private Secure MCP Tunnel session
+- [ ] create ChatGPT MCP app through the Tunnel path
+- [ ] verify exactly 12 native tools
+- [ ] capture the real generated app technical ID
+- [ ] finalize app mapping
+- [ ] build final plugin archive
+- [ ] create/update PRIVATE Remote GROWTH Stable plugin
+- [ ] read-only acceptance suite
+- [ ] plan-only acceptance
+- [ ] isolated write + rollback acceptance
+- [ ] protected-negative acceptance
+- [ ] reboot/reconnect acceptance
+- [ ] final release/checkpoint lock
+
+## Portability / public reproduction
+
+After the private Phase 10 acceptance is complete:
+
+- [ ] remove remaining machine-specific assumptions from public installer docs
+- [ ] clean-machine reproduction on a second Windows profile/device
+- [ ] compatibility matrix for Windows-MCP / FastMCP / gateway dependencies
+- [ ] reproducible engine packaging
+- [ ] public sample configuration without machine identity
+- [ ] installer/uninstaller regression on clean VM
+- [ ] public threat-model review
+
+## Longer-term research
+
+- macOS/Linux operator experiments;
+- provider benchmark harness;
+- community adapters;
+- signed skill/package metadata;
+- import/exportable operator plans;
+- stronger evidence ledger;
+- optional GUI-control provider research.
+
+## V1.0 criteria
+
+V1.0 requires more than “it works on GROWTH”.
+
+It requires:
+
+- stable config and migration formats;
+- reproducible installation;
 - security review;
-- reliable upgrade path;
+- clean-machine validation;
+- upgrade/rollback strategy;
+- explicit private/public boundaries;
 - production-quality docs;
-- enough real-world use to know what the project actually wants to be.
+- enough multi-machine use to know which machine-specific decisions should become product contracts.
 
 ## Research rule
 
-The project is allowed to change direction.
-
-Failed experiments are retained as evidence.
+Failed experiments remain evidence.
 
 Real usage outranks roadmap aesthetics.
+
+Do not call a milestone complete until its acceptance test actually passes.
