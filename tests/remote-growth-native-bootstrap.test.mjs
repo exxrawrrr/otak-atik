@@ -31,7 +31,7 @@ test("native tunnel setup keeps identity and secrets out of repository paths", (
   assert.match(setup, /SHA256SUMS\.txt/);
   assert.doesNotMatch(setup, /D:\\RAFDI_DATA/i);
   assert.doesNotMatch(run, /D:\\RAFDI_DATA/i);
-  assert.doesNotMatch(setup, /plugin_asdk_app_6abe/i);
+  assert.doesNotMatch(setup, /plugin_asdk_app_[0-9a-f]{32}/i);
 });
 
 test("public plugin template contains no live app binding", () => {
@@ -50,5 +50,5 @@ test("plugin builder generates app binding outside the checkout", () => {
   assert.match(builder, /plugin_asdk_app_/);
   assert.match(builder, /secret scan/i);
   assert.match(builder, /remote-growth-stable\/\.app\.json/);
-  assert.doesNotMatch(builder, /6abe1f80b18c81918cd12cc9b2354c57/i);
+  assert.doesNotMatch(builder, /plugin_asdk_app_[0-9a-f]{32}/i);
 });
