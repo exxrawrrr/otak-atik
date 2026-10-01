@@ -72,7 +72,25 @@ if ($Findings.Count -gt 0) {
   throw 'Generated package failed secret scan.'
 }
 
-Compress-Archive -Path $Build -DestinationPath $Zip -CompressionLevel Optimal -Force
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+if (Test-Path $Zip) { Remove-Item $Zip -Force }
+$Archive = [IO.Compression.ZipFile]::Open($Zip,[IO.Compression.ZipArchiveMode]::Create)
+try {
+  Get-ChildItem $Build -Recurse -File -Force | ForEach-Object {
+    $Relative = $_.FullName.Substring($Build.Length).TrimStart('\').Replace('\','/')
+    $EntryName = "remote-growth-stable/$Relative"
+    [IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+      $Archive,
+      $_.FullName,
+      $EntryName,
+      [IO.Compression.CompressionLevel]::Optimal
+    ) | Out-Null
+  }
+}
+finally {
+  $Archive.Dispose()
+}
+
 $ZipHash = (Get-FileHash $Zip -Algorithm SHA256).Hash
 
 [pscustomobject]@{
