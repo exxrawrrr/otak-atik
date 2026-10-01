@@ -171,7 +171,8 @@ The original GROWTH machine has verified:
 - direct native calls for health, workflow catalog, system health, and workspace discovery;
 - full native read-only acceptance across local search, workspace summary, repository status, system health, workflow catalog, and document inspection;
 - plan-only acceptance plus mutation and irreversible-action denial gates;
-- isolated native file copy with hash-equivalence verification and successful rollback.
+- isolated native file copy with hash-equivalence verification and successful rollback;
+- protected-negative acceptance for gateway/Tailscale/native/tunnel targets plus post-patch regression verification.
 
 ## Important distinction
 
@@ -212,7 +213,7 @@ Acceptance target:
 6. run the full read-only acceptance suite — **verified**;
 7. run plan-only and permission-gate tests — **verified**;
 8. run isolated write + rollback test — **verified**;
-9. run protected-negative test;
+9. run protected-negative and regression test — **verified**;
 10. create a release/checkpoint only after all gates pass.
 
 ## Research rule
