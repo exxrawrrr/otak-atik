@@ -1,0 +1,7 @@
+{
+  "apps": {
+    "remote_growth_stable": {
+      "id": "plugin_asdk_app_REPLACE_WITH_YOUR_OWN_APP_ID"
+    }
+  }
+}
