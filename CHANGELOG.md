@@ -77,7 +77,7 @@ Verified:
 - warm native-backend reconnect verified: facade stopped/restarted while the Secure MCP Tunnel process remained alive, followed by successful direct ChatGPT native-plugin calls;
 - cold tunnel restart/reboot remains a documented limitation until one-time Windows Credential Manager + Scheduled Task enrollment is completed.
 
-The remaining acceptance suite is still in progress.
+Phase 10 core acceptance is now release-locked. Warm native reconnect is verified. Zero-touch cold tunnel restart/reboot remains an optional follow-up; the current private machine requires a manual tunnel start/runtime-key entry after a true cold loss of the tunnel process unless local credential/task enrollment is enabled.
 
 ### Documentation
 
