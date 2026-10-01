@@ -68,7 +68,8 @@ Verified:
 - native read-only acceptance passed for health, local search, workspace discovery/summary, Git status, system health, workflow catalog, and DOCX inspection;
 - plan-only acceptance passed;
 - mutating workflow execution is denied without allow_mutations=true;
-- irreversible SystemOps execution is denied without allow_irreversible=true before the action runs.
+- irreversible SystemOps execution is denied without allow_irreversible=true before the action runs;
+- isolated native FileOps write acceptance passed with receipt/hash verification and rollback restoring the pre-test destination state.
 
 The remaining acceptance suite is still in progress.
 
