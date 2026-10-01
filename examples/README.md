@@ -14,3 +14,10 @@ Planned examples:
 - verification result reporting.
 
 Do not add real credentials, private URLs, or company data to examples.
+
+
+## Remote GROWTH native bootstrap
+
+See [remote-growth-native/README.md](remote-growth-native/README.md) for the reusable Windows Secure MCP Tunnel + private plugin builder pattern.
+
+The example contains no live credentials or author-specific app binding.
