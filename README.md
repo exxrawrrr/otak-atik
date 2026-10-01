@@ -38,6 +38,8 @@ The current release lock is intentionally honest about the remaining cold-start 
 
 There are two practical operator surfaces.
 
+Remote Desktop Commander **still works and remains useful** as a practical interactive route; this repository documents the self-built Remote GROWTH path rather than pretending every existing operator route became obsolete.
+
 ### 1. Full remote operator path
 
 ```text
