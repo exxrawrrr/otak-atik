@@ -42,6 +42,22 @@ The public repo does **not yet** claim that the full 64-tool GROWTH runtime is p
 
 From a cloned repository on Windows PowerShell:
 
+### Fast path
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-native\start-here.ps1
+```
+
+For automatic future tunnel starts, opt in to a current-user DPAPI-encrypted local key cache:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-native\start-here.ps1 -PersistEncryptedRuntimeKey
+```
+
+The launcher opens the Secure MCP Tunnel guide, runs the local tunnel setup, waits for health/readiness, and then opens ChatGPT Plugins.
+
+Or run each step manually:
+
 ### 1. Configure the Secure MCP Tunnel
 
 Memory-only runtime key:
