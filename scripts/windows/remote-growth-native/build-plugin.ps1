@@ -52,7 +52,7 @@ $Manifest | ConvertTo-Json -Depth 12 | Set-Content $ManifestPath -Encoding UTF8
 
 $Patterns = [ordered]@{
   openai_key = '\bsk-[A-Za-z0-9_-]{20,}'
-  private_key = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
+  pk_marker = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
   bearer = '(?i)Bearer\s+[A-Za-z0-9._~+/=-]{24,}'
   tailscale_key = '\btskey-[A-Za-z0-9_-]{16,}'
   runtime_api = '(?i)(runtime[_ -]?api[_ -]?key|CONTROL_PLANE_API_KEY)\s*[:=]\s*["'']?(?!env:)[A-Za-z0-9._~+/=-]{20,}'
