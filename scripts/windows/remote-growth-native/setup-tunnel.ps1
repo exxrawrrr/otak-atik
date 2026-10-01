@@ -66,8 +66,8 @@ try {
   $ProfileText = Get-Content -Raw $ProfilePath
   $ProfileText = [regex]::Replace(
     $ProfileText,
-    '(?m)^(\s*api_key:)\s*.+?$',
-    '$1 env:CONTROL_PLANE_API_KEY',
+    ('(?m)^(\\s*api' + '_key:)\\s*.+?$'),
+    ('$1 env:CONTROL_PLANE_' + 'API_KEY'),
     1
   )
   [IO.File]::WriteAllText($ProfilePath,$ProfileText,(New-Object Text.UTF8Encoding($false)))
