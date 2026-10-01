@@ -4,6 +4,69 @@ All notable changes will be documented here.
 
 ## [Unreleased]
 
+### Remote GROWTH Stable v0.7 operator stack
+
+The original Rafdi Remote transport experiment has grown into a layered local operator gateway.
+
+Current real-machine gateway state:
+
+- gateway runtime v0.7.0;
+- 64 MCP tools;
+- Composio catalog showing 64 available actions;
+- existing Windows primitive tools retained for compatibility.
+
+Added engine layers:
+
+- Fast Local persistent workspace/file search;
+- Document Engine;
+- Developer / Git Engine;
+- Safe File & Workspace Operations Engine;
+- System / Process / Network Operations Engine;
+- Smart Workflow / Batch Orchestrator Engine.
+
+### Safety model
+
+Added:
+
+- protected Remote GROWTH runtime targets;
+- protected connectivity/system services;
+- protected scheduled tasks;
+- plan-before-mutation semantics;
+- irreversible-action permission gate;
+- precondition revalidation;
+- integrity-hashed plans / receipts;
+- FileOps rollback;
+- SystemOps rollback;
+- workflow rollback;
+- duplicate workflow execution guard;
+- workflow dependency graph;
+- no arbitrary shell actions inside workflow specs.
+
+### Native ChatGPT plugin track
+
+Prepared a separate native facade for direct ChatGPT MCP/plugin integration.
+
+Verified:
+
+- loopback-only native endpoint;
+- 12 focused high-level tools;
+- raw PowerShell / raw filesystem mutation / raw UI automation excluded;
+- read-only vs write/destructive tool annotations;
+- five plugin skills;
+- pre-registration plugin package;
+- package secret scan;
+- ZIP integrity;
+- official OpenAI Secure MCP Tunnel client installation with checksum verification.
+
+Final private ChatGPT registration and acceptance remain in progress.
+
+### Documentation
+
+- updated README around the actual AI-to-computer project thesis;
+- updated project state and roadmap;
+- added current Remote GROWTH / Native ChatGPT architecture document;
+- preserved the September Rafdi Remote document as historical evidence instead of rewriting it.
+
 ## [0.1.0-alpha.5] - 2026-09-30
 
 ### Rafdi Remote experiment
@@ -121,7 +184,7 @@ Fresh public clone:
 
 - hybrid local/remote usage strategy;
 - quota-aware Remote Desktop Commander guidance;
-- Codex local MCP setup path.
+- Codex local Desktop Commander MCP setup path.
 
 ## [0.1.0-alpha.1] - 2026-09-28
 

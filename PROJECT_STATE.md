@@ -1,180 +1,218 @@
 # Project State
 
-**Current milestone:** V0.2 native operator/control layer + Rafdi Remote experimental transport
-**Repository maturity:** active public experiment / research lab
-**Current package:** 0.1.0-alpha.5
+**Updated:** 2026-10-01  
+**Current milestone:** Remote GROWTH Stable v0.7 + Native ChatGPT plugin finalization  
+**Repository maturity:** active public research lab / real-machine operator experiment  
+**npm package:** 0.1.0-alpha.5  
+**machine runtime:** Remote GROWTH Stable gateway v0.7.0
 
-## Honest status
+## Project thesis
 
-otak-atik did **not** replace the author's primary remote plugin workflow.
+The original question remains the best description of the project:
 
-The daily remote path is still usually:
+> Can ChatGPT safely access and operate a real computer from chat, with enough verification to trust what happened?
 
-```text
-ChatGPT
-â†’ Remote Desktop Commander
-â†’ GROWTH
-```
+The project no longer has only one answer.
 
-That original goal therefore remains a failure.
+## Current working paths
 
-But the project also produced a separate experimental path that now works in real use:
+### Existing remote operator path
 
 ```text
 ChatGPT
-â†’ Composio Custom MCP
-â†’ Tailscale Funnel
-â†’ Windows-MCP
-â†’ GROWTH
+→ Composio Custom MCP
+→ Remote GROWTH Stable
+→ GROWTH
 ```
 
-This path is called **Rafdi Remote**.
+Current Composio catalog:
 
-It is not presented as a production remote-desktop replacement, but it has moved beyond architecture-only status.
+```text
+64 available actions
+```
 
-## Rafdi Remote evidence
-
-On the original GROWTH Windows machine, the experiment has verified:
-
-- loopback-only Windows-MCP binding;
-- bearer authentication;
-- FastMCP host-origin protection;
-- real public Tailscale Funnel transport;
-- rejection of unauthenticated public requests;
-- authenticated MCP initialize;
-- supervisor child recovery;
-- Scheduled Task/logon-style recovery;
-- Tailscale down/up persistence;
-- actual Windows restart persistence;
-- post-restart ChatGPT â†’ Composio â†’ GROWTH command execution.
-
-Detailed evidence:
-
-- `docs/RAFDI-REMOTE-GROWTH.md`
-- `docs/RAFDI-REMOTE-GROWTH-PHASE-2A-CHECKPOINT.md`
-- `docs/RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md`
-- `docs/decisions/ADR-RAFDI-REMOTE-TRANSPORT.md`
-
-## Implemented project areas
-
-### Onboarding / transports
-
-- Windows installer + dry-run;
-- Remote Desktop Commander onboarding/helpers;
-- optional MCP SuperAssistant browser bridge experiment;
-- Codex local Desktop Commander MCP setup helper;
-- quota-aware local/remote guidance;
-- Rafdi Remote reusable Windows installer experiment.
-
-### Native otak-atik engine
-
-- transport router;
-- operator plan compiler;
-- capability inference;
-- risk/approval contract;
-- evidence contract;
-- provider scorecard;
-- failure/research lab;
-- executable routing benchmark;
-- CLI route / plan / providers / lab commands.
-
-### Registry / skills
-
-- canonical capability registry;
-- official skills and packs;
-- recipes;
-- provider states;
-- explicit PARTIAL_FAILURE record for MCP SuperAssistant.
-
-### Standalone utility pack
-
-Useful without any remote provider:
-
-- workspace snapshot;
-- secret hygiene scanner;
-- MCP config auditor;
-- SKILL.md quality auditor;
-- provider-neutral AI handoff builder;
-- Git diff risk reviewer.
-
-### Quality
-
-- deterministic validators;
-- self-hygiene in `npm run check`;
-- skill audit in `npm run check`;
-- Node contract/unit tests;
-- benchmark scenarios;
-- Windows PowerShell smoke validation;
-- Rafdi Remote regression tests;
-- security/contribution/ADR documentation.
-
-## Current real workflows
-
-Remote daily:
+### Direct interactive path
 
 ```text
 ChatGPT
-â†’ Remote Desktop Commander
-â†’ GROWTH
+→ Remote Desktop Commander
+→ GROWTH
 ```
 
-Remote backup / self-built path:
+Still useful for direct interactive work.
+
+### Native ChatGPT plugin track
 
 ```text
-ChatGPT
-â†’ Composio Custom MCP
-â†’ Tailscale Funnel
-â†’ Windows-MCP
-â†’ GROWTH
+ChatGPT MCP app / private plugin
+→ OpenAI Secure MCP Tunnel
+→ 127.0.0.1:18768
+→ Remote GROWTH Native Facade
+→ trusted local engines
 ```
 
-Local engineering:
+The native facade currently exposes **12 focused tools**.
+
+Final private registration and end-to-end acceptance are the remaining steps.
+
+## Remote GROWTH Stable v0.7
+
+The production gateway exposes **64 tools**:
+
+- 15 Windows primitive tools;
+- 6 Fast Local tools;
+- 6 Document Engine tools;
+- 9 Developer/Git tools;
+- 10 Safe FileOps tools;
+- 12 SystemOps tools;
+- 6 Workflow tools.
+
+The architecture is no longer simply Windows-MCP behind a tunnel.
 
 ```text
-Codex / local AI
-â†’ Desktop Commander local MCP
-â†’ GROWTH
+ChatGPT / Composio
+        ↓
+Remote GROWTH Gateway
+        ├─ Windows primitives
+        ├─ Fast Local Engine
+        ├─ Document Engine
+        ├─ Developer / Git Engine
+        ├─ Safe FileOps Engine
+        ├─ SystemOps Engine
+        └─ Workflow Engine
 ```
 
-Browser-extension experiment:
+## Safety model now implemented
+
+### File operations
+
+- plan before execution;
+- destination conflicts fail closed;
+- delete uses quarantine semantics;
+- preconditions are rechecked;
+- receipts are written;
+- rollback is supported where safe.
+
+### System operations
+
+- protected Remote GROWTH runtime processes;
+- protected ports and connectivity services;
+- protected Tailscale;
+- protected Microsoft and Remote GROWTH scheduled tasks;
+- irreversible actions require explicit permission;
+- planned actions are revalidated before execution.
+
+### Workflow orchestration
+
+- built-in templates only;
+- arbitrary shell workflow steps are not accepted;
+- mutation gate;
+- irreversible-action gate;
+- dependency graph;
+- duplicate execution guard;
+- per-step results;
+- receipt hash;
+- rollback integration for supported underlying engines.
+
+## Native ChatGPT package
+
+Current prepared native surface:
 
 ```text
-MCP SuperAssistant
-â†’ discovery works
-â†’ reliable daily execution not proven
-â†’ PARTIAL_FAILURE
+12 tools
+5 plugin skills
+loopback-only facade
+secret-free package
+official Secure MCP Tunnel client prepared
+```
+
+Native facade tools:
+
+- remote_growth_health
+- search_local
+- find_workspace
+- summarize_workspace
+- inspect_document
+- inspect_repo
+- inspect_system_health
+- list_workflows
+- plan_workflow
+- execute_workflow
+- get_workflow_status
+- rollback_workflow
+
+Raw PowerShell, raw filesystem mutation, and raw UI automation are deliberately not exposed through this native surface.
+
+## Verified evidence
+
+The original GROWTH machine has verified:
+
+- bearer/auth boundaries on the operator gateway;
+- public transport via Tailscale Funnel;
+- unauthenticated rejection;
+- supervisor recovery;
+- scheduled startup recovery;
+- Tailscale reconnect;
+- actual Windows reboot persistence;
+- post-reboot remote execution;
+- 64-tool gateway inventory;
+- persistent local index;
+- engine smoke tests;
+- protected system targets;
+- file operation rollback;
+- workflow mutation gates;
+- workflow rollback;
+- 12-tool native facade inventory;
+- native read/write annotations;
+- raw primitive exclusion;
+- plugin package secret scan and ZIP integrity.
+
+## Important distinction
+
+The **npm package** and the **GROWTH machine runtime** are related experiments but not the same release artifact.
+
+Do not describe gateway v0.7.0 as npm version 0.7.0.
+
+Current:
+
+```text
+npm package: 0.1.0-alpha.5
+Remote GROWTH gateway runtime: 0.7.0
+native plugin package: pre-registration 0.9.0
 ```
 
 ## What is not claimed
 
-The repository is not claiming:
+The repository does not claim:
 
-- production-grade remote desktop;
-- universal clean-machine reproducibility;
-- zero-trust remote access;
-- unattended Tailscale account approval;
-- unattended Composio Custom MCP creation;
-- a finished V1 operator platform.
+- universal production readiness;
+- zero-trust certification;
+- clean-machine reproducibility across arbitrary Windows devices;
+- multi-user production support;
+- public availability of the author's private ChatGPT plugin;
+- permission to publish machine credentials.
 
-## Next useful milestones
+## Current next milestone
 
-1. clean-machine Rafdi Remote reproduction on another Windows profile/device;
-2. version compatibility / pinning decision for Windows-MCP and FastMCP;
-3. executable adapter runtime;
-4. provider health probing;
-5. automatic user/project skill discovery;
-6. declarative recipe executor;
-7. persistent evidence/audit ledger;
-8. optional GUI-control experiments.
+**Phase 10 — Native registration and final acceptance**
+
+Acceptance target:
+
+1. keep Composio at 64/64;
+2. keep production gateway healthy;
+3. connect native facade through OpenAI Secure MCP Tunnel;
+4. create the private ChatGPT MCP app;
+5. bind the real generated technical app ID into the plugin package;
+6. run read-only tests;
+7. run plan-only test;
+8. run isolated write + rollback test;
+9. run protected-negative test;
+10. create a release/checkpoint only after all gates pass.
 
 ## Research rule
 
-The project is allowed to change direction.
+Reality outranks roadmap aesthetics.
 
-Failed experiments stay documented.
+A failed experiment stays documented.
 
-Real usage outranks roadmap aesthetics.
-
-A working plugin is better than a homemade architecture that is not used.
-
-A homemade path becomes interesting only after it survives reality.
+A new architecture is only promoted after it survives real-machine verification.

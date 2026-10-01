@@ -1,617 +1,439 @@
 # otak-atik
 
-> **Status: gagal sebagai tujuan awal. Berhasil sebagai eksperimen.**
+> **A public lab about one question: how far can ChatGPT safely operate a real Windows computer?**
 >
-> Awalnya gue pengen bikin jalur sendiri supaya AI bisa remote komputer gue tanpa akhirnya bergantung ke plugin orang lain.
->
-> Kenyataannya?
->
-> Untuk kerja harian, **Remote Desktop Commander masih paling praktis**.
->
-> Tapi karena kesel sama limit, eksperimen, tunnel, MCP, dan segala tetek bengek itu, akhirnya lahir juga jalur sendiri yang sekarang beneran jalan:
->
-> **Rafdi Remote.**
->
-> Jadi repo ini bukan cerita "gue bikin produk sempurna".
->
-> Ini cerita:
->
-> **gagal â†’ nyatet kegagalan â†’ kesel â†’ otak-atik lagi â†’ djiancok wes limit cok â†’ ternyata jadi sesuatu yang kepake.**
+> The project started as a messy attempt to make ChatGPT reach the author's PC from chat.
+> It failed several times, changed direction, and eventually produced a working remote operator path called **Remote GROWTH Stable**.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/feels-bad-man.jpg" width="290" alt="feels bad man meme" />
-</p>
+## Current status — 1 October 2026
 
-## TL;DR
-
-Kalau cuma mau tahu hasil akhirnya:
+The original idea was simple:
 
 ```text
-DAILY / PALING PRAKTIS
 ChatGPT
-  â†“
-Remote Desktop Commander
-  â†“
-GROWTH
+  ↓
+reach my Windows PC
+  ↓
+find files / inspect projects / run tools
+  ↓
+make controlled changes
+  ↓
+verify what actually happened
 ```
 
-Kalau mau jalur buatan sendiri yang sekarang sudah terbukti bekerja:
+That idea is no longer architecture-only.
+
+### Working operator path
 
 ```text
 ChatGPT
-  â†“
+  ↓
 Composio Custom MCP
-  â†“
-Tailscale Funnel
-  â†“
-Windows-MCP on 127.0.0.1
-  â†“
-PowerShell / files / processes / selected GUI tools
+  ↓
+Remote GROWTH Stable Gateway v0.7.0
+  ↓
+64 tools
+  ↓
+GROWTH Windows workstation
 ```
 
-Dan kalau kerja lokal:
+The Composio connection currently exposes **64 available actions**.
+
+Those 64 tools are not just raw desktop primitives. The gateway now contains layered engines for:
+
+- local search / persistent workspace index;
+- document inspection and controlled document operations;
+- Git / repository inspection and quality workflows;
+- safe file and workspace operations;
+- Windows system / process / network inspection;
+- planned system mutations with protected targets;
+- high-level workflow orchestration with receipts and rollback.
+
+### Native ChatGPT plugin track
+
+A second surface is now being prepared specifically for direct ChatGPT plugin/app use:
 
 ```text
-Codex / local AI
-  â†“
-Desktop Commander local MCP
-  â†“
+ChatGPT native plugin / MCP app
+  ↓
+OpenAI Secure MCP Tunnel
+  ↓
+127.0.0.1:18768
+  ↓
+Remote GROWTH Native Facade
+  ↓
+12 focused high-level tools
+  ↓
+trusted local engines
+```
+
+The native facade intentionally does **not** expose raw PowerShell, raw filesystem mutation, or raw UI automation.
+
+Current native package status:
+
+- native facade: **12 tools verified**;
+- loopback-only listener: **verified**;
+- plugin package: **pre-registration ready**;
+- five plugin skills: **validated**;
+- secret scan: **PASS**;
+- official OpenAI tunnel-client: **installed and checksum verified**;
+- final private ChatGPT registration + end-to-end acceptance: **in progress**.
+
+See:
+
+- [Current Remote GROWTH / Native ChatGPT architecture](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
+- [Historical Rafdi Remote evidence](docs/RAFDI-REMOTE-GROWTH.md)
+- [Project State](PROJECT_STATE.md)
+- [Roadmap](ROADMAP.md)
+
+---
+
+## Where this started
+
+Originally, this repository was basically:
+
+> “why can't the AI in my chat just enter my computer, read the project, run the terminal, fix something, and prove the result?”
+
+That led to experiments with:
+
+- MCP;
+- remote MCP;
+- local MCP;
+- browser bridges;
+- launchers;
+- skills and capability registries;
+- approvals and security boundaries;
+- evidence and verification;
+- provider routing;
+- tunnels;
+- desktop control;
+- and a lot of failed assumptions.
+
+The first practical answer was simply:
+
+```text
+ChatGPT
+  ↓
+Remote Desktop Commander
+  ↓
 Windows
 ```
 
-Jadi jawabannya bukan "satu tool mengalahkan semuanya".
+That still works and remains useful.
 
-Jawabannya sekarang:
-
-> **pakai jalur yang paling waras buat konteksnya.**
+But the self-built path kept evolving.
 
 ---
 
-## Rencanane awal e iki
+## Architecture evolution
 
-Awalnya sederhana.
-
-Gue sering pakai ChatGPT dari HP.
-
-Komputernya ada di tempat lain.
-
-Terus kepikiran:
-
-> **"kenapa AI gue nggak sekalian bisa masuk ke komputer, baca file, jalanin terminal, benerin project, terus kasih bukti kalau kerjaannya bener?"**
-
-Dari situ mulai otak-atik:
-
-- MCP, remote MCP, local MCP;
-- browser bridge;
-- launcher;
-- skill dan capability;
-- approval dan security boundary;
-- evidence dan verification;
-- router dan CLI;
-- tunnel;
-- remote desktop;
-- dan tentu saja: **kebanyakan ide**.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/disaster-girl.jpg" width="300" alt="disaster girl meme" />
-</p>
-
-Di kepala, diagramnya cakep:
-
-```text
-ChatGPT / AI
-      â†“
-otak-atik
-      â†“
-pilih transport
-      â†“
-pilih capability
-      â†“
-jalankan kerjaan
-      â†“
-verify
-      â†“
-done
-```
-
-Di dunia nyata?
-
-Ya nggak sebersih itu, cak.
-
----
-
-## Terus kenyataannya gimana?
-
-Versi pertama dari kenyataan:
+### Stage 1 — use an existing remote plugin
 
 ```text
 ChatGPT
-   â†“
+  ↓
 Remote Desktop Commander
-   â†“
-komputer gue
+  ↓
+GROWTH
 ```
 
-Setelah bikin router, adapter concept, launcher, skill registry, benchmark, provider scorecard, failure lab, dan macam-macam...
+Simple and practical.
 
-**jalur yang paling sering gue pakai justru plugin yang sudah ada.**
-
-Kalau ukuran suksesnya:
-
-> "apakah otak-atik menggantikan plugin?"
-
-Jawabannya tetap:
-
-## **nggak.**
-
-Dan itu gue biarin tertulis.
-
-Karena repo yang pura-pura sukses cuma bikin orang lain ngulang kesalahan yang sama.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/ship-your-machine.jpg" width="305" alt="ship your machine meme" />
-</p>
-
----
-
-# Plot twist: terus quota mulai bikin emosi
-
-Remote Desktop Commander enak.
-
-Masalahnya, remote call itu bukan sumber daya tak terbatas.
-
-Sampai pada titik workflow gue mulai terasa seperti:
-
-> **"djiancok wes limit cok, masa cuma mau nyentuh PowerShell kudu mikir sisa call."**
-
-Nah, dari sini arah repo berubah.
-
-Bukan lagi:
-
-> "gue harus mengganti plugin."
-
-Tapi:
-
-> **"gue butuh jalur cadangan yang beneran usable, bisa auto-start, bisa direcover, dan nggak bikin gue setup ulang tunnel tiap laptop restart."**
-
-Dari situlah eksperimen **Rafdi Remote GROWTH** mulai serius.
-
----
-
-# Rafdi Remote: eksperimen yang akhirnya beneran hidup
-
-Arsitektur final yang diuji:
+### Stage 2 — build a second remote MCP path
 
 ```text
 ChatGPT
-  â†“
+  ↓
 Composio Custom MCP
-  â†“
+  ↓
 Tailscale Funnel
-  â†“
+  ↓
 Windows-MCP
-  â†“
-127.0.0.1 on GROWTH
-  â†“
-PowerShell / FileSystem / Process / selected computer-use tools
+  ↓
+GROWTH
 ```
 
-Bukan sekadar diagram.
+This survived:
 
-Di GROWTH, jalur ini sudah diuji terhadap:
-
-- bearer authentication;
-- public HTTPS Funnel;
-- rejection untuk request tanpa token;
-- authenticated MCP initialize;
+- authentication tests;
+- public reachability tests;
+- host/origin protection;
 - supervisor recovery;
-- Scheduled Task recovery;
 - Tailscale reconnect;
-- actual Windows reboot;
-- dan command nyata dari ChatGPT sesudah reboot.
+- Scheduled Task recovery;
+- an actual Windows reboot;
+- post-reboot commands from ChatGPT.
 
-Bukti lengkapnya ada di:
+### Stage 3 — stop treating Windows-MCP primitives as the final API
 
-- [Rafdi Remote overview](docs/RAFDI-REMOTE-GROWTH.md)
-- [Phase 2A checkpoint](docs/RAFDI-REMOTE-GROWTH-PHASE-2A-CHECKPOINT.md)
-- [Phase 2B reality test](docs/RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md)
-- [Transport/security ADR](docs/decisions/ADR-RAFDI-REMOTE-TRANSPORT.md)
-- [Reusable installer](experiments/rafdi-remote-growth/README.md)
+The gateway grew into:
+
+```text
+Remote GROWTH Stable Gateway
+  ├─ Windows primitives
+  ├─ Fast Local Engine
+  ├─ Document Engine
+  ├─ Developer / Git Engine
+  ├─ Safe FileOps Engine
+  ├─ SystemOps Engine
+  └─ Workflow Engine
+```
+
+Current gateway version:
+
+```text
+v0.7.0
+64 tools
+```
+
+### Stage 4 — make it usable as a ChatGPT-native plugin
+
+Instead of giving a native ChatGPT app all 64 operator tools, the project now uses a deliberately smaller facade:
+
+```text
+Native Facade
+  12 focused tools
+  ↓
+Workflow Engine / trusted engines
+```
+
+This lets the public/operator gateway remain powerful while the ChatGPT-native surface stays easier to reason about.
 
 ---
 
-## Yang paling penting: survive restart beneran
+## The 64-tool gateway
 
-Bukan cuma "task kelihatannya ada".
+Current tool groups:
 
-GROWTH benar-benar restart.
+| Layer | Count | Purpose |
+|---|---:|---|
+| Windows primitives | 15 | PowerShell, files, process, screenshot, selected GUI control |
+| Fast Local | 6 | indexed local search, files, workspaces, index health |
+| Document Engine | 6 | inspect, extract, search, compare, controlled replace |
+| Developer / Git | 9 | repo discovery/status/search/diff/checkpoint/quality |
+| Safe FileOps | 10 | storage, duplicates, hashes, archive, batch plan/execute/rollback, backup |
+| SystemOps | 12 | health, process/port/service/network/task inspection + planned safe mutations |
+| Workflow Engine | 6 | catalog, plan, execute, status, rollback |
+| **Total** | **64** | |
 
-Sesudah boot:
-
-```text
-Windows boot
-  â†“
-Scheduled Task
-  â†“
-Rafdi Remote supervisor
-  â†“
-Windows-MCP 127.0.0.1:18765
-  â†“
-Tailscale Funnel restored
-  â†“
-ChatGPT via Composio
-  â†“
-PowerShell on GROWTH
-```
-
-Dan itu terbukti jalan.
-
-Jadi sekarang gue punya dua kenyataan yang sama-sama benar:
+The project moved from “give AI a shell” toward:
 
 ```text
-Remote Desktop Commander
-= masih paling praktis
-```
-
-dan:
-
-```text
-Rafdi Remote
-= jalur buatan sendiri yang sudah terbukti bekerja
-```
-
-Itu jauh lebih berguna daripada maksa satu pihak jadi "pemenang".
-
----
-
-## Bug paling nyebelin yang ketemu
-
-Public Funnel sempat hidup, request sampai ke Windows, tapi MCP balas:
-
-```text
-400 Invalid host header
-```
-
-Awalnya keliatan kayak masalah Tailscale.
-
-Ternyata bukan.
-
-Kita sampai pasang one-request HTTP probe di belakang Funnel buat lihat Host header yang benar-benar datang.
-
-Tailscale ternyata meneruskan host yang benar.
-
-Root cause-nya ada di **Windows-MCP 0.8.6** yang memasang Trusted Host middleware loopback sendiri.
-
-Akhirnya public mode pakai compatibility shim resmi Windows-MCP:
-
-```text
---allow-insecure-remote
-```
-
-Tapi ini **bukan** berarti service dibuka ngawur.
-
-Recipe repo ini tetap mensyaratkan:
-
-```text
-bind = 127.0.0.1
-bearer auth = ON
-FastMCP host-origin protection = ON
-allowed hosts = explicit
-public transport = Tailscale Funnel
-```
-
-Kalau salah satu boundary itu dibuang, itu bukan lagi recipe yang diuji di repo ini.
-
----
-
-## Hal-hal yang gagal di jalan
-
-### MCP SuperAssistant browser bridge
-
-Discovery pernah jalan.
-
-`initialize` jalan.
-
-`tools/list` muncul.
-
-Tapi jalur itu **nggak terbukti jadi daily execution path yang reliable**.
-
-Statusnya tetap:
-
-```text
-PARTIAL_FAILURE
-```
-
-Laporan tetap disimpan:
-
-[Experiment report â€” MCP SuperAssistant browser bridge](labs/reports/2026-09-28-mcp-superassistant-browser-bridge.md)
-
-### Installer Rafdi Remote versi awal
-
-Dogfood nangkep banyak hal yang kalau langsung dipublish bakal ngeselin:
-
-- resolver `uv.exe` terlalu sempit;
-- health check SSE false-negative;
-- parameter `$Pid` bentrok dengan `$PID` bawaan PowerShell;
-- mutex supervisor terlalu global;
-- patch substring sempat merusak empat script;
-- output local-only sempat misleading;
-- Windows detection lama terlalu bergantung pada `$env:OS`;
-- test residue sempat ikut auto-start setelah reboot.
-
-Semua itu alasan kenapa gue sekarang lebih percaya:
-
-> **dogfood dulu, baru ngoceh "works".**
-
----
-
-## Yang sebenarnya gue pakai sekarang
-
-### Remote harian dari ChatGPT / HP
-
-**Remote Desktop Commander**
-
-Masih paling gampang ketika gue cuma pengen:
-
-- buka file;
-- jalanin PowerShell;
-- inspect process;
-- edit project;
-- troubleshooting mesin secara langsung.
-
-### Backup / jalur buatan sendiri
-
-**Rafdi Remote GROWTH**
-
-Dipakai lewat:
-
-```text
-ChatGPT â†’ Composio Custom MCP â†’ Tailscale â†’ Windows-MCP
-```
-
-Ini sekarang bukan lagi konsep doang.
-
-Tapi statusnya tetap **experimental**, bukan produk remote-access universal.
-
-### Kerja lokal
-
-**Desktop Commander local MCP**
-
-Kalau AI dan Windows ada di mesin yang sama, muter lewat internet ya ngapain.
-
-```powershell
-codex mcp add desktop-commander -- npx -y @wonderwhy-er/desktop-commander@latest
+inspect
+  ↓
+plan
+  ↓
+permission gate
+  ↓
+execute
+  ↓
+verify
+  ↓
+receipt
+  ↓
+rollback when supported
 ```
 
 ---
 
-## Jadi repo ini gagal total?
+## Native ChatGPT facade
 
-Nggak.
-
-Tapi gue juga nggak mau rewrite sejarah seolah dari awal semuanya sesuai roadmap.
-
-Status paling jujurnya:
+The native surface currently exposes only these high-level tools:
 
 ```text
-FAILED AS THE ORIGINAL "REPLACE THE PLUGIN" IDEA
-
-BUT
-
-SUCCESSFUL AS:
-- a research lab
-- a failure log
-- a routing/operator experiment
-- a standalone utility pack
-- a real remote-MCP backup path
+remote_growth_health
+search_local
+find_workspace
+summarize_workspace
+inspect_document
+inspect_repo
+inspect_system_health
+list_workflows
+plan_workflow
+execute_workflow
+get_workflow_status
+rollback_workflow
 ```
 
-Repo ini sekarang lebih berharga karena ada bagian yang gagal **dan** ada bagian yang akhirnya works.
+Raw operator primitives are intentionally absent from this surface.
+
+The plugin package also includes focused skills for:
+
+- onboarding / routing;
+- repository operations;
+- safe file operations;
+- safe system operations;
+- document work.
+
+No API key, bearer token, tunnel runtime key, or private key belongs in the package or repository.
 
 ---
 
-## Biar mampir nggak cuma bawa cerita gagal
+## What is actually verified
 
-Walaupun lu nggak pakai remote setup apa pun, CLI repo ini tetap punya utilitas standalone.
+On the original GROWTH machine, the project has verified:
 
-### Snapshot project
+- loopback-only MCP bindings;
+- authenticated public gateway transport;
+- unauthenticated request rejection;
+- supervisor and startup recovery;
+- Tailscale persistence;
+- real Windows reboot recovery;
+- 64-tool MCP gateway inventory;
+- persistent local workspace index;
+- document / developer / file / system engines;
+- protected runtime targets;
+- irreversible-action gates;
+- FileOps and SystemOps receipts;
+- high-level workflows;
+- workflow mutation gate;
+- duplicate execution guard;
+- workflow rollback;
+- native 12-tool facade;
+- native tool safety annotations;
+- raw primitive exclusion from the native facade;
+- plugin package secret scan;
+- plugin ZIP integrity.
+
+This is still evidence from a real primary machine, not a claim of universal production readiness.
+
+---
+
+## What is still in progress
+
+The current finalization track is:
+
+```text
+Remote GROWTH Native Facade
+  ↓
+OpenAI Secure MCP Tunnel
+  ↓
+ChatGPT MCP app
+  ↓
+private Remote GROWTH Stable plugin
+  ↓
+read-only acceptance
+  ↓
+plan-only acceptance
+  ↓
+isolated write + rollback acceptance
+  ↓
+protected-negative acceptance
+  ↓
+release lock
+```
+
+The public repo must never include the author's tunnel credentials, bearer keys, machine secrets, or generated private app credentials.
+
+---
+
+## Remote Desktop Commander did not become useless
+
+This repo is not trying to rewrite history.
+
+Remote Desktop Commander is still valuable for direct interactive computer work.
+
+The useful lesson became:
+
+```text
+use an existing tool when it is the best tool
+
+AND
+
+build your own path when you need different reliability,
+control, quota, safety, or workflow semantics
+```
+
+Both can be true.
+
+---
+
+## Standalone utilities
+
+The repo still includes provider-neutral utilities:
 
 ```powershell
 otak-atik snapshot .
-```
-
-Bikin peta project tanpa nge-dump semua source.
-
-### Secret hygiene
-
-```powershell
-otak-atik hygiene .
 otak-atik hygiene . --strict
-```
-
-Nilai secret sengaja tidak dicetak.
-
-### Audit MCP config
-
-```powershell
 otak-atik mcp-check path\to\mcp.json
-```
-
-### Lint SKILL.md
-
-```powershell
 otak-atik skill-check path\to\SKILL.md
-```
-
-### Handoff ke AI lain
-
-```powershell
-otak-atik handoff . --task "lanjut benerin project ini" --out handoff.json
-```
-
-### Review risiko Git diff
-
-```powershell
+otak-atik handoff . --task "continue this project" --out handoff.json
 otak-atik diff-risk .
 ```
 
-Detail: [Standalone Utility Pack](docs/UTILITY-PACK.md).
+The npm package itself remains a separate alpha research package from the machine-specific Remote GROWTH runtime.
 
----
-
-## Native engine / lab
-
-Bagian eksperimen native masih ada:
-
-```powershell
-otak-atik doctor
-otak-atik capabilities
-otak-atik skills
-otak-atik route --local
-otak-atik route --remote
-otak-atik plan "fix failing project and run tests" --local
-otak-atik providers
-otak-atik lab
-```
-
-Validation penuh:
-
-```powershell
-npm run check
-```
-
-Current package:
+Current npm package line:
 
 ```text
 0.1.0-alpha.5
 ```
 
-Node:
-
-```text
->= 20
-```
-
 ---
 
-## Kandidat yang masih menarik buat dieksplor
-
-Repo ini tetap nyimpen pertanyaan yang belum selesai:
-
-> bisakah kita punya remote graphical computer-use yang open source, Windows-friendly, MCP-native, aman, dan nggak bikin lima service cuma untuk klik Start Menu?
-
-Beberapa kandidat yang pernah dicatat:
-
-- [QuickDesk](https://github.com/barry-ran/QuickDesk)
-- [RustDesk](https://github.com/rustdesk/rustdesk)
-- [MCPComputerUse](https://github.com/kblood/MCPComputerUse)
-- [Remote Desktop Commander](https://github.com/desktop-commander/remote-desktop-commander)
-
-Gue nggak menganggap kandidat sebagai solusi final sebelum ada bukti real usage di mesin sendiri.
-
----
-
-## Prinsip repo ini sekarang
+## Research principles
 
 ```text
 Reality > roadmap.
 Evidence > vibes.
-Working plugin > homemade architecture yang nggak kepakai.
-Homemade path yang sudah terbukti > homemade path yang cuma cakep di diagram.
-Local > remote kalau task-nya memang lokal.
-Verification > "harusnya sudah".
-Failure documented > failure dilupakan.
-Useful > gengsi bikin sendiri.
+Verification > "should work".
+Failure documented > failure forgotten.
+High-level safe operations > unnecessary raw shell access.
+Local > remote when the task is local.
+Secrets stay local.
+Working paths may coexist.
 ```
 
-Pelajaran paling mahalnya:
+The repository started as a failed attempt to replace a convenient remote plugin.
 
-> **nggak semua masalah perlu diselesaikan dengan bikin produk baru.**
+It evolved into something more interesting:
 
-Tapi kadang, setelah cukup banyak gagal, sesuatu yang awalnya cuma "otak-atik" malah berubah jadi backup system yang beneran hidup.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/friday-deploy.jpg" width="300" alt="friday deploy meme" />
-</p>
+> **a documented AI-to-computer control lab with a real 64-tool remote operator path and an actively tested native ChatGPT plugin path.**
 
 ---
 
-## Docs yang paling relevan
+## Documentation
 
-### Remote / transport
+### Current architecture
 
-- [What I actually use](docs/WHAT-I-ACTUALLY-USE.md)
-- [Rafdi Remote overview](docs/RAFDI-REMOTE-GROWTH.md)
-- [Rafdi Remote Phase 2B](docs/RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md)
-- [Remote Desktop Commander](docs/REMOTE-DESKTOP-COMMANDER.md)
-- [Alternatives](docs/ALTERNATIVES.md)
-
-### Engineering / research
-
-- [Research status](docs/RESEARCH-STATUS.md)
-- [Provider matrix](docs/PROVIDER-MATRIX.md)
-- [Browser bridge](docs/BROWSER-BRIDGE.md)
-- [Setup decision tree](docs/SETUP-DECISION-TREE.md)
-- [Project state](PROJECT_STATE.md)
+- [Remote GROWTH Native ChatGPT](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
+- [Project State](PROJECT_STATE.md)
 - [Roadmap](ROADMAP.md)
+- [What I actually use](docs/WHAT-I-ACTUALLY-USE.md)
+
+### Historical evidence
+
+- [Rafdi Remote GROWTH](docs/RAFDI-REMOTE-GROWTH.md)
+- [Phase 2A checkpoint](docs/RAFDI-REMOTE-GROWTH-PHASE-2A-CHECKPOINT.md)
+- [Phase 2B checkpoint](docs/RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md)
+- [Transport/security ADR](docs/decisions/ADR-RAFDI-REMOTE-TRANSPORT.md)
 
 ### Security / contribution
 
 - [Security](SECURITY.md)
 - [Contributing](CONTRIBUTING.md)
-- [Rafdi Remote transport ADR](docs/decisions/ADR-RAFDI-REMOTE-TRANSPORT.md)
+- [Sources](SOURCES.md)
 
 ---
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/exxrawrrr/exxrawrrr/main/assets/readme-memes/git-force-push.jpg" width="300" alt="git force push meme" />
-</p>
+## For everyone else
 
-# For everyone else
+**otak-atik is an AI-to-computer control research lab.**
 
-**otak-atik is a public AI-to-computer control research lab that started as a failed attempt to replace a convenient remote plugin and evolved into a mix of routing experiments, standalone developer utilities, documented failures, and a working experimental remote-MCP backup path.**
-
-The primary daily remote route is still:
+It documents the path from:
 
 ```text
-ChatGPT
-â†’ Remote Desktop Commander
-â†’ Windows
+"Can ChatGPT reach my computer?"
 ```
 
-A separately built experimental path has also been verified:
+to a verified experimental stack with:
 
-```text
-ChatGPT
-â†’ Composio Custom MCP
-â†’ Tailscale Funnel
-â†’ Windows-MCP
-â†’ Windows
-```
+- a real Windows machine;
+- a stable remote MCP gateway;
+- 64 operator tools;
+- safety-gated engines and workflows;
+- and a focused native ChatGPT plugin surface in final integration testing.
 
-That path survived authentication tests, public reachability tests, supervisor recovery, Tailscale reconnect, and an actual Windows restart on the original GROWTH machine.
+It is not a universal remote-desktop product.
 
-This does **not** make the repository a production remote-desktop replacement.
-
-It does make the failure story more interesting than "we gave up."
-
-## Contributions
-
-Real usage reports are more valuable than architecture opinions.
-
-If you know a better approach, open an issue with what you personally verified.
-
-Especially useful:
-
-- remote transport model;
-- license;
-- supported operating systems;
-- MCP integration;
-- screenshot/mouse/keyboard support;
-- self-hosting model;
-- authentication/security boundary;
-- actual test evidence.
-
----
-
-**The original idea failed to replace the plugin. The experiment did not stop there.**
+It is a public record of what actually worked, what failed, and why the architecture changed.
