@@ -53,7 +53,7 @@ ChatGPT MCP app / private plugin
 
 The native facade currently exposes **12 focused tools**.
 
-The private ChatGPT MCP app/plugin is now registered, the Secure MCP Tunnel session is healthy, and direct native calls from ChatGPT have been verified. Final package binding and the remaining acceptance suite are still in progress.
+The private ChatGPT MCP app/plugin is registered, the Secure MCP Tunnel session is healthy, direct native calls from ChatGPT are verified, and a private v1.0.0 package has been finalized locally with the verified app binding. The public repository contains only identity-neutral templates/bootstrap code. The remaining work is behavioral acceptance and recovery testing.
 
 ## Remote GROWTH Stable v0.7
 
@@ -181,7 +181,7 @@ Current:
 ```text
 npm package: 0.1.0-alpha.5
 Remote GROWTH gateway runtime: 0.7.0
-native plugin package: pre-registration 0.9.0
+native private package: 1.0.0 (local-only app binding)\npublic native template: identity-neutral
 ```
 
 ## What is not claimed
@@ -205,7 +205,7 @@ Acceptance target:
 2. keep production gateway healthy — **verified**;
 3. connect native facade through OpenAI Secure MCP Tunnel — **verified**;
 4. create the private ChatGPT MCP app and verify the 12-tool surface — **verified**;
-5. bind the real generated technical app ID into the plugin package;
+5. bind the real generated technical app ID into the private plugin package — **verified locally, not published**;
 6. run the full read-only acceptance suite;
 7. run plan-only test;
 8. run isolated write + rollback test;
