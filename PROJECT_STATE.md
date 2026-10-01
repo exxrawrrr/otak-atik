@@ -53,7 +53,7 @@ ChatGPT MCP app / private plugin
 
 The native facade currently exposes **12 focused tools**.
 
-The private ChatGPT MCP app/plugin is registered, the Secure MCP Tunnel session is healthy, direct native calls from ChatGPT are verified, and a private v1.0.0 package has been finalized locally with the verified app binding. The public repository contains only identity-neutral templates/bootstrap code. The remaining work is behavioral acceptance and recovery testing.
+The private ChatGPT MCP app/plugin is registered, the Secure MCP Tunnel session is healthy, direct native calls from ChatGPT are verified, and a private v1.0.0 package has been finalized locally with the verified app binding. The public repository contains only identity-neutral templates/bootstrap code. Warm native-backend reconnect through the existing tunnel is verified; zero-touch cold tunnel restart/reboot remains pending because the private machine has not enrolled the runtime credential into Windows Credential Manager or installed the native tunnel Scheduled Task.
 
 ## Remote GROWTH Stable v0.7
 
@@ -172,7 +172,8 @@ The original GROWTH machine has verified:
 - full native read-only acceptance across local search, workspace summary, repository status, system health, workflow catalog, and document inspection;
 - plan-only acceptance plus mutation and irreversible-action denial gates;
 - isolated native file copy with hash-equivalence verification and successful rollback;
-- protected-negative acceptance for gateway/Tailscale/native/tunnel targets plus post-patch regression verification.
+- protected-negative acceptance for gateway/Tailscale/native/tunnel targets plus post-patch regression verification;
+- controlled native-backend outage/restart with tunnel process retained and direct ChatGPT plugin calls recovering afterward.
 
 ## Important distinction
 
@@ -214,7 +215,7 @@ Acceptance target:
 7. run plan-only and permission-gate tests — **verified**;
 8. run isolated write + rollback test — **verified**;
 9. run protected-negative and regression test — **verified**;
-10. create a release/checkpoint only after all gates pass.
+10. resolve or explicitly document the remaining cold-start/reboot limitation, then create the final release/checkpoint.
 
 ## Research rule
 

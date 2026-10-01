@@ -73,7 +73,9 @@ Verified:
 - SystemOps protected-negative acceptance passed for gateway and Tailscale targets;
 - SystemOps service planner Python string bug fixed in the private machine runtime;
 - runtime protection expanded to the native facade and Secure MCP Tunnel processes/ports;
-- post-patch regression reverified 64-tool production gateway, 12-tool native facade, tunnel health/readiness, and public unauthenticated HTTP 401.
+- post-patch regression reverified 64-tool production gateway, 12-tool native facade, tunnel health/readiness, and public unauthenticated HTTP 401;
+- warm native-backend reconnect verified: facade stopped/restarted while the Secure MCP Tunnel process remained alive, followed by successful direct ChatGPT native-plugin calls;
+- cold tunnel restart/reboot remains a documented limitation until one-time Windows Credential Manager + Scheduled Task enrollment is completed.
 
 The remaining acceptance suite is still in progress.
 
