@@ -82,3 +82,35 @@ before installing or running them.
 The current alpha does not yet claim a hardened sandbox.
 
 Policy metadata is a contract for the evolving operator engine, not a security boundary equivalent to operating-system isolation.
+
+
+## Remote GROWTH native identity boundary
+
+The public Remote GROWTH native bootstrap is designed so that code can be copied or forked while account identity stays local.
+
+Never commit:
+
+- OpenAI runtime API keys;
+- Secure MCP Tunnel IDs from a real account;
+- generated private ChatGPT app IDs;
+- local bearer keys;
+- DPAPI-encrypted credential blobs;
+- generated private plugin builds.
+
+The public templates intentionally contain placeholders only.
+
+Generated configuration and private builds should live below the current user's local application-data directory, not inside the Git checkout.
+
+For Windows convenience, the bootstrap may optionally persist a runtime API key with current-user DPAPI protection. This is still sensitive local state and must not be uploaded or copied into the repository.
+
+The preferred public invariant is:
+
+```text
+portable source code
++
+local user-specific setup
++
+locally generated identity bindings
+=
+no author credential inheritance
+```
