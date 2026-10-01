@@ -53,7 +53,7 @@ ChatGPT MCP app / private plugin
 
 The native facade currently exposes **12 focused tools**.
 
-Final private registration and end-to-end acceptance are the remaining steps.
+The private ChatGPT MCP app/plugin is now registered, the Secure MCP Tunnel session is healthy, and direct native calls from ChatGPT have been verified. Final package binding and the remaining acceptance suite are still in progress.
 
 ## Remote GROWTH Stable v0.7
 
@@ -165,7 +165,10 @@ The original GROWTH machine has verified:
 - 12-tool native facade inventory;
 - native read/write annotations;
 - raw primitive exclusion;
-- plugin package secret scan and ZIP integrity.
+- plugin package secret scan and ZIP integrity;
+- Secure MCP Tunnel health/readiness;
+- private ChatGPT plugin registration;
+- direct native calls for health, workflow catalog, system health, and workspace discovery.
 
 ## Important distinction
 
@@ -198,12 +201,12 @@ The repository does not claim:
 
 Acceptance target:
 
-1. keep Composio at 64/64;
-2. keep production gateway healthy;
-3. connect native facade through OpenAI Secure MCP Tunnel;
-4. create the private ChatGPT MCP app;
+1. keep Composio at 64/64 — **verified**;
+2. keep production gateway healthy — **verified**;
+3. connect native facade through OpenAI Secure MCP Tunnel — **verified**;
+4. create the private ChatGPT MCP app and verify the 12-tool surface — **verified**;
 5. bind the real generated technical app ID into the plugin package;
-6. run read-only tests;
+6. run the full read-only acceptance suite;
 7. run plan-only test;
 8. run isolated write + rollback test;
 9. run protected-negative test;
