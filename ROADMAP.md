@@ -94,13 +94,13 @@ Updated: **2026-10-01**
 
 ### Phase 10 — final private registration / acceptance
 
-- [ ] establish the private Secure MCP Tunnel session
-- [ ] create ChatGPT MCP app through the Tunnel path
-- [ ] verify exactly 12 native tools
+- [x] establish the private Secure MCP Tunnel session
+- [x] create ChatGPT MCP app through the Tunnel path
+- [x] verify exactly 12 native tools
 - [ ] capture the real generated app technical ID
 - [ ] finalize app mapping
 - [ ] build final plugin archive
-- [ ] create/update PRIVATE Remote GROWTH Stable plugin
+- [x] create/update PRIVATE Remote GROWTH Stable plugin
 - [ ] read-only acceptance suite
 - [ ] plan-only acceptance
 - [ ] isolated write + rollback acceptance
