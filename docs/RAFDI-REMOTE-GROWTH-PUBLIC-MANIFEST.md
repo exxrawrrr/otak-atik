@@ -138,7 +138,7 @@ Phase 2 implementation is complete only when:
 - intended tree exists;
 - scripts parse successfully;
 - no real machine hostname is hardcoded in executable templates;
-- no `C:\Users\User` dependency exists;
+- no hardcoded user-profile path dependency exists;
 - no real bearer token exists;
 - setup supports dry-run;
 - status/repair/uninstall share common discovery logic;
