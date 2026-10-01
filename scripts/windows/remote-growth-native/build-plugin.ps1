@@ -51,12 +51,12 @@ $Manifest.extensions.'com.openai' | Add-Member -NotePropertyName apps -NotePrope
 $Manifest | ConvertTo-Json -Depth 12 | Set-Content $ManifestPath -Encoding UTF8
 
 $Patterns = [ordered]@{
-  openai_key = '\bsk-[A-Za-z0-9_-]{20,}'
+  openai_marker = '\bsk-[A-Za-z0-9_-]{20,}'
   pk_marker = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
   bearer = '(?i)Bearer\s+[A-Za-z0-9._~+/=-]{24,}'
-  tailscale_key = '\btskey-[A-Za-z0-9_-]{16,}'
-  runtime_api = '(?i)(runtime[_ -]?api[_ -]?key|CONTROL_PLANE_API_KEY)\s*[:=]\s*["'']?(?!env:)[A-Za-z0-9._~+/=-]{20,}'
-  tunnel_id = '\btunnel_[A-Za-z0-9_-]{20,}\b'
+  tailscale_marker = '\btskey-[A-Za-z0-9_-]{16,}'
+  runtime_marker = '(?i)(runtime[_ -]?api[_ -]?key|CONTROL_PLANE_API_KEY)\s*[:=]\s*["'']?(?!env:)[A-Za-z0-9._~+/=-]{20,}'
+  tunnel_marker = '\btunnel_[A-Za-z0-9_-]{20,}\b'
 }
 $Findings = @()
 Get-ChildItem $Build -Recurse -File | Where-Object { $_.Length -lt 5000000 } | ForEach-Object {
