@@ -51,7 +51,7 @@ Those 64 tools are not just raw desktop primitives. The gateway now contains lay
 
 ### Native ChatGPT plugin track
 
-A second surface is now being prepared specifically for direct ChatGPT plugin/app use:
+A second surface is now registered as a private ChatGPT plugin/MCP app and can call the focused native facade directly:
 
 ```text
 ChatGPT native plugin / MCP app
@@ -77,7 +77,10 @@ Current native package status:
 - five plugin skills: **validated**;
 - secret scan: **PASS**;
 - official OpenAI tunnel-client: **installed and checksum verified**;
-- final private ChatGPT registration + end-to-end acceptance: **in progress**.
+- Secure MCP Tunnel session: **healthy / ready**;
+- private ChatGPT MCP app/plugin: **registered**;
+- direct native calls from ChatGPT: **verified**;
+- final app-ID/package binding + full acceptance suite: **in progress**.
 
 See:
 
@@ -293,7 +296,10 @@ On the original GROWTH machine, the project has verified:
 - native tool safety annotations;
 - raw primitive exclusion from the native facade;
 - plugin package secret scan;
-- plugin ZIP integrity.
+- plugin ZIP integrity;
+- Secure MCP Tunnel health/readiness;
+- private ChatGPT plugin registration;
+- direct native tool calls from ChatGPT.
 
 This is still evidence from a real primary machine, not a claim of universal production readiness.
 
@@ -306,11 +312,11 @@ The current finalization track is:
 ```text
 Remote GROWTH Native Facade
   ↓
-OpenAI Secure MCP Tunnel
+OpenAI Secure MCP Tunnel ✅
   ↓
-ChatGPT MCP app
+ChatGPT MCP app / private plugin ✅
   ↓
-private Remote GROWTH Stable plugin
+real app-ID package binding
   ↓
 read-only acceptance
   ↓

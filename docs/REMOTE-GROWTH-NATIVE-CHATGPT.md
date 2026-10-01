@@ -233,18 +233,23 @@ The public repository should document the pattern, not the author's private tunn
 
 ## Current Phase 10 acceptance target
 
-The remaining private integration work is deliberately small and test-driven:
+Registration is now proven from the ChatGPT side:
 
-1. establish the Secure MCP Tunnel session;
-2. create the ChatGPT MCP app through the Tunnel connection path;
-3. scan exactly 12 native tools;
-4. capture the generated app technical ID;
-5. finalize the private plugin mapping;
-6. run read-only acceptance;
-7. run plan-only acceptance;
-8. run isolated file write + rollback acceptance;
-9. verify a protected system target fails closed;
-10. verify no regression to the 64-tool operator gateway.
+- Secure MCP Tunnel session healthy/ready;
+- private ChatGPT MCP app/plugin registered;
+- exactly 12 native tools exposed;
+- direct native calls from ChatGPT verified for health, workflow catalog, system health, and workspace discovery.
+
+Remaining test-driven work:
+
+1. capture the generated app technical ID for final package mapping;
+2. finalize the private plugin package mapping;
+3. run the full read-only acceptance suite;
+4. run plan-only acceptance;
+5. run isolated file write + rollback acceptance;
+6. verify a protected system target fails closed;
+7. verify no regression to the 64-tool operator gateway;
+8. run reconnect/reboot acceptance and lock the final release evidence.
 
 ## Acceptance philosophy
 

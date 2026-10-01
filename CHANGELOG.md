@@ -56,9 +56,12 @@ Verified:
 - pre-registration plugin package;
 - package secret scan;
 - ZIP integrity;
-- official OpenAI Secure MCP Tunnel client installation with checksum verification.
+- official OpenAI Secure MCP Tunnel client installation with checksum verification;
+- Secure MCP Tunnel health/readiness;
+- private ChatGPT MCP app/plugin registration;
+- direct native calls from ChatGPT to the 12-tool facade.
 
-Final private ChatGPT registration and acceptance remain in progress.
+Final app-ID/package binding and the remaining acceptance suite are still in progress.
 
 ### Documentation
 
