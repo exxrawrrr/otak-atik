@@ -69,7 +69,11 @@ Verified:
 - plan-only acceptance passed;
 - mutating workflow execution is denied without allow_mutations=true;
 - irreversible SystemOps execution is denied without allow_irreversible=true before the action runs;
-- isolated native FileOps write acceptance passed with receipt/hash verification and rollback restoring the pre-test destination state.
+- isolated native FileOps write acceptance passed with receipt/hash verification and rollback restoring the pre-test destination state;
+- SystemOps protected-negative acceptance passed for gateway and Tailscale targets;
+- SystemOps service planner Python string bug fixed in the private machine runtime;
+- runtime protection expanded to the native facade and Secure MCP Tunnel processes/ports;
+- post-patch regression reverified 64-tool production gateway, 12-tool native facade, tunnel health/readiness, and public unauthenticated HTTP 401.
 
 The remaining acceptance suite is still in progress.
 

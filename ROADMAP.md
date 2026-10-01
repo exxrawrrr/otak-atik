@@ -107,7 +107,7 @@ Updated: **2026-10-01**
 - [x] read-only acceptance suite
 - [x] plan-only acceptance
 - [x] isolated write + rollback acceptance
-- [ ] protected-negative acceptance
+- [x] protected-negative acceptance
 - [ ] reboot/reconnect acceptance
 - [ ] final release/checkpoint lock
 
