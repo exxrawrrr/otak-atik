@@ -49,6 +49,6 @@ test("plugin builder generates app binding outside the checkout", () => {
   assert.match(builder, /LOCALAPPDATA/);
   assert.match(builder, /plugin_asdk_app_/);
   assert.match(builder, /secret scan/i);
-  assert.match(builder, /remote-growth-stable\/\.app\.json/);
+  assert.match(builder, /Join-Path \$Build '\.app\.json'/);
   assert.doesNotMatch(builder, /plugin_asdk_app_[0-9a-f]{32}/i);
 });
