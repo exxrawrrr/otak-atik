@@ -1,5 +1,14 @@
 # Rafdi Remote GROWTH — Experiment Evidence
 
+> **Historical snapshot.**
+>
+> This document is intentionally frozen around the original **2026-09-29** transport experiment.
+> The project has since advanced to a **64-tool Remote GROWTH Stable gateway**, layered local engines,
+> a workflow orchestrator, and a focused **12-tool native ChatGPT facade**.
+>
+> For current architecture and plugin progress, see:
+> [REMOTE-GROWTH-NATIVE-CHATGPT.md](REMOTE-GROWTH-NATIVE-CHATGPT.md).
+
 Status: **REAL-WORLD VERIFIED ON ONE WINDOWS MACHINE**
 
 Date frozen: **2026-09-29**
@@ -130,13 +139,13 @@ Quick Tunnel proved the architecture but had an operational problem: the generat
 
 ### 6. Tailscale Funnel
 
-Status: **SELECTED FINAL TRANSPORT FOR THIS EXPERIMENT**
+Status: **SELECTED FINAL TRANSPORT FOR THIS HISTORICAL EXPERIMENT**
 
 Tailscale was installed and authenticated once.
 
 A Funnel was configured in background mode to proxy HTTPS traffic to the loopback-only Windows-MCP listener.
 
-Final architecture:
+Historical architecture:
 
 ```text
 ChatGPT
@@ -185,9 +194,9 @@ The following were not hypothetical:
 - supervisor remained running;
 - Funnel remained on.
 
-## Final verified tool surface
+## Historical verified tool surface
 
-The stable custom MCP exposed:
+At the time of this frozen snapshot, the stable custom MCP exposed 15 Windows-oriented primitive tools:
 
 - PowerShell;
 - FileSystem;
@@ -205,6 +214,8 @@ The stable custom MCP exposed:
 - Wait;
 - WaitFor.
 
+The later 64-tool gateway is documented separately.
+
 ## Evidence labels
 
 | Component | Result |
@@ -221,20 +232,12 @@ The stable custom MCP exposed:
 | Supervisor recovery | verified |
 | Tailscale service persistence | verified |
 | Windows Scheduled Task startup | verified |
-| Generic clean-machine installer | **not yet built** |
-| Multi-user reproducibility | **not yet proven** |
 
-## The useful conclusion
+## Why keep this document
 
-The original repo used to end with:
+Because later success should not erase the path that got there.
 
-```text
-ChatGPT
-→ Remote Desktop Commander
-→ Windows
-```
-
-After this experiment, there is now a second path that was actually exercised:
+This snapshot records the moment when the project first proved:
 
 ```text
 ChatGPT
@@ -244,8 +247,4 @@ ChatGPT
 → Windows
 ```
 
-That is a meaningful result.
-
-It does **not** mean the project should pretend the hard parts disappeared.
-
-The remaining work is packaging the machine-specific experiment into a safe, idempotent setup that another person can run without copying the author's hostname, paths, or secrets.
+The current system is substantially more capable, but the evidence here remains useful when reasoning about transport failures, recovery, and security boundaries.
