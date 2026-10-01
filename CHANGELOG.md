@@ -59,9 +59,14 @@ Verified:
 - official OpenAI Secure MCP Tunnel client installation with checksum verification;
 - Secure MCP Tunnel health/readiness;
 - private ChatGPT MCP app/plugin registration;
-- direct native calls from ChatGPT to the 12-tool facade.
+- direct native calls from ChatGPT to the 12-tool facade;
+- private v1.0.0 package finalized locally with the verified app binding;
+- public identity-neutral plugin template;
+- Windows native bootstrap for tunnel setup/run/status/doctor/plugin build;
+- optional current-user DPAPI-encrypted runtime-key cache outside the Git checkout;
+- generated private app bindings/builds stored below LocalAppData rather than the repository.
 
-Final app-ID/package binding and the remaining acceptance suite are still in progress.
+The remaining acceptance suite is still in progress.
 
 ### Documentation
 
