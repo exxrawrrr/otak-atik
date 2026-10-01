@@ -1,29 +1,44 @@
 # otak-atik
 
-> **A public lab about one question: how far can ChatGPT safely operate a real Windows computer?**
->
-> The project started as a messy attempt to make ChatGPT reach the author's PC from chat.
-> It failed several times, changed direction, and eventually produced a working remote operator path called **Remote GROWTH Stable**.
+> **A public AI-to-computer control lab: how far can ChatGPT safely operate a real Windows machine without turning the whole setup into an untraceable shell?**
 
-## Current status — 1 October 2026
+`otak-atik` is an experimental, local-first repository for building and documenting practical AI operator workflows. It started from a simple problem — letting ChatGPT inspect and operate a real Windows workstation — and grew into a safety-gated remote operator stack with evidence, permissions, verification, receipts, and rollback.
 
-The original idea was simple:
+This repository is both:
 
-```text
-ChatGPT
-  ↓
-reach my Windows PC
-  ↓
-find files / inspect projects / run tools
-  ↓
-make controlled changes
-  ↓
-verify what actually happened
-```
+- a **working engineering lab** for AI-to-computer control;
+- a **public record** of what actually worked, failed, changed direction, and why.
 
-That idea is no longer architecture-only.
+It is **not** presented as a universal remote-desktop product or as proof that arbitrary AI agents can safely control arbitrary computers.
 
-### Working operator path
+---
+
+## Current status
+
+Snapshot: **1 October 2026**
+
+| Surface | Current state |
+| --- | --- |
+| Remote GROWTH Stable gateway | **v0.7.0** |
+| Gateway inventory | **64 tools** |
+| Native ChatGPT facade | **12 focused tools** |
+| Private native plugin package | **v1.0.0 finalized locally** |
+| Public reusable native bootstrap | **validated from a fresh clone** |
+| Core Phase 10 acceptance | **COMPLETE VERIFIED** |
+| Warm native reconnect | **verified** |
+| Cold reboot / lost tunnel process | **manual tunnel start required unless optional local auto-start enrollment is configured** |
+| Standalone npm package line | **0.1.0-alpha.5** |
+| License | **Apache-2.0** |
+
+The current release lock is intentionally honest about the remaining cold-start limitation. The public repository does not contain the owner's tunnel runtime key, bearer token, generated private app ID, local credential store, or machine secrets.
+
+---
+
+## Architecture
+
+There are two practical operator surfaces.
+
+### 1. Full remote operator path
 
 ```text
 ChatGPT
@@ -34,24 +49,23 @@ Remote GROWTH Stable Gateway v0.7.0
   ↓
 64 tools
   ↓
-GROWTH Windows workstation
+Windows workstation
 ```
 
-The Composio connection currently exposes **64 available actions**.
+The 64-tool gateway combines:
 
-Those 64 tools are not just raw desktop primitives. The gateway now contains layered engines for:
+| Layer | Count | Purpose |
+| --- | ---: | --- |
+| Windows primitives | 15 | selected PowerShell, file, process, screenshot, and GUI operations |
+| Fast Local | 6 | local search, indexed files, workspaces, index health |
+| Document Engine | 6 | inspect, extract, search, compare, controlled replace |
+| Developer / Git | 9 | repository inspection, diff, search, checkpoint, quality |
+| Safe FileOps | 10 | hashes, duplicates, archive, plan/execute/rollback, backup |
+| SystemOps | 12 | system, process, port, service, network, task inspection and safe planned mutation |
+| Workflow Engine | 6 | catalog, plan, execute, status, rollback |
+| **Total** | **64** | |
 
-- local search / persistent workspace index;
-- document inspection and controlled document operations;
-- Git / repository inspection and quality workflows;
-- safe file and workspace operations;
-- Windows system / process / network inspection;
-- planned system mutations with protected targets;
-- high-level workflow orchestration with receipts and rollback.
-
-### Native ChatGPT plugin track
-
-A second surface is now registered as a private ChatGPT plugin/MCP app and can call the focused native facade directly:
+### 2. Native ChatGPT plugin path
 
 ```text
 ChatGPT native plugin / MCP app
@@ -67,163 +81,40 @@ Remote GROWTH Native Facade
 trusted local engines
 ```
 
-The native facade intentionally does **not** expose raw PowerShell, raw filesystem mutation, or raw UI automation.
+The native facade deliberately exposes a much smaller surface:
 
-Current native package status:
+```text
+remote_growth_health
+search_local
+find_workspace
+summarize_workspace
+inspect_document
+inspect_repo
+inspect_system_health
+list_workflows
+plan_workflow
+execute_workflow
+get_workflow_status
+rollback_workflow
+```
 
-- native facade: **12 tools verified**;
-- loopback-only listener: **verified**;
-- private plugin package: **v1.0.0 finalized locally with the verified app binding**;
-- five plugin skills: **validated**;
-- secret scan: **PASS**;
-- official OpenAI tunnel-client: **installed and checksum verified**;
-- Secure MCP Tunnel session: **healthy / ready**;
-- private ChatGPT MCP app/plugin: **registered**;
-- direct native calls from ChatGPT: **verified**;
-- public reusable native bootstrap: **validated from a fresh clone**;
-- core Phase 10 acceptance suite: **COMPLETE VERIFIED**;
-- warm native-backend reconnect: **verified**;
-- cold reboot/tunnel-process restart: **manual tunnel start required unless optional local auto-start enrollment is configured**.
-
-See:
-
-- [Current Remote GROWTH / Native ChatGPT architecture](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
-- [Reusable native setup/bootstrap](examples/remote-growth-native/README.md)
-- [Historical Rafdi Remote evidence](docs/RAFDI-REMOTE-GROWTH.md)
-- [Project State](PROJECT_STATE.md)
-- [Roadmap](ROADMAP.md)
+Raw PowerShell, raw filesystem mutation, and raw UI automation are intentionally absent from the native facade.
 
 ---
 
-## Where this started
+## The design idea
 
-Originally, this repository was basically:
-
-> “why can't the AI in my chat just enter my computer, read the project, run the terminal, fix something, and prove the result?”
-
-That led to experiments with:
-
-- MCP;
-- remote MCP;
-- local MCP;
-- browser bridges;
-- launchers;
-- skills and capability registries;
-- approvals and security boundaries;
-- evidence and verification;
-- provider routing;
-- tunnels;
-- desktop control;
-- and a lot of failed assumptions.
-
-The first practical answer was simply:
+The project moved away from:
 
 ```text
-ChatGPT
-  ↓
-Remote Desktop Commander
-  ↓
-Windows
+AI
+↓
+here is a shell
+↓
+good luck
 ```
 
-That still works and remains useful.
-
-But the self-built path kept evolving.
-
----
-
-## Architecture evolution
-
-### Stage 1 — use an existing remote plugin
-
-```text
-ChatGPT
-  ↓
-Remote Desktop Commander
-  ↓
-GROWTH
-```
-
-Simple and practical.
-
-### Stage 2 — build a second remote MCP path
-
-```text
-ChatGPT
-  ↓
-Composio Custom MCP
-  ↓
-Tailscale Funnel
-  ↓
-Windows-MCP
-  ↓
-GROWTH
-```
-
-This survived:
-
-- authentication tests;
-- public reachability tests;
-- host/origin protection;
-- supervisor recovery;
-- Tailscale reconnect;
-- Scheduled Task recovery;
-- an actual Windows reboot;
-- post-reboot commands from ChatGPT.
-
-### Stage 3 — stop treating Windows-MCP primitives as the final API
-
-The gateway grew into:
-
-```text
-Remote GROWTH Stable Gateway
-  ├─ Windows primitives
-  ├─ Fast Local Engine
-  ├─ Document Engine
-  ├─ Developer / Git Engine
-  ├─ Safe FileOps Engine
-  ├─ SystemOps Engine
-  └─ Workflow Engine
-```
-
-Current gateway version:
-
-```text
-v0.7.0
-64 tools
-```
-
-### Stage 4 — make it usable as a ChatGPT-native plugin
-
-Instead of giving a native ChatGPT app all 64 operator tools, the project now uses a deliberately smaller facade:
-
-```text
-Native Facade
-  12 focused tools
-  ↓
-Workflow Engine / trusted engines
-```
-
-This lets the public/operator gateway remain powerful while the ChatGPT-native surface stays easier to reason about.
-
----
-
-## The 64-tool gateway
-
-Current tool groups:
-
-| Layer | Count | Purpose |
-|---|---:|---|
-| Windows primitives | 15 | PowerShell, files, process, screenshot, selected GUI control |
-| Fast Local | 6 | indexed local search, files, workspaces, index health |
-| Document Engine | 6 | inspect, extract, search, compare, controlled replace |
-| Developer / Git | 9 | repo discovery/status/search/diff/checkpoint/quality |
-| Safe FileOps | 10 | storage, duplicates, hashes, archive, batch plan/execute/rollback, backup |
-| SystemOps | 12 | health, process/port/service/network/task inspection + planned safe mutations |
-| Workflow Engine | 6 | catalog, plan, execute, status, rollback |
-| **Total** | **64** | |
-
-The project moved from “give AI a shell” toward:
+toward:
 
 ```text
 inspect
@@ -241,125 +132,56 @@ receipt
 rollback when supported
 ```
 
----
-
-## Native ChatGPT facade
-
-The native surface currently exposes only these high-level tools:
-
-```text
-remote_growth_health
-search_local
-find_workspace
-summarize_workspace
-inspect_document
-inspect_repo
-inspect_system_health
-list_workflows
-plan_workflow
-execute_workflow
-get_workflow_status
-rollback_workflow
-```
-
-Raw operator primitives are intentionally absent from this surface.
-
-The plugin package also includes focused skills for:
-
-- onboarding / routing;
-- repository operations;
-- safe file operations;
-- safe system operations;
-- document work.
-
-No API key, bearer token, tunnel runtime key, or private key belongs in the package or repository.
+The important part is not the number of tools. The important part is that higher-impact operations are meant to remain inspectable, permission-scoped, evidence-backed, and recoverable.
 
 ---
 
 ## What is actually verified
 
-On the original GROWTH machine, the project has verified:
+On the primary Windows machine, the project has verified:
 
-- loopback-only MCP bindings;
-- authenticated public gateway transport;
-- unauthenticated request rejection;
-- supervisor and startup recovery;
-- Tailscale persistence;
-- real Windows reboot recovery;
-- 64-tool MCP gateway inventory;
-- persistent local workspace index;
-- document / developer / file / system engines;
+- authenticated remote transport and unauthenticated rejection;
+- loopback-only native bindings;
+- real Windows reboot recovery on the earlier remote path;
+- 64-tool gateway inventory;
+- persistent local workspace indexing;
+- document, developer, file, system, and workflow engines;
 - protected runtime targets;
 - irreversible-action gates;
 - FileOps and SystemOps receipts;
-- high-level workflows;
-- workflow mutation gate;
-- duplicate execution guard;
+- high-level workflow execution;
+- duplicate-execution protection;
 - workflow rollback;
 - native 12-tool facade;
-- native tool safety annotations;
-- raw primitive exclusion from the native facade;
-- plugin package secret scan;
-- plugin ZIP integrity;
-- Secure MCP Tunnel health/readiness;
+- native safety annotations;
+- exclusion of raw primitives from the native facade;
+- public package secret scans;
+- Secure MCP Tunnel readiness;
 - private ChatGPT plugin registration;
-- direct native tool calls from ChatGPT.
+- direct native calls from ChatGPT;
+- read-only acceptance;
+- permission-gate acceptance;
+- isolated write + rollback acceptance;
+- protected-negative and regression acceptance;
+- warm native-backend reconnect.
 
-This is still evidence from a real primary machine, not a claim of universal production readiness.
-
----
-
-## Phase 10 release lock
-
-Status: **COMPLETE VERIFIED — with one documented cold-start limitation.**
-
-Verified:
-
-```text
-64-tool production gateway ✅
-12-tool native facade ✅
-private ChatGPT plugin ✅
-read-only acceptance ✅
-permission gates ✅
-isolated write + rollback ✅
-protected-negative tests ✅
-warm reconnect/recovery ✅
-```
-
-Known limitation:
-
-> If Windows fully reboots or the tunnel-client process is lost, the private tunnel currently needs a manual start/runtime-key entry unless the optional Windows Credential Manager + Scheduled Task auto-start enrollment is configured.
-
-That limitation is intentionally preferable to silently committing or extracting a private runtime credential.
-
-The public repo never includes the author's tunnel credentials, bearer keys, machine secrets, generated private app ID, or local credential store.
+That is real evidence from one primary machine and one evolving project. It is **not** a claim of universal production readiness.
 
 ---
 
-## Remote Desktop Commander did not become useless
+## Known limitation
 
-This repo is not trying to rewrite history.
+The current native private tunnel has one documented operational limitation:
 
-Remote Desktop Commander is still valuable for direct interactive computer work.
+> If Windows fully reboots or the tunnel-client process is lost, the tunnel currently needs a manual start/runtime-key entry unless the user explicitly enrolls the optional Windows Credential Manager + Scheduled Task auto-start path.
 
-The useful lesson became:
-
-```text
-use an existing tool when it is the best tool
-
-AND
-
-build your own path when you need different reliability,
-control, quota, safety, or workflow semantics
-```
-
-Both can be true.
+The project prefers that limitation over silently committing, extracting, or weakening the handling of a private runtime credential.
 
 ---
 
 ## Standalone utilities
 
-The repo still includes provider-neutral utilities:
+The repository also contains provider-neutral utilities that can be useful independently of the private Remote GROWTH setup:
 
 ```powershell
 otak-atik snapshot .
@@ -370,79 +192,237 @@ otak-atik handoff . --task "continue this project" --out handoff.json
 otak-atik diff-risk .
 ```
 
-The npm package itself remains a separate alpha research package from the machine-specific Remote GROWTH runtime.
+The standalone package remains an alpha research package. It is separate from the machine-specific private runtime.
 
-Current npm package line:
+Requirements for repository tooling:
 
 ```text
-0.1.0-alpha.5
+Node.js >= 20
+```
+
+Useful repository checks:
+
+```bash
+npm run validate
+npm test
+npm run check
+npm run release:check
 ```
 
 ---
 
-## Research principles
+## Repository map
 
-```text
-Reality > roadmap.
-Evidence > vibes.
-Verification > "should work".
-Failure documented > failure forgotten.
-High-level safe operations > unnecessary raw shell access.
-Local > remote when the task is local.
-Secrets stay local.
-Working paths may coexist.
-```
-
-The repository started as a failed attempt to replace a convenient remote plugin.
-
-It evolved into something more interesting:
-
-> **a documented AI-to-computer control lab with a real 64-tool remote operator path and an actively tested native ChatGPT plugin path.**
+| Path | Purpose |
+| --- | --- |
+| `docs/` | architecture, decisions, evidence, historical project notes |
+| `examples/remote-growth-native/` | reusable native ChatGPT bootstrap example |
+| `src/` | core reusable package implementation |
+| `adapters/` | integration/adaptation surfaces |
+| `clients/` | client-side integration helpers |
+| `registries/` | machine-readable capability/registry data |
+| `schemas/` | structured contracts |
+| `scripts/` | validation, audit, benchmark, and release helpers |
+| `tests/` | regression and safety tests |
+| `experiments/` / `labs/` | intentionally experimental work |
+| `PROJECT_STATE.md` | current factual project state |
+| `ROADMAP.md` | active and historical roadmap |
+| `SECURITY.md` | security expectations and disclosure guidance |
 
 ---
 
 ## Documentation
 
-### Current architecture
+Start here:
 
-- [Remote GROWTH Native ChatGPT](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
 - [Project State](PROJECT_STATE.md)
 - [Roadmap](ROADMAP.md)
+- [Current Remote GROWTH / Native ChatGPT architecture](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
+- [Reusable native setup/bootstrap](examples/remote-growth-native/README.md)
+- [Historical Rafdi Remote GROWTH evidence](docs/RAFDI-REMOTE-GROWTH.md)
 - [What I actually use](docs/WHAT-I-ACTUALLY-USE.md)
-
-### Historical evidence
-
-- [Rafdi Remote GROWTH](docs/RAFDI-REMOTE-GROWTH.md)
-- [Phase 2A checkpoint](docs/RAFDI-REMOTE-GROWTH-PHASE-2A-CHECKPOINT.md)
-- [Phase 2B checkpoint](docs/RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md)
-- [Transport/security ADR](docs/decisions/ADR-RAFDI-REMOTE-TRANSPORT.md)
-
-### Security / contribution
-
 - [Security](SECURITY.md)
 - [Contributing](CONTRIBUTING.md)
 - [Sources](SOURCES.md)
+- [Attribution](ATTRIBUTION.md)
 
 ---
 
-## For everyone else
+## Security boundary
 
-**otak-atik is an AI-to-computer control research lab.**
+This repository should never require publishing the owner's:
 
-It documents the path from:
+- tunnel runtime keys;
+- bearer tokens;
+- generated private ChatGPT app identifiers;
+- workstation secrets;
+- private credentials;
+- local credential-store contents.
+
+A public example should remain identity-neutral and reproducible without pretending that private machine state belongs in source control.
+
+If you are evaluating this project, treat `PROJECT_STATE.md`, committed evidence, and test results as stronger authority than optimistic prose.
+
+---
+
+## Contributing
+
+This is primarily a working research lab, but issues and focused contributions are welcome.
+
+Please read:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SECURITY.md](SECURITY.md)
+
+Keep experimental claims narrow. A test that passed once is evidence for that test — not a universal guarantee.
+
+---
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
+
+Third-party material retains its original ownership/licensing; see [NOTICE](NOTICE), [SOURCES.md](SOURCES.md), and [ATTRIBUTION.md](ATTRIBUTION.md).
+
+---
+
+# Owner's Notes — catatan gue sendiri
+
+> Bagian atas buat orang yang baru datang dan pengen ngerti repo ini tanpa perlu ikut terseret ke seluruh sejarah kekacauannya.
+>
+> Bagian bawah ini buat gue sendiri.
+
+## Awalnya sesimpel: “kok ChatGPT nggak bisa masuk PC gue?”
+
+Kurang lebih pertanyaan awalnya:
 
 ```text
-"Can ChatGPT reach my computer?"
+gue chat
+↓
+AI masuk komputer
+↓
+cari file
+↓
+cek project
+↓
+ngerjain sesuatu
+↓
+kasih bukti
 ```
 
-to a verified experimental stack with:
+Di kepala: sederhana.
 
-- a real Windows machine;
-- a stable remote MCP gateway;
-- 64 operator tools;
-- safety-gated engines and workflows;
-- and a focused native ChatGPT plugin surface that has completed its core Phase 10 acceptance suite.
+Di kenyataan: authentication, transport, tunnel, MCP, permission, Windows, restart, secret, process, provider, timeout, rollback, dan segala makhluk yang sebelumnya tidak diundang ikut rapat.
 
-It is not a universal remote-desktop product.
+<p align="center">
+  <img src="docs/assets/readme-notes/ew-wat.png" width="330" alt="confused reaction meme" />
+</p>
 
-It is a public record of what actually worked, what failed, and why the architecture changed.
+Kurang lebih ekspresi gue waktu sadar “AI masuk PC” ternyata bukan satu fitur. Itu satu kecamatan.
+
+## Fase awal: yang penting nyambung dulu
+
+Sempat ada beberapa jalur:
+
+```text
+ChatGPT → Remote Desktop Commander → Windows
+```
+
+lalu eksperimen:
+
+```text
+ChatGPT → Composio → Tailscale Funnel → Windows-MCP → GROWTH
+```
+
+Beberapa bagian gagal. Beberapa ternyata jalan. Beberapa jalan tapi bikin pertanyaan baru: **kalau bisa mengeksekusi, terus siapa yang memastikan eksekusinya aman dan benar?**
+
+<p align="center">
+  <img src="docs/assets/readme-notes/test-in-prod.jpg" width="350" alt="testing in production meme" />
+</p>
+
+Ada masa di mana rasanya semua pengujian memang secara spiritual dilakukan di production.
+
+Tidak ideal. Sangat mendidik.
+
+## Terus gue sadar: raw shell bukan tujuan akhirnya
+
+Punya akses PowerShell itu keren kira-kira lima menit.
+
+Setelah itu pertanyaannya berubah:
+
+- target mana yang boleh disentuh?
+- tindakan mana yang perlu approval?
+- kalau gagal, bukti gagalnya mana?
+- kalau sukses, benar sukses atau cuma proses exit 0?
+- kalau mutasi, bisa rollback nggak?
+- AI boleh lihat secret nggak?
+- dua eksekusi identik bisa kejadian dua kali nggak?
+
+Dari situ arsitekturnya berubah dari kumpulan primitive menjadi engine, workflow, receipt, permission gate, dan verification.
+
+<p align="center">
+  <img src="docs/assets/readme-notes/mostly-dead.jpg" width="350" alt="mostly dead reaction meme" />
+</p>
+
+Banyak eksperimen tidak benar-benar “mati”. Mereka cuma cukup hidup untuk ngajarin kenapa desain berikutnya harus beda.
+
+## Dari 64 tools malah balik bikin 12
+
+Ini salah satu bagian yang paling lucu.
+
+Setelah susah payah bikin gateway **64 tools**, pas bikin native ChatGPT plugin malah keputusan terbaiknya adalah:
+
+> **jangan kasih semua 64.**
+
+Native facade dipangkas jadi 12 high-level tools supaya lebih mudah diaudit, lebih sulit dipakai ngawur, dan tidak perlu expose raw shell/file mutation/UI automation.
+
+Ternyata kadang progress engineering itu bukan “fiturnya nambah”.
+
+Kadang progress itu:
+
+```text
+64 kemampuan tersedia
+↓
+pikir ulang boundary
+↓
+12 kemampuan yang memang layak diekspos
+```
+
+## Phase 10 akhirnya kekunci
+
+Read-only ✅  
+Permission gate ✅  
+Isolated write + rollback ✅  
+Protected negative ✅  
+Regression ✅  
+Warm reconnect ✅
+
+Cold reboot auto-start?
+
+Belum gue paksa otomatis karena caranya menyentuh private runtime credential. Untuk sekarang manual start setelah kehilangan tunnel process lebih jujur dan lebih aman daripada bikin README sok bilang “full autonomous recovery”.
+
+<p align="center">
+  <img src="docs/assets/readme-notes/at-last.gif" width="350" alt="at last reaction meme" />
+</p>
+
+Akhirnya sampai juga di titik di mana kalimat yang bisa ditulis bukan “harusnya works”, tapi **“ini yang sudah benar-benar dites.”**
+
+## Hal yang jangan gue lupain
+
+```text
+Reality > roadmap.
+Evidence > vibes.
+Verification > "harusnya".
+Recoverable > magical.
+High-level safe operations > unnecessary raw shell access.
+Secrets stay local.
+Working paths may coexist.
+```
+
+Remote Desktop Commander masih berguna. Remote GROWTH juga berguna. Native ChatGPT facade juga punya tempat sendiri.
+
+Tidak semua hal harus diganti hanya karena gue berhasil bikin benda baru.
+
+Dan kalau suatu hari repo ini mulai sok kelihatan “production-grade universal autonomous computer operator”, baca lagi sejarahnya.
+
+Repo ini lebih menarik justru karena dia jujur soal batasannya.
