@@ -109,6 +109,8 @@ Updated: **2026-10-01**
 - [x] isolated write + rollback acceptance
 - [x] protected-negative acceptance
 - [ ] reboot/reconnect acceptance
+  - [x] warm native-backend reconnect through existing Secure MCP Tunnel
+  - [ ] zero-touch cold tunnel restart / reboot enrollment
 - [ ] final release/checkpoint lock
 
 ## Portability / public reproduction
