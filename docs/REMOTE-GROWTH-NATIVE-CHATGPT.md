@@ -263,13 +263,14 @@ Registration is now proven from the ChatGPT side:
 - Secure MCP Tunnel session healthy/ready;
 - private ChatGPT MCP app/plugin registered;
 - exactly 12 native tools exposed;
-- direct native calls from ChatGPT verified for health, workflow catalog, system health, and workspace discovery.
+- direct native calls from ChatGPT verified for health, workflow catalog, system health, and workspace discovery;
+- native read-only acceptance verified across eight representative calls: health, local search, workspace discovery, workspace summary, repository status, system health, workflow catalog, and document inspection.
 
 Remaining test-driven work:
 
 1. generated app technical ID captured/verified privately — complete;
 2. private package mapping/archive finalized locally — complete;
-3. run the full read-only acceptance suite;
+3. full read-only acceptance suite — complete;
 4. run plan-only acceptance;
 5. run isolated file write + rollback acceptance;
 6. verify a protected system target fails closed;

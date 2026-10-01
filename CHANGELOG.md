@@ -64,7 +64,8 @@ Verified:
 - public identity-neutral plugin template;
 - Windows native bootstrap for tunnel setup/run/status/doctor/plugin build;
 - optional current-user DPAPI-encrypted runtime-key cache outside the Git checkout;
-- generated private app bindings/builds stored below LocalAppData rather than the repository.
+- generated private app bindings/builds stored below LocalAppData rather than the repository;
+- native read-only acceptance passed for health, local search, workspace discovery/summary, Git status, system health, workflow catalog, and DOCX inspection.
 
 The remaining acceptance suite is still in progress.
 

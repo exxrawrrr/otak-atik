@@ -168,7 +168,8 @@ The original GROWTH machine has verified:
 - plugin package secret scan and ZIP integrity;
 - Secure MCP Tunnel health/readiness;
 - private ChatGPT plugin registration;
-- direct native calls for health, workflow catalog, system health, and workspace discovery.
+- direct native calls for health, workflow catalog, system health, and workspace discovery;
+- full native read-only acceptance across local search, workspace summary, repository status, system health, workflow catalog, and document inspection.
 
 ## Important distinction
 
@@ -206,7 +207,7 @@ Acceptance target:
 3. connect native facade through OpenAI Secure MCP Tunnel — **verified**;
 4. create the private ChatGPT MCP app and verify the 12-tool surface — **verified**;
 5. bind the real generated technical app ID into the private plugin package — **verified locally, not published**;
-6. run the full read-only acceptance suite;
+6. run the full read-only acceptance suite — **verified**;
 7. run plan-only test;
 8. run isolated write + rollback test;
 9. run protected-negative test;

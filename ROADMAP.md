@@ -104,7 +104,7 @@ Updated: **2026-10-01**
 - [x] finalize private app mapping locally (not committed)
 - [x] build final private plugin archive v1.0.0 with secret scan
 - [x] create/update PRIVATE Remote GROWTH Stable plugin
-- [ ] read-only acceptance suite
+- [x] read-only acceptance suite
 - [ ] plan-only acceptance
 - [ ] isolated write + rollback acceptance
 - [ ] protected-negative acceptance
