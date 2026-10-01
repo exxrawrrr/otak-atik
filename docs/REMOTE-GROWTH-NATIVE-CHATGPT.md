@@ -270,7 +270,8 @@ Registration is now proven from the ChatGPT side:
 - isolated write verified: one disposable file copy completed with equivalent SHA-256 verification and was removed by workflow rollback while the source remained intact;
 - protected-negative verification passed for gateway and Tailscale targets;
 - runtime protection was expanded to native facade/tunnel ports and command patterns after CHAT 08 exposed the gap;
-- post-patch regression kept the 64-tool gateway, 12-tool native facade, tunnel 200/200 state, and public HTTP 401 intact.
+- post-patch regression kept the 64-tool gateway, 12-tool native facade, tunnel 200/200 state, and public HTTP 401 intact;
+- warm reconnect verified by stopping the native facade, keeping the tunnel process alive, restarting the facade with a new PID, and successfully calling the native ChatGPT plugin again.
 
 Remaining test-driven work:
 
@@ -281,7 +282,9 @@ Remaining test-driven work:
 5. isolated file write + rollback acceptance — complete;
 6. protected-negative + regression acceptance — complete;
 7. verify no regression to the 64-tool operator gateway;
-8. run reconnect/reboot acceptance and lock the final release evidence.
+8. warm native-backend reconnect — complete;
+9. zero-touch cold tunnel restart / reboot — pending one-time local credential/task enrollment;
+10. lock the final release evidence.
 
 ## Acceptance philosophy
 
