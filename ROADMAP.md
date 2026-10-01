@@ -105,7 +105,7 @@ Updated: **2026-10-01**
 - [x] build final private plugin archive v1.0.0 with secret scan
 - [x] create/update PRIVATE Remote GROWTH Stable plugin
 - [x] read-only acceptance suite
-- [ ] plan-only acceptance
+- [x] plan-only acceptance
 - [ ] isolated write + rollback acceptance
 - [ ] protected-negative acceptance
 - [ ] reboot/reconnect acceptance

@@ -65,7 +65,10 @@ Verified:
 - Windows native bootstrap for tunnel setup/run/status/doctor/plugin build;
 - optional current-user DPAPI-encrypted runtime-key cache outside the Git checkout;
 - generated private app bindings/builds stored below LocalAppData rather than the repository;
-- native read-only acceptance passed for health, local search, workspace discovery/summary, Git status, system health, workflow catalog, and DOCX inspection.
+- native read-only acceptance passed for health, local search, workspace discovery/summary, Git status, system health, workflow catalog, and DOCX inspection;
+- plan-only acceptance passed;
+- mutating workflow execution is denied without allow_mutations=true;
+- irreversible SystemOps execution is denied without allow_irreversible=true before the action runs.
 
 The remaining acceptance suite is still in progress.
 
