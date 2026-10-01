@@ -106,7 +106,7 @@ Updated: **2026-10-01**
 - [x] create/update PRIVATE Remote GROWTH Stable plugin
 - [x] read-only acceptance suite
 - [x] plan-only acceptance
-- [ ] isolated write + rollback acceptance
+- [x] isolated write + rollback acceptance
 - [ ] protected-negative acceptance
 - [ ] reboot/reconnect acceptance
 - [ ] final release/checkpoint lock

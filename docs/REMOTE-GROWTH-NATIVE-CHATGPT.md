@@ -266,7 +266,8 @@ Registration is now proven from the ChatGPT side:
 - direct native calls from ChatGPT verified for health, workflow catalog, system health, and workspace discovery;
 - native read-only acceptance verified across eight representative calls: health, local search, workspace discovery, workspace summary, repository status, system health, workflow catalog, and document inspection;
 - mutation gate verified: mutating workflows fail closed without allow_mutations=true;
-- irreversible gate verified: irreversible SystemOps steps fail closed without allow_irreversible=true before the action executes.
+- irreversible gate verified: irreversible SystemOps steps fail closed without allow_irreversible=true before the action executes;
+- isolated write verified: one disposable file copy completed with equivalent SHA-256 verification and was removed by workflow rollback while the source remained intact.
 
 Remaining test-driven work:
 
@@ -274,7 +275,7 @@ Remaining test-driven work:
 2. private package mapping/archive finalized locally — complete;
 3. full read-only acceptance suite — complete;
 4. plan-only and permission-gate acceptance — complete;
-5. run isolated file write + rollback acceptance;
+5. isolated file write + rollback acceptance — complete;
 6. verify a protected system target fails closed;
 7. verify no regression to the 64-tool operator gateway;
 8. run reconnect/reboot acceptance and lock the final release evidence.

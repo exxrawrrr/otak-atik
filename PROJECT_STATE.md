@@ -170,7 +170,8 @@ The original GROWTH machine has verified:
 - private ChatGPT plugin registration;
 - direct native calls for health, workflow catalog, system health, and workspace discovery;
 - full native read-only acceptance across local search, workspace summary, repository status, system health, workflow catalog, and document inspection;
-- plan-only acceptance plus mutation and irreversible-action denial gates.
+- plan-only acceptance plus mutation and irreversible-action denial gates;
+- isolated native file copy with hash-equivalence verification and successful rollback.
 
 ## Important distinction
 
@@ -210,7 +211,7 @@ Acceptance target:
 5. bind the real generated technical app ID into the private plugin package — **verified locally, not published**;
 6. run the full read-only acceptance suite — **verified**;
 7. run plan-only and permission-gate tests — **verified**;
-8. run isolated write + rollback test;
+8. run isolated write + rollback test — **verified**;
 9. run protected-negative test;
 10. create a release/checkpoint only after all gates pass.
 
