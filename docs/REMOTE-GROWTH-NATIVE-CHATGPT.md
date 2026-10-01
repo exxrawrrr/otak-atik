@@ -1,6 +1,6 @@
 # Remote GROWTH Stable — Current Architecture and Native ChatGPT Track
 
-Status: **ACTIVE / REAL-MACHINE VERIFIED / NATIVE PLUGIN FINALIZATION IN PROGRESS**  
+Status: **ACTIVE / REAL-MACHINE VERIFIED / PHASE 10 RELEASE-LOCKED**  
 Snapshot date: **2026-10-01**
 
 ## Why this exists
@@ -273,7 +273,7 @@ Registration is now proven from the ChatGPT side:
 - post-patch regression kept the 64-tool gateway, 12-tool native facade, tunnel 200/200 state, and public HTTP 401 intact;
 - warm reconnect verified by stopping the native facade, keeping the tunnel process alive, restarting the facade with a new PID, and successfully calling the native ChatGPT plugin again.
 
-Remaining test-driven work:
+Phase 10 release state:
 
 1. generated app technical ID captured/verified privately — complete;
 2. private package mapping/archive finalized locally — complete;
@@ -281,10 +281,12 @@ Remaining test-driven work:
 4. plan-only and permission-gate acceptance — complete;
 5. isolated file write + rollback acceptance — complete;
 6. protected-negative + regression acceptance — complete;
-7. verify no regression to the 64-tool operator gateway;
+7. 64-tool operator gateway regression — complete;
 8. warm native-backend reconnect — complete;
-9. zero-touch cold tunnel restart / reboot — pending one-time local credential/task enrollment;
-10. lock the final release evidence.
+9. final release evidence — locked;
+10. optional zero-touch cold tunnel restart/reboot enrollment — not enabled on the private machine.
+
+Current cold-start contract: after a true loss of the tunnel-client process or full reboot, start the private tunnel manually and provide the runtime key, unless the user explicitly opts into local Windows Credential Manager + Scheduled Task enrollment.
 
 ## Acceptance philosophy
 
