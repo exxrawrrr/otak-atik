@@ -72,6 +72,7 @@ if ($Findings.Count -gt 0) {
   throw 'Generated package failed secret scan.'
 }
 
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 if (Test-Path $Zip) { Remove-Item $Zip -Force }
 $Archive = [IO.Compression.ZipFile]::Open($Zip,[IO.Compression.ZipArchiveMode]::Create)
