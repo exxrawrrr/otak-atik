@@ -91,15 +91,18 @@ Updated: **2026-10-01**
 - [x] ZIP integrity verification
 - [x] official OpenAI tunnel-client installed and checksum verified
 - [x] secure helper scripts prepared
+- [x] reusable public native bootstrap with LocalAppData isolation
+- [x] optional current-user DPAPI credential cache
+- [x] identity-neutral public plugin template + builder
 
 ### Phase 10 — final private registration / acceptance
 
 - [x] establish the private Secure MCP Tunnel session
 - [x] create ChatGPT MCP app through the Tunnel path
 - [x] verify exactly 12 native tools
-- [ ] capture the real generated app technical ID
-- [ ] finalize app mapping
-- [ ] build final plugin archive
+- [x] capture and verify the real generated app technical ID privately
+- [x] finalize private app mapping locally (not committed)
+- [x] build final private plugin archive v1.0.0 with secret scan
 - [x] create/update PRIVATE Remote GROWTH Stable plugin
 - [ ] read-only acceptance suite
 - [ ] plan-only acceptance

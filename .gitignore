@@ -161,3 +161,11 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+
+# Remote GROWTH native generated identity/credential artifacts
+*.dpapi
+**/.app.json
+.remote-growth-local/
+remote-growth.local.json
+**/remote-growth.local.json

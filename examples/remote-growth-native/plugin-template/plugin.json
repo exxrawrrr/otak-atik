@@ -1,0 +1,25 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "remote-growth-stable",
+  "version": "0.1.0",
+  "description": "Operate a private local workstation through focused search, inspection, and safety-gated workflows.",
+  "keywords": ["windows", "local-workspace", "developer-tools", "workflow", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/remote-growth-getting-started/SKILL.md",
+      "interface": {
+        "displayName": "Remote GROWTH Stable",
+        "shortDescription": "Safe local computer ops",
+        "longDescription": "Search and inspect local files, documents, repositories and system state, then use safety-gated workflows for requested changes.",
+        "developerName": "Your Name",
+        "category": "Productivity",
+        "capabilities": ["Read", "Write"],
+        "defaultPrompt": [
+          "Find my local project and summarize its repository status.",
+          "Check this workstation's health without changing anything.",
+          "Plan a safe file operation and show me the plan before executing it."
+        ]
+      }
+    }
+  }
+}

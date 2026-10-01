@@ -25,18 +25,18 @@ test("end-to-end onboarding assets exist", () => {
   }
 });
 
-test("README honestly documents Remote Desktop Commander as the practical primary route", () => {
+test("README preserves Remote Desktop Commander as a working practical route", () => {
   const readme = fs.readFileSync("README.md", "utf8");
   assert.match(readme, /Remote Desktop Commander/);
-  assert.match(readme, /jalur yang paling sering gue pakai justru plugin yang sudah ada/i);
-  assert.match(readme, /Codex \/ local AI/i);
+  assert.match(readme, /still works and remains useful/i);
+  assert.match(readme, /Working paths may coexist/i);
 });
 
-test("README honestly documents MCP SuperAssistant as a partial failure", () => {
-  const readme = fs.readFileSync("README.md", "utf8");
-  assert.match(readme, /MCP SuperAssistant/);
-  assert.match(readme, /PARTIAL_FAILURE/);
-  assert.match(readme, /nggak terbukti jadi daily execution path yang reliable/i);
+test("historical usage docs preserve MCP SuperAssistant partial-failure evidence", () => {
+  const usage = fs.readFileSync("docs/WHAT-I-ACTUALLY-USE.md", "utf8");
+  assert.match(usage, /MCP SuperAssistant/);
+  assert.match(usage, /PARTIAL_FAILURE/);
+  assert.match(usage, /reliable normal .*tools\/call.* execution was not proven/i);
 });
 
 test("README exposes standalone value without requiring MCP", () => {

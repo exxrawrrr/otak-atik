@@ -73,18 +73,20 @@ Current native package status:
 
 - native facade: **12 tools verified**;
 - loopback-only listener: **verified**;
-- plugin package: **pre-registration ready**;
+- private plugin package: **v1.0.0 finalized locally with the verified app binding**;
 - five plugin skills: **validated**;
 - secret scan: **PASS**;
 - official OpenAI tunnel-client: **installed and checksum verified**;
 - Secure MCP Tunnel session: **healthy / ready**;
 - private ChatGPT MCP app/plugin: **registered**;
 - direct native calls from ChatGPT: **verified**;
-- final app-ID/package binding + full acceptance suite: **in progress**.
+- public reusable native bootstrap: **validated from a fresh clone**;
+- full behavioral acceptance suite: **in progress**.
 
 See:
 
 - [Current Remote GROWTH / Native ChatGPT architecture](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
+- [Reusable native setup/bootstrap](examples/remote-growth-native/README.md)
 - [Historical Rafdi Remote evidence](docs/RAFDI-REMOTE-GROWTH.md)
 - [Project State](PROJECT_STATE.md)
 - [Roadmap](ROADMAP.md)
@@ -316,7 +318,7 @@ OpenAI Secure MCP Tunnel ✅
   ↓
 ChatGPT MCP app / private plugin ✅
   ↓
-real app-ID package binding
+private app-ID package binding ✅ (local only)
   ↓
 read-only acceptance
   ↓

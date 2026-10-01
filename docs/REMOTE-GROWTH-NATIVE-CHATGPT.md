@@ -205,7 +205,9 @@ This design avoids exposing the native facade as another public inbound service.
 
 ## Plugin package
 
-A pre-registration package has been built with:
+The author's private package has now been finalized locally as v1.0.0 using the verified app-backed ChatGPT technical ID. That binding is intentionally not committed.
+
+The public repository separately contains an identity-neutral template with:
 
 - plugin manifest;
 - five focused skills;
@@ -215,7 +217,7 @@ A pre-registration package has been built with:
 - evaluation cases;
 - registration runbook.
 
-Validation already performed:
+Private/local and public-template validation performed:
 
 - JSON parsing;
 - skill count/frontmatter;
@@ -231,6 +233,29 @@ The official OpenAI tunnel client has been installed on the test machine and its
 
 The public repository should document the pattern, not the author's private tunnel ID or runtime API key.
 
+## Reusable public bootstrap
+
+The public repository includes:
+
+```text
+examples/remote-growth-native/
+scripts/windows/remote-growth-native/
+```
+
+The bootstrap keeps account-specific state outside Git under the current user's LocalAppData directory.
+
+It supports:
+
+- official tunnel-client download with SHA256SUMS verification;
+- user-owned tunnel initialization;
+- runtime API key via process environment;
+- optional current-user DPAPI-encrypted runtime-key cache;
+- tunnel run/status/stop/doctor helpers;
+- a plugin builder that injects the user's own verified app ID only into a generated local build;
+- generated plugin secret scan and SHA-256 output.
+
+The public source contains no live app binding and no author credential.
+
 ## Current Phase 10 acceptance target
 
 Registration is now proven from the ChatGPT side:
@@ -242,8 +267,8 @@ Registration is now proven from the ChatGPT side:
 
 Remaining test-driven work:
 
-1. capture the generated app technical ID for final package mapping;
-2. finalize the private plugin package mapping;
+1. generated app technical ID captured/verified privately — complete;
+2. private package mapping/archive finalized locally — complete;
 3. run the full read-only acceptance suite;
 4. run plan-only acceptance;
 5. run isolated file write + rollback acceptance;

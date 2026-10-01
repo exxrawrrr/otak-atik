@@ -108,7 +108,7 @@ Hardcoded private-value scan:
 growth-rafdi                 0
 tail39bf37                   0
 trycloudflare                0
-C:\Users\User                0
+<hardcoded-user-profile-path>  0
 rafdiulhaq001@gmail.com      0
 ```
 

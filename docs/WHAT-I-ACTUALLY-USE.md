@@ -2,9 +2,9 @@
 
 This page exists because the machine accumulated multiple MCP, browser, tunnel, and remote-control experiments. Installed does not mean required.
 
-## 1. Primary remote path — Remote Desktop Commander
+## 1. Direct interactive path — Remote Desktop Commander
 
-Most day-to-day remote work still uses:
+For ad-hoc interactive computer work, Remote Desktop Commander remains useful:
 
 ```text
 ChatGPT
@@ -12,51 +12,46 @@ ChatGPT
 → GROWTH
 ```
 
-This remains the quickest route when the job is simply:
+It is convenient for:
 
-- inspect files;
-- run PowerShell;
-- inspect processes;
-- patch a project;
-- troubleshoot the Windows machine.
+- direct filesystem/terminal inspection;
+- troubleshooting;
+- development work that needs broad interactive access;
+- an independent control path while Remote GROWTH itself is being restarted or upgraded.
 
-That convenience is also why the original "replace the plugin" goal is still considered failed.
+## 2. Self-built operator path — Remote GROWTH Stable
 
-## 2. Backup / self-built path — Rafdi Remote
-
-The self-built route is now:
+The self-built operator is no longer only a backup experiment.
 
 ```text
 ChatGPT
 → Composio Custom MCP
-→ Tailscale Funnel
-→ Windows-MCP
+→ Remote GROWTH Stable Gateway v0.7.0
+→ 64 tools
 → GROWTH
 ```
 
-This started as a quota-pressure backup experiment and became a usable second path.
+The 64-tool surface includes Windows primitives plus Fast Local, Document, Developer/Git, FileOps, SystemOps, and Workflow engines.
 
-It has been verified against:
+This path has survived authentication, recovery, reboot, and regression testing.
 
-- bearer auth;
-- public Funnel transport;
-- unauthenticated rejection;
-- authenticated MCP initialize;
-- supervisor recovery;
-- Scheduled Task recovery;
-- Tailscale reconnect;
-- real Windows reboot;
-- post-restart ChatGPT command execution.
+## 3. Native ChatGPT path — focused Remote GROWTH plugin
 
-The Stable runtime listens locally on loopback and is not intended to expose Windows-MCP directly to the LAN.
+For direct ChatGPT app/plugin use:
 
-See:
+```text
+ChatGPT private MCP app/plugin
+→ OpenAI Secure MCP Tunnel
+→ loopback-only native facade
+→ 12 focused tools
+→ trusted Remote GROWTH engines
+```
 
-- `RAFDI-REMOTE-GROWTH.md`
-- `RAFDI-REMOTE-GROWTH-PHASE-2B-CHECKPOINT.md`
-- `../experiments/rafdi-remote-growth/README.md`
+This native facade intentionally excludes raw PowerShell, raw filesystem mutation, and raw UI automation.
 
-## 3. Local engineering — Desktop Commander local MCP
+The native app is registered and callable. Remaining Phase 10 work is behavioral acceptance and recovery testing.
+
+## 4. Local engineering — Desktop Commander local MCP
 
 When the AI client and Windows machine are already local:
 
@@ -74,7 +69,7 @@ Example:
 codex mcp add desktop-commander -- npx -y @wonderwhy-er/desktop-commander@latest
 ```
 
-## 4. MCP SuperAssistant — historical / partial failure
+## 5. MCP SuperAssistant — historical / partial failure
 
 The Chrome-extension experiment remains documented because it taught useful lessons.
 
@@ -99,14 +94,15 @@ Do not rebuild this historical complexity unless you specifically need the brows
 
 ## Current decision rule
 
-Use:
-
 ```text
-REMOTE + FASTEST PATH
+DIRECT INTERACTIVE COMPUTER WORK
 → Remote Desktop Commander
 
-REMOTE + SELF-BUILT BACKUP
-→ Rafdi Remote
+SELF-BUILT 64-TOOL OPERATOR
+→ Remote GROWTH Stable through Composio
+
+FOCUSED CHATGPT-NATIVE WORK
+→ Remote GROWTH native plugin
 
 LOCAL ENGINEERING
 → Desktop Commander local MCP
@@ -119,24 +115,24 @@ BROWSER EXPERIMENT
 
 Because each one solves a different failure mode.
 
-Remote Desktop Commander is convenient but has hosted-service/quota considerations.
-
-Rafdi Remote reduces dependence on that single path, but it adds Tailscale, Windows-MCP, authentication, and operational responsibility.
-
-Local MCP is simpler when the work is already local.
-
-The rule is not "always use the custom thing."
+The project no longer treats “one universal transport” as the goal.
 
 The rule is:
 
-> use the least complicated path that still gives the required capability and verification.
+> use the least complicated path that gives the required capability, safety boundary, and verification.
 
 ## Current recommendation for new users
 
 If you only want practical remote control, start with the simplest provider that already works for you.
 
-If you specifically want to reproduce the Rafdi Remote experiment, read the installer README and security ADR first.
+If you want to reproduce the native-plugin pattern, use:
 
-Do not copy private machine names, bearer keys, Tailscale identities, or local paths from somebody else's setup.
+```text
+examples/remote-growth-native/
+```
+
+Every user must supply their own tunnel, runtime credential, and ChatGPT app binding.
+
+Do not copy private machine names, bearer keys, tunnel identities, app IDs, encrypted credential blobs, or local paths from somebody else's setup.
 
 And do not recreate every historical experiment just because it exists in this repository.
