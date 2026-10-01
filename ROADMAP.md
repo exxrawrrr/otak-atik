@@ -108,10 +108,9 @@ Updated: **2026-10-01**
 - [x] plan-only acceptance
 - [x] isolated write + rollback acceptance
 - [x] protected-negative acceptance
-- [ ] reboot/reconnect acceptance
-  - [x] warm native-backend reconnect through existing Secure MCP Tunnel
-  - [ ] zero-touch cold tunnel restart / reboot enrollment
-- [ ] final release/checkpoint lock
+- [x] reconnect acceptance — warm native-backend recovery through existing Secure MCP Tunnel
+- [ ] optional zero-touch cold tunnel restart / reboot enrollment
+- [x] final release/checkpoint lock with manual cold-start limitation documented
 
 ## Portability / public reproduction
 

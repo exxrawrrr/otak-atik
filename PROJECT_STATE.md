@@ -1,7 +1,7 @@
 # Project State
 
 **Updated:** 2026-10-01  
-**Current milestone:** Remote GROWTH Stable v0.7 + Native ChatGPT plugin finalization  
+**Current milestone:** Remote GROWTH Stable v0.7 + Native ChatGPT Phase 10 release lock  
 **Repository maturity:** active public research lab / real-machine operator experiment  
 **npm package:** 0.1.0-alpha.5  
 **machine runtime:** Remote GROWTH Stable gateway v0.7.0
@@ -53,7 +53,7 @@ ChatGPT MCP app / private plugin
 
 The native facade currently exposes **12 focused tools**.
 
-The private ChatGPT MCP app/plugin is registered, the Secure MCP Tunnel session is healthy, direct native calls from ChatGPT are verified, and a private v1.0.0 package has been finalized locally with the verified app binding. The public repository contains only identity-neutral templates/bootstrap code. Warm native-backend reconnect through the existing tunnel is verified; zero-touch cold tunnel restart/reboot remains pending because the private machine has not enrolled the runtime credential into Windows Credential Manager or installed the native tunnel Scheduled Task.
+The private ChatGPT MCP app/plugin is registered, the Secure MCP Tunnel session is healthy, direct native calls from ChatGPT are verified, and a private v1.0.0 package has been finalized locally with the verified app binding. Phase 10 core acceptance is release-locked. Warm native-backend reconnect is verified. Cold reboot/tunnel-process recovery remains a documented manual-start limitation until optional local Credential Manager + Scheduled Task enrollment is performed.
 
 ## Remote GROWTH Stable v0.7
 
@@ -215,7 +215,7 @@ Acceptance target:
 7. run plan-only and permission-gate tests — **verified**;
 8. run isolated write + rollback test — **verified**;
 9. run protected-negative and regression test — **verified**;
-10. resolve or explicitly document the remaining cold-start/reboot limitation, then create the final release/checkpoint.
+10. cold-start/reboot limitation explicitly documented; final release/checkpoint — **verified and locked**.
 
 ## Research rule
 

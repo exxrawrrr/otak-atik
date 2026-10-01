@@ -81,7 +81,9 @@ Current native package status:
 - private ChatGPT MCP app/plugin: **registered**;
 - direct native calls from ChatGPT: **verified**;
 - public reusable native bootstrap: **validated from a fresh clone**;
-- full behavioral acceptance suite: **in progress**.
+- core Phase 10 acceptance suite: **COMPLETE VERIFIED**;
+- warm native-backend reconnect: **verified**;
+- cold reboot/tunnel-process restart: **manual tunnel start required unless optional local auto-start enrollment is configured**.
 
 See:
 
@@ -307,31 +309,30 @@ This is still evidence from a real primary machine, not a claim of universal pro
 
 ---
 
-## What is still in progress
+## Phase 10 release lock
 
-The current finalization track is:
+Status: **COMPLETE VERIFIED — with one documented cold-start limitation.**
+
+Verified:
 
 ```text
-Remote GROWTH Native Facade
-  ↓
-OpenAI Secure MCP Tunnel ✅
-  ↓
-ChatGPT MCP app / private plugin ✅
-  ↓
-private app-ID package binding ✅ (local only)
-  ↓
-read-only acceptance
-  ↓
-plan-only acceptance
-  ↓
-isolated write + rollback acceptance
-  ↓
-protected-negative acceptance
-  ↓
-release lock
+64-tool production gateway ✅
+12-tool native facade ✅
+private ChatGPT plugin ✅
+read-only acceptance ✅
+permission gates ✅
+isolated write + rollback ✅
+protected-negative tests ✅
+warm reconnect/recovery ✅
 ```
 
-The public repo must never include the author's tunnel credentials, bearer keys, machine secrets, or generated private app credentials.
+Known limitation:
+
+> If Windows fully reboots or the tunnel-client process is lost, the private tunnel currently needs a manual start/runtime-key entry unless the optional Windows Credential Manager + Scheduled Task auto-start enrollment is configured.
+
+That limitation is intentionally preferable to silently committing or extracting a private runtime credential.
+
+The public repo never includes the author's tunnel credentials, bearer keys, machine secrets, generated private app ID, or local credential store.
 
 ---
 
@@ -440,7 +441,7 @@ to a verified experimental stack with:
 - a stable remote MCP gateway;
 - 64 operator tools;
 - safety-gated engines and workflows;
-- and a focused native ChatGPT plugin surface in final integration testing.
+- and a focused native ChatGPT plugin surface that has completed its core Phase 10 acceptance suite.
 
 It is not a universal remote-desktop product.
 
