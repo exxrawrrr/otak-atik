@@ -71,6 +71,11 @@ jobs:
           Write-Host "Windows PowerShell scripts parsed successfully."
 
 
+      - name: Wizard dry run
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\setup-wizard.ps1 -DryRun -NonInteractive -NoClear -SourceRoot $PWD
+
       - name: Parse Rafdi Remote PowerShell
         shell: powershell
         run: |
