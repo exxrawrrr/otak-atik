@@ -49,7 +49,7 @@ jobs:
         shell: powershell
         run: |
           $errors = @()
-          Get-ChildItem .\scripts\windows\*.ps1 | ForEach-Object {
+          Get-ChildItem .\scripts\windows -Filter *.ps1 -Recurse | ForEach-Object {
             $tokens = $null
             $parseErrors = $null
             [System.Management.Automation.Language.Parser]::ParseFile(
@@ -70,6 +70,38 @@ jobs:
 
           Write-Host "Windows PowerShell scripts parsed successfully."
 
+
+      - name: Compile portable Remote GROWTH Python
+        shell: powershell
+        run: |
+          Get-ChildItem .\runtime\remote-growth-stable -Filter *.py -Recurse | ForEach-Object {
+            python -m py_compile $_.FullName
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Reject machine-specific runtime identity
+        shell: powershell
+        run: |
+          $forbidden = @(
+            'D:\\RAFDI_DATA',
+            'C:\\Users\\User',
+            'growth-rafdi',
+            'tail39bf37'
+          )
+          $hits = @()
+          foreach ($pattern in $forbidden) {
+            $hits += Get-ChildItem .\runtime\remote-growth-stable -File -Recurse |
+              Select-String -SimpleMatch -Pattern $pattern -ErrorAction SilentlyContinue
+          }
+          if ($hits.Count -gt 0) {
+            $hits | Format-Table Path,LineNumber,Line
+            throw "Machine-specific identity leaked into portable runtime."
+          }
+
+      - name: Runtime installer dry run
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-stable\install-runtime.ps1 -SourceRuntimeRoot .\runtime\remote-growth-stable -TailscaleDnsName example-device.example.ts.net -DryRun
 
       - name: Wizard dry run
         shell: powershell

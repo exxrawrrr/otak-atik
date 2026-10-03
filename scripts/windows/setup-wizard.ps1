@@ -11,13 +11,13 @@ $ErrorActionPreference = "Stop"
 
 $script:Brand = "Created by Rafdi D. Ulhaq - exxrawrrr"
 $script:AppName = "OTAK-ATIK"
-$script:StateSchema = 1
+$script:StateSchema = 2
+$script:PublicHttpsPort = 443
 
 function Get-UserDataRoot {
   if ($env:LOCALAPPDATA) {
     return (Join-Path $env:LOCALAPPDATA "otak-atik")
   }
-
   return (Join-Path $HOME ".otak-atik")
 }
 
@@ -25,20 +25,17 @@ $script:DataRoot = Get-UserDataRoot
 $script:StatePath = Join-Path $script:DataRoot "setup-state.json"
 $script:LogRoot = Join-Path $script:DataRoot "logs"
 $script:LogPath = Join-Path $script:LogRoot ("setup-" + (Get-Date -Format "yyyyMMdd") + ".log")
+$script:RemoteInstallRoot = Join-Path $script:DataRoot "remote-growth-stable"
 
 function Initialize-Console {
   try { [Console]::Title = "OTAK-ATIK - Remote AI Setup Wizard" } catch {}
   try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {}
-  if (-not $NoClear) {
-    Clear-Host
-  }
+  if (-not $NoClear) { Clear-Host }
 }
 
 function Write-LogLine {
   param([string]$Message)
-
   if ($DryRun) { return }
-
   try {
     New-Item -ItemType Directory -Force -Path $script:LogRoot | Out-Null
     $line = "{0} {1}" -f (Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"), $Message
@@ -60,12 +57,7 @@ function Write-BrandHeader {
 }
 
 function Write-Step {
-  param(
-    [int]$Number,
-    [int]$Total,
-    [string]$Title
-  )
-
+  param([int]$Number,[int]$Total,[string]$Title)
   Write-Host ""
   Write-Host (" STEP {0} OF {1} " -f $Number, $Total) -NoNewline -ForegroundColor Black -BackgroundColor Cyan
   Write-Host ("  " + $Title) -ForegroundColor Cyan
@@ -74,11 +66,9 @@ function Write-Step {
 
 function Write-Status {
   param(
-    [ValidateSet("OK","WAIT","FIX","INFO","FAIL")]
-    [string]$Kind,
+    [ValidateSet("OK","WAIT","FIX","INFO","FAIL")][string]$Kind,
     [string]$Message
   )
-
   $color = switch ($Kind) {
     "OK"   { "Green" }
     "WAIT" { "Yellow" }
@@ -86,7 +76,6 @@ function Write-Status {
     "INFO" { "Gray" }
     "FAIL" { "Red" }
   }
-
   Write-Host (" [{0}]" -f $Kind.PadRight(4)) -NoNewline -ForegroundColor $color
   Write-Host (" " + $Message)
   Write-LogLine ("[{0}] {1}" -f $Kind, $Message)
@@ -99,19 +88,11 @@ function Write-Footer {
 }
 
 function Read-Continue {
-  param(
-    [string]$Prompt = "Press ENTER to continue or Q to exit"
-  )
-
+  param([string]$Prompt = "Press ENTER to continue or Q to exit")
   if ($NonInteractive) { return $true }
-
   Write-Host ""
   $answer = Read-Host $Prompt
-  if ($answer -match "^[Qq]$") {
-    return $false
-  }
-
-  return $true
+  return ($answer -notmatch "^[Qq]$")
 }
 
 function New-DefaultState {
@@ -122,27 +103,31 @@ function New-DefaultState {
     source_root = $SourceRoot
     preflight = [ordered]@{}
     next_action = "PREFLIGHT"
+    tailscale_dns = ""
+    public_mcp_url = ""
+    runtime_install_root = $script:RemoteInstallRoot
+    composio_confirmed_count = $null
+    composio_confirmation = ""
   }
 }
 
 function Convert-StateToHashtable {
   param($Object)
-
   $state = New-DefaultState
   if ($null -eq $Object) { return $state }
-
-  if ($Object.schema) { $state.schema = [int]$Object.schema }
-  if ($Object.state) { $state.state = [string]$Object.state }
-  if ($Object.updated_at) { $state.updated_at = [string]$Object.updated_at }
-  if ($Object.source_root) { $state.source_root = [string]$Object.source_root }
-  if ($Object.next_action) { $state.next_action = [string]$Object.next_action }
-
+  foreach ($name in @(
+    "schema","state","updated_at","source_root","next_action",
+    "tailscale_dns","public_mcp_url","runtime_install_root",
+    "composio_confirmed_count","composio_confirmation"
+  )) {
+    $prop = $Object.PSObject.Properties[$name]
+    if ($prop) { $state[$name] = $prop.Value }
+  }
   if ($Object.preflight) {
     foreach ($prop in $Object.preflight.PSObject.Properties) {
       $state.preflight[$prop.Name] = $prop.Value
     }
   }
-
   return $state
 }
 
@@ -150,10 +135,8 @@ function Load-SetupState {
   if ($ResetState -or -not (Test-Path $script:StatePath)) {
     return (New-DefaultState)
   }
-
   try {
-    $raw = Get-Content -Raw -Path $script:StatePath
-    return (Convert-StateToHashtable ($raw | ConvertFrom-Json))
+    return (Convert-StateToHashtable ((Get-Content -Raw -Path $script:StatePath) | ConvertFrom-Json))
   } catch {
     Write-Status "INFO" "Previous setup progress could not be read. A safe new session will be used."
     Write-LogLine ("State read failed: " + $_.Exception.Message)
@@ -163,82 +146,300 @@ function Load-SetupState {
 
 function Save-SetupState {
   param($State)
-
   if ($DryRun) { return }
-
   New-Item -ItemType Directory -Force -Path $script:DataRoot | Out-Null
   $State.updated_at = (Get-Date).ToString("o")
-  $json = $State | ConvertTo-Json -Depth 6
-  Set-Content -Path $script:StatePath -Value $json -Encoding UTF8
+  $State | ConvertTo-Json -Depth 8 | Set-Content -Path $script:StatePath -Encoding UTF8
 }
 
 function Find-TailscaleExecutable {
-  $cmd = Get-Command "tailscale" -ErrorAction SilentlyContinue
+  $cmd = Get-Command "tailscale.exe" -ErrorAction SilentlyContinue
+  if (-not $cmd) { $cmd = Get-Command "tailscale" -ErrorAction SilentlyContinue }
   if ($cmd) { return $cmd.Source }
 
-  if ($env:ProgramFiles) {
-    $candidate = Join-Path $env:ProgramFiles "Tailscale\tailscale.exe"
-    if (Test-Path $candidate) { return $candidate }
+  $fallbacks = @()
+  if ($env:ProgramFiles) { $fallbacks += (Join-Path $env:ProgramFiles "Tailscale\tailscale.exe") }
+  $pf86 = [Environment]::GetFolderPath("ProgramFilesX86")
+  if ($pf86) { $fallbacks += (Join-Path $pf86 "Tailscale\tailscale.exe") }
+  foreach ($candidate in $fallbacks) {
+    if ($candidate -and (Test-Path -LiteralPath $candidate)) { return $candidate }
   }
-
   return $null
 }
 
 function Get-TailscaleState {
   $exe = Find-TailscaleExecutable
   $service = Get-Service -Name "Tailscale" -ErrorAction SilentlyContinue
-
   $result = [ordered]@{
     installed = [bool]($exe -or $service)
     executable = $exe
     service = if ($service) { [string]$service.Status } else { "Unknown" }
     backend = "Unknown"
     connected = $false
+    dns_name = ""
   }
+  if (-not $result.installed -or -not $exe) { return $result }
 
-  if (-not $result.installed) {
-    return $result
-  }
-
-  if ($exe) {
-    try {
-      $raw = (& $exe status --json 2>$null | Out-String).Trim()
-      if ($raw) {
-        $json = $raw | ConvertFrom-Json
-        if ($json.BackendState) {
-          $result.backend = [string]$json.BackendState
-          $result.connected = ($result.backend -eq "Running")
-        }
+  try {
+    $raw = (& $exe status --json 2>$null | Out-String).Trim()
+    if ($raw) {
+      $json = $raw | ConvertFrom-Json
+      $result.backend = [string]$json.BackendState
+      $result.connected = ($result.backend -eq "Running")
+      if ($json.Self -and $json.Self.DNSName) {
+        $result.dns_name = ([string]$json.Self.DNSName).TrimEnd(".")
       }
-    } catch {
-      Write-LogLine ("Tailscale status probe failed: " + $_.Exception.Message)
     }
+  } catch {
+    Write-LogLine ("Tailscale status probe failed: " + $_.Exception.Message)
   }
-
   return $result
 }
 
-function Get-Preflight {
-  $isWindows = ($env:OS -eq "Windows_NT")
-  $psVersion = $PSVersionTable.PSVersion.ToString()
+function Install-TailscaleGuided {
+  if ($DryRun) {
+    Write-Status "INFO" "Would install Tailscale with winget: Tailscale.Tailscale"
+    return $false
+  }
+  $winget = Get-Command "winget.exe" -ErrorAction SilentlyContinue
+  if (-not $winget) {
+    Write-Status "FAIL" "Automatic Tailscale installation requires winget."
+    return $false
+  }
+  if (-not (Read-Continue -Prompt "Press ENTER to install Tailscale or Q to exit")) { return $false }
+  Write-Status "INFO" "Installing the secure connection app..."
+  & $winget.Source install --id Tailscale.Tailscale -e --accept-source-agreements --accept-package-agreements
+  if ($LASTEXITCODE -ne 0) {
+    Write-Status "FAIL" "Tailscale installation did not complete successfully."
+    return $false
+  }
+  return [bool](Find-TailscaleExecutable)
+}
 
-  $nodeFound = [bool](Get-Command "node" -ErrorAction SilentlyContinue)
-  $nodeVersion = $null
-  $nodeMajor = 0
+function Ensure-TailscaleConnected {
+  $ts = Get-TailscaleState
 
-  if ($nodeFound) {
+  if (-not $ts.installed) {
+    Write-Status "FIX" "Tailscale needs to be installed"
+    if (-not (Install-TailscaleGuided)) { return $null }
+    $ts = Get-TailscaleState
+  }
+
+  if ($DryRun) {
+    if ($ts.connected) {
+      Write-Status "OK" "Tailscale is already connected"
+    } else {
+      Write-Status "INFO" "Would open the user's Tailscale login flow and re-check the device"
+    }
+    return $ts
+  }
+
+  $service = Get-Service -Name "Tailscale" -ErrorAction SilentlyContinue
+  if ($service -and $service.Status -ne "Running") {
     try {
-      $nodeVersion = (& node --version 2>$null | Out-String).Trim()
-      $clean = $nodeVersion.TrimStart("v")
-      $nodeMajor = [int](($clean -split "\.")[0])
+      Start-Service -Name "Tailscale"
+      Start-Sleep -Seconds 2
+      Write-Status "OK" "Secure connection service started"
     } catch {
-      $nodeFound = $false
+      Write-Status "FAIL" "Tailscale is installed but its Windows service could not be started."
+      return $null
     }
   }
 
+  $ts = Get-TailscaleState
+  if (-not $ts.connected) {
+    Write-Status "WAIT" "Tailscale needs your account login"
+    Write-Host " A browser sign-in may open. Finish login with your own account," -ForegroundColor Gray
+    Write-Host " then return to this terminal." -ForegroundColor Gray
+    if (-not (Read-Continue -Prompt "Press ENTER to open Tailscale login or Q to exit")) { return $null }
+    try {
+      & $ts.executable login
+    } catch {
+      Write-LogLine ("tailscale login failed: " + $_.Exception.Message)
+    }
+
+    for ($i = 0; $i -lt 20; $i++) {
+      Start-Sleep -Seconds 2
+      $ts = Get-TailscaleState
+      if ($ts.connected -and $ts.dns_name) { break }
+    }
+  }
+
+  if (-not $ts.connected) {
+    Write-Status "FAIL" "Tailscale is installed, but this computer is not connected to an account yet."
+    return $null
+  }
+  if (-not $ts.dns_name) {
+    Write-Status "FAIL" "Tailscale is connected but did not return a device DNS name required by Funnel."
+    return $null
+  }
+
+  Write-Status "OK" "Tailscale account connected"
+  Write-Status "OK" "This device has a secure DNS identity"
+  return $ts
+}
+
+function Resolve-RuntimeSourceRoot {
+  $candidates = @()
+  if ($SourceRoot) {
+    $candidates += (Join-Path $SourceRoot "runtime\remote-growth-stable")
+  }
+  $candidates += (Join-Path $script:DataRoot "runtime-source\remote-growth-stable")
+  foreach ($candidate in $candidates) {
+    if ($candidate -and (Test-Path -LiteralPath (Join-Path $candidate "MCP_GATEWAY\gateway.py"))) {
+      return $candidate
+    }
+  }
+  return $null
+}
+
+function Resolve-RemoteHelper {
+  param([string]$Name)
+  $candidates = @()
+  if ($SourceRoot) {
+    $candidates += (Join-Path $SourceRoot ("scripts\windows\remote-growth-stable\" + $Name))
+  }
+  $candidates += (Join-Path $PSScriptRoot ("remote-growth-stable\" + $Name))
+  foreach ($candidate in $candidates) {
+    if ($candidate -and (Test-Path -LiteralPath $candidate)) { return $candidate }
+  }
+  return $null
+}
+
+function Get-FunnelStatus {
+  param([string]$TailscaleExe)
+  try { return ((& $TailscaleExe funnel status 2>&1) -join [Environment]::NewLine) }
+  catch { return [string]$_ }
+}
+
+function Get-PublicMcpUrl {
+  param([string]$DnsName,[int]$Port)
+  if ($Port -eq 443) { return "https://$DnsName/mcp" }
+  return "https://$($DnsName):$Port/mcp"
+}
+
+function Get-PublicBaseUrl {
+  param([string]$DnsName,[int]$Port)
+  if ($Port -eq 443) { return "https://$DnsName" }
+  return "https://$($DnsName):$Port"
+}
+
+function Test-ExpectedFunnel {
+  param([string]$Status,[string]$DnsName,[int]$HttpsPort,[int]$TargetPort)
+  $base = Get-PublicBaseUrl -DnsName $DnsName -Port $HttpsPort
+  $marker = $base + " (Funnel on)"
+  return (
+    $Status -match [regex]::Escape($marker) -and
+    $Status -match [regex]::Escape("127.0.0.1:$TargetPort")
+  )
+}
+
+function Test-FunnelPortConflict {
+  param([string]$Status,[string]$DnsName,[int]$HttpsPort,[int]$TargetPort)
+  $base = Get-PublicBaseUrl -DnsName $DnsName -Port $HttpsPort
+  $marker = $base + " (Funnel on)"
+  if ($Status -notmatch [regex]::Escape($marker)) { return $false }
+  return ($Status -notmatch [regex]::Escape("127.0.0.1:$TargetPort"))
+}
+
+function Enable-GuidedFunnel {
+  param([string]$TailscaleExe,[string]$DnsName,[int]$HttpsPort,[int]$TargetPort)
+
+  if ($DryRun) {
+    Write-Status "INFO" ("Would verify Funnel HTTPS " + $HttpsPort + " and map it only to the verified local gateway")
+    return $true
+  }
+
+  $status = Get-FunnelStatus -TailscaleExe $TailscaleExe
+  if (Test-ExpectedFunnel -Status $status -DnsName $DnsName -HttpsPort $HttpsPort -TargetPort $TargetPort) {
+    Write-Status "OK" "Secure public route already points to Remote GROWTH"
+    return $true
+  }
+  if (Test-FunnelPortConflict -Status $status -DnsName $DnsName -HttpsPort $HttpsPort -TargetPort $TargetPort) {
+    Write-Status "FAIL" ("Tailscale HTTPS port " + $HttpsPort + " is already mapped to another local service.")
+    Write-Status "INFO" "OTAK-ATIK will not overwrite that route automatically."
+    return $false
+  }
+
+  Write-Status "WAIT" "The local 64-tool gateway is ready. The next action exposes only that protected gateway through Tailscale."
+  if (-not (Read-Continue -Prompt "Press ENTER to enable the secure route or Q to exit")) { return $false }
+
+  $output = ((& $TailscaleExe funnel --bg --yes ("--https=" + $HttpsPort) $TargetPort 2>&1) -join [Environment]::NewLine)
+  $exitCode = $LASTEXITCODE
+
+  if ($exitCode -ne 0) {
+    $match = [regex]::Match($output, "https://[^\s]+")
+    if ($match.Success) {
+      $approvalUrl = $match.Value.TrimEnd(".",",",")")
+      Write-Status "WAIT" "Tailscale needs one-time Funnel approval in your browser"
+      try { Start-Process $approvalUrl } catch {}
+      if (-not (Read-Continue -Prompt "Approve Funnel in the browser, then press ENTER to retry or Q to exit")) { return $false }
+      $output = ((& $TailscaleExe funnel --bg --yes ("--https=" + $HttpsPort) $TargetPort 2>&1) -join [Environment]::NewLine)
+      $exitCode = $LASTEXITCODE
+    }
+  }
+
+  if ($exitCode -ne 0) {
+    Write-LogLine ("Funnel command failed: " + $output)
+    Write-Status "FAIL" "Tailscale could not create the secure public route."
+    return $false
+  }
+
+  for ($i = 0; $i -lt 12; $i++) {
+    Start-Sleep -Seconds 2
+    $status = Get-FunnelStatus -TailscaleExe $TailscaleExe
+    if (Test-ExpectedFunnel -Status $status -DnsName $DnsName -HttpsPort $HttpsPort -TargetPort $TargetPort) {
+      Write-Status "OK" "Secure public route points to the verified gateway"
+      return $true
+    }
+  }
+
+  Write-Status "FAIL" "Tailscale returned successfully, but the expected gateway mapping was not found."
+  return $false
+}
+
+function Invoke-RuntimeAcceptance {
+  param([switch]$Public)
+  $testScript = Resolve-RemoteHelper -Name "test-runtime.ps1"
+  if (-not $testScript) { return $null }
+  $args = @("-InstallRoot",$script:RemoteInstallRoot,"-AsJson")
+  if ($Public) { $args += "-IncludePublic" }
+  $line = (& $testScript @args 2>$null | Select-Object -Last 1)
+  $code = $LASTEXITCODE
+  if (-not $line) { return $null }
+  try {
+    $obj = $line | ConvertFrom-Json
+    $obj | Add-Member -NotePropertyName exit_code -NotePropertyValue $code -Force
+    return $obj
+  } catch {
+    return $null
+  }
+}
+
+function Copy-TextValue {
+  param([string]$Value,[string]$Label)
+  try {
+    Set-Clipboard -Value $Value
+    Write-Status "OK" ($Label + " copied to clipboard")
+  } catch {
+    Write-Status "FAIL" ("Could not copy " + $Label.ToLower() + " to clipboard")
+  }
+}
+
+function Get-Preflight {
+  $isWindows = ([System.Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT)
+  $psVersion = $PSVersionTable.PSVersion.ToString()
+  $nodeFound = [bool](Get-Command "node" -ErrorAction SilentlyContinue)
+  $nodeVersion = $null
+  $nodeMajor = 0
+  if ($nodeFound) {
+    try {
+      $nodeVersion = (& node --version 2>$null | Out-String).Trim()
+      $nodeMajor = [int](($nodeVersion.TrimStart("v") -split "\.")[0])
+    } catch { $nodeFound = $false }
+  }
   $gitFound = [bool](Get-Command "git" -ErrorAction SilentlyContinue)
   $tailscale = Get-TailscaleState
-
   return [ordered]@{
     windows = $isWindows
     powershell_version = $psVersion
@@ -256,70 +457,42 @@ function Get-Preflight {
 
 function Show-Preflight {
   param($Preflight)
-
-  if ($Preflight.windows) {
-    Write-Status "OK" "Windows detected"
-  } else {
-    Write-Status "FAIL" "This guided setup currently supports Windows 10/11 only"
-  }
+  if ($Preflight.windows) { Write-Status "OK" "Windows detected" }
+  else { Write-Status "FAIL" "This guided setup currently supports Windows 10/11 only" }
 
   Write-Status "OK" ("PowerShell " + $Preflight.powershell_version)
 
-  if ($Preflight.node_supported) {
-    Write-Status "OK" ("Node.js " + $Preflight.node_version)
-  } elseif ($Preflight.node_found) {
-    Write-Status "FIX" ("Node.js " + $Preflight.node_version + " found; version 20+ is required")
-  } else {
-    Write-Status "FIX" "Node.js 20+ needs to be installed"
-  }
+  if ($Preflight.node_supported) { Write-Status "OK" ("Node.js " + $Preflight.node_version + " (developer CLI)") }
+  elseif ($Preflight.node_found) { Write-Status "INFO" ("Node.js " + $Preflight.node_version + " found; 20+ is only needed for optional repository/developer commands") }
+  else { Write-Status "INFO" "Node.js is optional for Remote GROWTH setup; install 20+ only for repository/developer commands" }
 
-  if ($Preflight.git_found) {
-    Write-Status "OK" "Git detected"
-  } else {
-    Write-Status "INFO" "Git not detected; it is recommended for updates and development"
-  }
+  if ($Preflight.git_found) { Write-Status "OK" "Git detected" }
+  else { Write-Status "INFO" "Git not detected; it is recommended for updates and development" }
 
   if ($Preflight.tailscale_installed) {
-    if ($Preflight.tailscale_connected) {
-      Write-Status "OK" "Secure connection app is installed and signed in"
-    } elseif ($Preflight.tailscale_service -eq "Running") {
-      Write-Status "WAIT" "Secure connection app is running but still needs account sign-in"
-    } else {
-      Write-Status "FIX" "Secure connection app is installed but not running"
-    }
+    if ($Preflight.tailscale_connected) { Write-Status "OK" "Tailscale is installed and signed in" }
+    elseif ($Preflight.tailscale_service -eq "Running") { Write-Status "WAIT" "Tailscale is running but still needs account sign-in" }
+    else { Write-Status "FIX" "Tailscale is installed but not running" }
   } else {
-    Write-Status "FIX" "Secure connection app needs to be installed"
+    Write-Status "FIX" "Tailscale needs to be installed"
   }
-}
-
-function Test-CorePreflight {
-  param($Preflight)
-
-  return (
-    $Preflight.windows -and
-    $Preflight.node_supported
-  )
 }
 
 Initialize-Console
 Write-BrandHeader
 
-if ($DryRun) {
-  Write-Status "INFO" "Dry-run mode: no files or settings will be changed."
-}
+if ($DryRun) { Write-Status "INFO" "Dry-run mode: no files, accounts, routes, or settings will be changed." }
 
 $state = Load-SetupState
-
 if ($state.state -ne "NEW") {
   Write-Status "INFO" ("Previous safe progress detected: " + $state.state)
-  Write-Status "INFO" "The wizard will re-check reality instead of blindly replaying old steps."
+  Write-Status "INFO" "The wizard will re-check the real machine instead of blindly replaying old steps."
 }
 
-Write-Host " This wizard prepares your computer for the guided" -ForegroundColor White
-Write-Host " Composio + Remote GROWTH setup path." -ForegroundColor White
+Write-Host " This wizard prepares ChatGPT access through Composio," -ForegroundColor White
+Write-Host " Tailscale, and the protected Remote GROWTH 64-tool gateway." -ForegroundColor White
 Write-Host ""
-Write-Host " You will always sign in to your own accounts yourself." -ForegroundColor DarkGray
-Write-Host " Secrets are not stored in this public repository." -ForegroundColor DarkGray
+Write-Host " You sign in to your own accounts. Secrets stay local." -ForegroundColor DarkGray
 
 if (-not (Read-Continue -Prompt "Press ENTER to start or Q to exit")) {
   Write-Status "INFO" "Setup closed without making changes."
@@ -328,59 +501,270 @@ if (-not (Read-Continue -Prompt "Press ENTER to start or Q to exit")) {
 }
 
 Write-Step 1 5 "Checking your computer"
-
 $preflight = Get-Preflight
 Show-Preflight $preflight
-
-$coreReady = Test-CorePreflight $preflight
 $state.preflight = $preflight
 
-if (-not $coreReady) {
+if (-not $preflight.windows) {
   $state.state = "NEW"
-  $state.next_action = "FIX_PREFLIGHT"
+  $state.next_action = "UNSUPPORTED_OS"
   Save-SetupState $state
-
-  Write-Host ""
-  Write-Status "FAIL" "Core requirements are not ready, so setup will not continue yet."
-  Write-Status "INFO" "No network, authentication, or remote-access settings were changed."
+  Write-Status "FAIL" "This setup cannot continue on the current operating system."
   Write-Footer
   exit 2
 }
 
+if (-not $preflight.node_supported) {
+  Write-Status "INFO" "Node.js 20+ is optional for repository/developer commands; Remote GROWTH setup can continue without it."
+}
+
 $state.state = "PREFLIGHT_OK"
-$state.next_action = if ($preflight.tailscale_connected) { "VERIFY_TAILSCALE_ROUTE" } else { "CONNECT_TAILSCALE" }
+$state.next_action = "CONNECT_TAILSCALE"
+Save-SetupState $state
+Write-Status "OK" "Computer check passed"
+
+Write-Step 2 5 "Secure connection"
+$ts = Ensure-TailscaleConnected
+if ($DryRun) {
+  Write-Status "INFO" "Dry run: account login and Funnel changes are skipped."
+  Write-Step 3 5 "Preparing Remote GROWTH"
+  $runtimeSource = Resolve-RuntimeSourceRoot
+  $runtimeInstaller = Resolve-RemoteHelper -Name "install-runtime.ps1"
+  if ($runtimeSource -and $runtimeInstaller) {
+    & $runtimeInstaller -SourceRuntimeRoot $runtimeSource -TailscaleDnsName "" -PublicHttpsPort $script:PublicHttpsPort -InstallPrerequisites -DryRun
+  } else {
+    Write-Status "FAIL" "Portable runtime source/helper is missing from this checkout/install."
+    Write-Footer
+    exit 2
+  }
+  Write-Step 4 5 "Connect Composio"
+  Write-Status "INFO" "Would register the protected Custom MCP through Composio API only after public security checks pass."
+  Write-Step 5 5 "Final check"
+  Write-Status "INFO" "Would require public HTTP 401 without auth and authenticated tools/list == 64."
+  Write-Footer
+  exit 0
+}
+
+if (-not $ts) {
+  $state.next_action = "CONNECT_TAILSCALE"
+  Save-SetupState $state
+  Write-Footer
+  exit 2
+}
+
+$state.state = "TAILSCALE_READY"
+$state.next_action = "INSTALL_GATEWAY"
+$state.tailscale_dns = [string]$ts.dns_name
+Save-SetupState $state
+
+Write-Step 3 5 "Preparing Remote GROWTH"
+$runtimeSource = Resolve-RuntimeSourceRoot
+$runtimeInstaller = Resolve-RemoteHelper -Name "install-runtime.ps1"
+if (-not $runtimeSource -or -not $runtimeInstaller) {
+  Write-Status "FAIL" "Portable Remote GROWTH runtime files are missing."
+  Write-Footer
+  exit 2
+}
+
+Write-Status "INFO" "Installing the isolated 64-tool runtime and verifying it locally..."
+try {
+  & $runtimeInstaller -SourceRuntimeRoot $runtimeSource -InstallRoot $script:RemoteInstallRoot -TailscaleDnsName ([string]$ts.dns_name) -TailscaleExe ([string]$ts.executable) -PublicHttpsPort $script:PublicHttpsPort -InstallPrerequisites
+  if ($LASTEXITCODE -ne 0) { throw "runtime installer exited with code $LASTEXITCODE" }
+} catch {
+  Write-LogLine ("Runtime install failed: " + $_.Exception.Message)
+  Write-Status "FAIL" "Remote GROWTH did not pass the local 64-tool verification."
+  Write-Status "INFO" "Nothing will be exposed publicly until the local runtime is healthy."
+  Write-Footer
+  exit 2
+}
+
+$localAcceptance = Invoke-RuntimeAcceptance
+if (-not $localAcceptance -or -not $localAcceptance.ok -or [int]$localAcceptance.local.count -ne 64) {
+  Write-Status "FAIL" "Local gateway exists, but the expected 64-tool inventory was not verified."
+  Write-Footer
+  exit 2
+}
+Write-Status "OK" "Remote GROWTH local gateway"
+Write-Status "OK" "64 tools verified locally"
+Write-Status "OK" "Secure access code generated and kept local"
+
+$configPath = Join-Path $script:RemoteInstallRoot "config.json"
+$config = Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
+$publicUrl = [string]$config.publicMcpUrl
+
+if (-not (Enable-GuidedFunnel -TailscaleExe ([string]$ts.executable) -DnsName ([string]$ts.dns_name) -HttpsPort $script:PublicHttpsPort -TargetPort ([int]$config.gatewayPort))) {
+  $state.state = "GATEWAY_READY"
+  $state.next_action = "ENABLE_PUBLIC_ROUTE"
+  Save-SetupState $state
+  Write-Footer
+  exit 2
+}
+
+Write-Status "WAIT" "Checking the public route and authentication boundary..."
+$publicAcceptance = $null
+for ($i = 0; $i -lt 15; $i++) {
+  $publicAcceptance = Invoke-RuntimeAcceptance -Public
+  if ($publicAcceptance -and $publicAcceptance.ok) { break }
+  Start-Sleep -Seconds 3
+}
+
+if (-not $publicAcceptance -or -not $publicAcceptance.ok) {
+  Write-Status "FAIL" "The secure route exists, but public acceptance is not fully healthy yet."
+  if ($publicAcceptance -and $publicAcceptance.public) {
+    if ($publicAcceptance.public.unauthenticated_status -ne 401) {
+      Write-Status "FAIL" "Unauthenticated public traffic was not confirmed as HTTP 401."
+    }
+    if (-not $publicAcceptance.public.inventory_match) {
+      Write-Status "FAIL" "Authenticated public tools/list did not return exactly 64 tools."
+    }
+  }
+  Write-Status "INFO" "Composio will not be opened until these checks pass."
+  $state.state = "GATEWAY_READY"
+  $state.next_action = "VERIFY_PUBLIC_ROUTE"
+  Save-SetupState $state
+  Write-Footer
+  exit 2
+}
+
+Write-Status "OK" "Public endpoint reachable"
+Write-Status "OK" "Unauthorized access blocked with HTTP 401"
+Write-Status "OK" "Authenticated public inventory: 64 tools"
+
+$state.state = "PUBLIC_ROUTE_READY"
+$state.next_action = "CONNECT_COMPOSIO"
+$state.public_mcp_url = $publicUrl
+$state.runtime_install_root = $script:RemoteInstallRoot
+Save-SetupState $state
+
+Write-Step 4 5 "Connect Composio"
+Write-Host " Your protected MCP server is ready." -ForegroundColor White
+Write-Host ""
+Write-Status "INFO" "Composio Custom MCP is API-managed while the feature remains experimental."
+Write-Status "INFO" "Your Composio Project API Key is used in memory only and is never saved."
+
+$composioMetaPath = Join-Path $script:RemoteInstallRoot "composio.json"
+$composioReady = $false
+$composioMeta = $null
+
+if (Test-Path -LiteralPath $composioMetaPath) {
+  try {
+    $composioMeta = Get-Content -Raw -LiteralPath $composioMetaPath | ConvertFrom-Json
+    $composioReady = (
+      [string]$composioMeta.publicMcpUrl -eq $publicUrl -and
+      [int]$composioMeta.syncedCount -eq 64 -and
+      [string]$composioMeta.slug
+    )
+  } catch {
+    $composioReady = $false
+  }
+}
+
+if ($composioReady) {
+  Write-Status "OK" "Existing Composio Custom MCP metadata already records a successful 64-tool sync"
+} else {
+  $composioHelper = Resolve-RemoteHelper -Name "connect-composio.ps1"
+
+  if (-not $composioHelper) {
+    Write-Status "FAIL" "Composio setup helper is missing from this install."
+    $state.state = "COMPOSIO_WAITING"
+    $state.next_action = "CONNECT_COMPOSIO"
+    Save-SetupState $state
+    Write-Footer
+    exit 2
+  }
+
+  $state.state = "COMPOSIO_WAITING"
+  $state.next_action = "CONNECT_COMPOSIO"
+  Save-SetupState $state
+
+  try {
+    & $composioHelper -InstallRoot $script:RemoteInstallRoot
+    $composioExit = $LASTEXITCODE
+  } catch {
+    Write-LogLine ("Composio helper failed: " + $_.Exception.Message)
+    $composioExit = 2
+  }
+
+  if ($composioExit -ne 0) {
+    Write-Status "FAIL" "Composio Custom MCP setup is not complete yet."
+    Write-Status "INFO" "Your Tailscale and Remote GROWTH setup remain intact; run START.cmd again to continue."
+    $state.state = "COMPOSIO_WAITING"
+    $state.next_action = "CONNECT_COMPOSIO"
+    Save-SetupState $state
+    Write-Footer
+    exit 2
+  }
+
+  if (-not (Test-Path -LiteralPath $composioMetaPath)) {
+    Write-Status "FAIL" "Composio returned success but the local non-secret connection receipt is missing."
+    Write-Footer
+    exit 2
+  }
+
+  try {
+    $composioMeta = Get-Content -Raw -LiteralPath $composioMetaPath | ConvertFrom-Json
+    $composioReady = (
+      [string]$composioMeta.publicMcpUrl -eq $publicUrl -and
+      [int]$composioMeta.syncedCount -eq 64 -and
+      [string]$composioMeta.slug
+    )
+  } catch {
+    $composioReady = $false
+  }
+}
+
+if (-not $composioReady) {
+  Write-Status "FAIL" "Composio did not verify the expected 64-tool Custom MCP sync."
+  $state.state = "COMPOSIO_WAITING"
+  $state.next_action = "CONNECT_COMPOSIO"
+  Save-SetupState $state
+  Write-Footer
+  exit 2
+}
+
+$state.state = "COMPOSIO_CONNECTED"
+$state.next_action = "FINAL_ACCEPTANCE"
+$state.composio_confirmed_count = 64
+$state.composio_confirmation = "api-synced"
+Save-SetupState $state
+
+Write-Status "OK" ("Composio toolkit: " + [string]$composioMeta.slug)
+Write-Status "OK" "Composio API sync verified exactly 64 tools"
+
+Write-Step 5 5 "Final check"
+$tsFinal = Get-TailscaleState
+$funnelFinal = if ($tsFinal.executable) { Get-FunnelStatus -TailscaleExe ([string]$tsFinal.executable) } else { "" }
+$publicFinal = Invoke-RuntimeAcceptance -Public
+
+$tailscaleOk = [bool]($tsFinal.connected -and $tsFinal.dns_name)
+$funnelOk = [bool](Test-ExpectedFunnel -Status $funnelFinal -DnsName ([string]$state.tailscale_dns) -HttpsPort $script:PublicHttpsPort -TargetPort 18765)
+$acceptanceOk = [bool]($publicFinal -and $publicFinal.ok)
+
+Write-Status $(if ($tailscaleOk) { "OK" } else { "FAIL" }) "Tailscale connection"
+Write-Status $(if ($funnelOk) { "OK" } else { "FAIL" }) "Secure public route"
+Write-Status $(if ($acceptanceOk) { "OK" } else { "FAIL" }) "Authentication + public 64-tool inventory"
+Write-Status "OK" "Composio API receipt: 64 tools synced"
+
+if (-not ($tailscaleOk -and $funnelOk -and $acceptanceOk)) {
+  $state.next_action = "FINAL_ACCEPTANCE"
+  Save-SetupState $state
+  Write-Status "FAIL" "Final acceptance is incomplete. Setup remains safely resumable."
+  Write-Footer
+  exit 2
+}
+
+$state.state = "ACCEPTANCE_PASSED"
+$state.next_action = "READY"
 Save-SetupState $state
 
 Write-Host ""
-Write-Status "OK" "Computer check passed"
-if ($DryRun) {
-  Write-Status "INFO" "Dry run complete; setup state was not written."
-} else {
-  Write-Status "INFO" ("Safe progress saved to " + $script:StatePath)
-}
-
-Write-Step 2 5 "Secure connection"
-
-if ($preflight.tailscale_connected) {
-  Write-Status "OK" "Your secure connection account is already signed in"
-  Write-Status "WAIT" "Route/Funnel verification is intentionally deferred to the next wiring phase"
-} elseif ($preflight.tailscale_installed) {
-  Write-Status "WAIT" "Your secure connection account still needs sign-in"
-} else {
-  Write-Status "FIX" "Tailscale installation and sign-in are the next setup actions"
-}
-
-Write-Host ""
-Write-Host " This build intentionally stops here." -ForegroundColor Yellow
-Write-Host " The terminal UX, preflight checks, and resumable state are active;" -ForegroundColor Gray
-Write-Host " secure-route and Composio wiring are not enabled yet." -ForegroundColor Gray
-Write-Host ""
-Write-Status "INFO" "No fake success state will be shown before those checks are real."
-
+Write-Host "+======================================================+" -ForegroundColor Green
+Write-Host "|                   SETUP COMPLETE                     |" -ForegroundColor Green
+Write-Host "|                                                      |" -ForegroundColor Green
+Write-Host "|       Remote GROWTH + Composio is ready.             |" -ForegroundColor White
+Write-Host "|                 64 tools verified.                   |" -ForegroundColor White
+Write-Host "+======================================================+" -ForegroundColor Green
 Write-Footer
 
-if (-not $NonInteractive) {
-  [void](Read-Host "Press ENTER to close")
-}
-
+if (-not $NonInteractive) { [void](Read-Host "Press ENTER to close") }
 exit 0

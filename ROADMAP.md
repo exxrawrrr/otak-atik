@@ -1,6 +1,6 @@
 # Roadmap
 
-Updated: **2026-10-01**
+Updated: **2026-10-03**
 
 ## V0.1 — Foundation / onboarding
 
@@ -131,7 +131,7 @@ UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP
 ### Remaining implementation
 
 - [x] CHAT 2 — Beautiful Terminal Wizard
-- [ ] CHAT 3 — Tailscale + Composio Guided Wiring
+- [x] CHAT 3 — Tailscale + Composio Guided Wiring
 - [ ] CHAT 4 — STATUS + REPAIR
 - [ ] CHAT 5 — Fresh-User Acceptance + Release
 

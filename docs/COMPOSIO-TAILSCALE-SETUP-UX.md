@@ -1,6 +1,6 @@
 # Composio + Tailscale User Setup UX
 
-Status: **CHAT 1 — UX CONTRACT LOCKED**  
+Status: **CHAT 3 — UX CONTRACT IMPLEMENTED; STATUS/REPAIR + FRESH-MACHINE RELEASE GATES PENDING**  
 Owner branding: **Created by Rafdi D. Ulhaq — exxrawrrr**  
 Target platform: **Windows 10/11**  
 Primary route:
@@ -620,17 +620,47 @@ CHAT 1 is complete when all of the following are true:
 - [x] secret/public boundaries are defined;
 - [x] resumable setup state is defined.
 
+## CHAT 3 implementation evolution
+
+The original CHAT 1 contract intentionally assumed a manual Composio connection because Custom MCP lifecycle details were not yet locked.
+
+CHAT 3 now uses Composio's current experimental v3.1 API lifecycle instead:
+
+```text
+public Remote GROWTH accepted
+  ↓
+user provides Composio Project API Key once
+  ↓
+register/upsert Custom MCP toolkit
+  ↓
+create or reuse API-key auth config
+  ↓
+open hosted Composio connection page
+  ↓
+Remote GROWTH access code copied to clipboard
+  ↓
+connected account becomes ACTIVE
+  ↓
+Composio sync
+  ↓
+synced_count == 64
+```
+
+The Composio Project API Key is not stored. The Remote GROWTH bearer credential remains local except when the user explicitly pastes it into Composio's hosted connection flow. The local receipt stores only non-secret toolkit/account identifiers and the last verified synced tool count.
+
+This replaces the earlier manual "type the tool count you see" acceptance step with an API-reported `synced_count == 64` gate.
+
 ## Explicitly not implemented in CHAT 1
 
 CHAT 1 does **not** claim that the new wizard already exists.
 
-Implementation belongs to later chats:
+Implementation status:
 
 ```text
-CHAT 2 — Beautiful Terminal Wizard
-CHAT 3 — Tailscale + Composio Guided Wiring
-CHAT 4 — STATUS + REPAIR
-CHAT 5 — Fresh-User Acceptance + Release
+CHAT 2 — Beautiful Terminal Wizard                    DONE
+CHAT 3 — Tailscale + Composio Guided Wiring           DONE
+CHAT 4 — STATUS + REPAIR                              PENDING
+CHAT 5 — Fresh-User Acceptance + Release              PENDING
 ```
 
-CHAT 2 must implement this contract rather than inventing a different setup flow ad hoc.
+CHAT 3 implements the guided path but does not replace the final clean-machine acceptance gate in CHAT 5.

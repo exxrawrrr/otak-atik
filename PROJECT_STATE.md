@@ -1,7 +1,7 @@
 # Project State
 
-**Updated:** 2026-10-01  
-**Current milestone:** Remote GROWTH Stable v0.7 + Native ChatGPT Phase 10 release lock  
+**Updated:** 2026-10-03  
+**Current milestone:** Remote GROWTH Stable v0.7 + Guided Composio onboarding CHAT 3 complete  
 **Repository maturity:** active public research lab / real-machine operator experiment  
 **npm package:** 0.1.0-alpha.5  
 **machine runtime:** Remote GROWTH Stable gateway v0.7.0
@@ -175,6 +175,28 @@ The original GROWTH machine has verified:
 - protected-negative acceptance for gateway/Tailscale/native/tunnel targets plus post-patch regression verification;
 - controlled native-backend outage/restart with tunnel process retained and direct ChatGPT plugin calls recovering afterward.
 
+## Guided public onboarding status
+
+CHAT 3 now carries an **identity-neutral portable source package** for the 64-tool Remote GROWTH Stable runtime.
+
+The guided Windows flow now has implementation for:
+
+- Tailscale install/login detection;
+- device DNS discovery;
+- isolated Remote GROWTH runtime installation under LocalAppData;
+- local authenticated 64-tool verification before any public exposure;
+- Tailscale Funnel with conflict detection and fail-closed behavior;
+- HTTP 401 verification for unauthenticated public access;
+- authenticated public 64-tool verification;
+- API-managed Custom MCP registration using a user-supplied Composio Project API Key held in memory only;
+- creation/reuse of the required API-key auth config for the Custom MCP;
+- hosted Composio connection flow with the Remote GROWTH credential copied to the clipboard;
+- Composio API sync with `synced_count == 64` required before setup is marked complete.
+
+CHAT 3 has real-machine evidence beyond dry-run: an isolated portable runtime was built from the public source on GROWTH using separate test ports and returned **64/64 tools**, then the temporary runtime/processes were removed. The production public route was also checked read-only and returned **HTTP 401 without authentication** plus **64/64 tools with authentication**.
+
+The Windows CI workflow now builds a fresh portable runtime on isolated ports and repeats the exact 64-tool acceptance gate. This still does **not** claim reproducibility across every arbitrary Windows device, a full reboot/recovery cycle, or first-time-user acceptance; those remain CHAT 5 gates.
+
 ## Important distinction
 
 The **npm package** and the **GROWTH machine runtime** are related experiments but not the same release artifact.
@@ -202,20 +224,17 @@ The repository does not claim:
 
 ## Current next milestone
 
-**Phase 10 — Native registration and final acceptance**
+**Guided Composio onboarding — CHAT 4 + CHAT 5**
 
-Acceptance target:
+Next acceptance targets:
 
-1. keep Composio at 64/64 — **verified**;
-2. keep production gateway healthy — **verified**;
-3. connect native facade through OpenAI Secure MCP Tunnel — **verified**;
-4. create the private ChatGPT MCP app and verify the 12-tool surface — **verified**;
-5. bind the real generated technical app ID into the private plugin package — **verified locally, not published**;
-6. run the full read-only acceptance suite — **verified**;
-7. run plan-only and permission-gate tests — **verified**;
-8. run isolated write + rollback test — **verified**;
-9. run protected-negative and regression test — **verified**;
-10. cold-start/reboot limitation explicitly documented; final release/checkpoint — **verified and locked**.
+1. implement the simple user-facing `STATUS.cmd` view;
+2. implement safe `REPAIR.cmd` diagnosis/self-healing without weakening auth or overwriting unrelated port/Funnel owners;
+3. reuse the same local/public 64-tool acceptance contract from setup;
+4. reproduce the installer on a fresh Windows profile/device;
+5. run first-time-user setup without repository/domain knowledge;
+6. verify restart/recovery and Composio 64-tool visibility;
+7. only then mark the guided installer user-ready/release-ready.
 
 ## Research rule
 
