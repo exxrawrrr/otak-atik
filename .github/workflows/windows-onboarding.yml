@@ -6,12 +6,14 @@ on:
     paths:
       - "scripts/install.ps1"
       - "scripts/windows/**"
+      - "runtime/remote-growth-stable/**"
       - "config/browser-bridge/**"
       - ".github/workflows/windows-onboarding.yml"
   pull_request:
     paths:
       - "scripts/install.ps1"
       - "scripts/windows/**"
+      - "runtime/remote-growth-stable/**"
       - "config/browser-bridge/**"
   workflow_dispatch:
 
@@ -60,10 +62,64 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
+      - name: Reject machine-specific runtime data
+        shell: powershell
+        run: |
+          $patterns = @('D:\RAFDI_DATA','C:\Users\User','tail39bf37')
+          $findings = @()
+          Get-ChildItem .\runtime\remote-growth-stable -File -Recurse | ForEach-Object {
+            $path = $_.FullName
+            foreach ($pattern in $patterns) {
+              $match = Select-String -LiteralPath $path -Pattern $pattern -SimpleMatch -ErrorAction SilentlyContinue
+              if ($match) { $findings += $match }
+            }
+          }
+          if ($findings.Count -gt 0) {
+            $findings | Format-Table Path,LineNumber,Line -AutoSize
+            throw "Portable runtime contains machine-specific data."
+          }
+
       - name: Runtime installer dry run
         shell: powershell
         run: |
           .\scripts\windows\remote-growth-stable\install-runtime.ps1 -SourceRuntimeRoot .\runtime\remote-growth-stable -TailscaleDnsName example-device.example.ts.net -DryRun
+
+      - name: Setup Python for portable runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install uv for portable runtime test
+        shell: powershell
+        run: |
+          python -m pip install uv
+
+      - name: Fresh portable runtime acceptance
+        shell: powershell
+        run: |
+          $runtime = Join-Path $env:RUNNER_TEMP "otak-atik-remote-growth"
+          .\scripts\windows\remote-growth-stable\install-runtime.ps1 `
+            -SourceRuntimeRoot .\runtime\remote-growth-stable `
+            -InstallRoot $runtime `
+            -GatewayPort 19765 `
+            -UpstreamPort 19766 `
+            -SkipAutoStartTask `
+            -Force
+          .\scripts\windows\remote-growth-stable\test-runtime.ps1 -InstallRoot $runtime -AsJson
+
+      - name: Cleanup portable runtime acceptance
+        if: always()
+        shell: powershell
+        run: |
+          foreach ($port in @(19765,19766)) {
+            Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue |
+              Select-Object -ExpandProperty OwningProcess |
+              Sort-Object -Unique |
+              ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
+          }
+          Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+            Where-Object { $_.ProcessId -ne $PID -and [string]$_.CommandLine -like '*otak-atik-remote-growth*' } |
+            ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 
       - name: Installer dry run
         shell: powershell
