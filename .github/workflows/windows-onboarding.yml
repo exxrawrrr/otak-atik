@@ -308,3 +308,130 @@ jobs:
         shell: powershell
         run: |
           otak-atik doctor
+
+  fresh-user-bundle:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse release builder
+        shell: powershell
+        run: |
+          $tokens = $null
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path ".\scripts\build-windows-bundle.ps1"),
+            [ref]$tokens,
+            [ref]$errors
+          )
+          if ($errors.Count -gt 0) {
+            $errors | Format-List
+            throw "Release bundle builder has PowerShell parse errors."
+          }
+
+      - name: Build user-first Windows ZIP
+        shell: powershell
+        run: |
+          $json = .\scripts\build-windows-bundle.ps1
+          $bundle = $json | ConvertFrom-Json
+          if (-not (Test-Path -LiteralPath $bundle.bundle)) {
+            throw "Windows release bundle was not created."
+          }
+          if ([int]$bundle.files -lt 20) {
+            throw "Windows release bundle is unexpectedly small."
+          }
+          "BUNDLE_ZIP=$($bundle.bundle)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Extract release like a new user
+        shell: powershell
+        run: |
+          $extractRoot = Join-Path $env:RUNNER_TEMP "otak-atik-fresh-user"
+          if (Test-Path -LiteralPath $extractRoot) {
+            Remove-Item -LiteralPath $extractRoot -Recurse -Force
+          }
+          Expand-Archive -LiteralPath $env:BUNDLE_ZIP -DestinationPath $extractRoot -Force
+
+          foreach ($name in @("START.cmd","STATUS.cmd","REPAIR.cmd","README-FIRST.txt","VERSION.txt")) {
+            if (-not (Test-Path -LiteralPath (Join-Path $extractRoot $name))) {
+              throw "Fresh-user bundle is missing $name."
+            }
+          }
+          "FRESH_ROOT=$extractRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: First START works without Node or Git
+        shell: powershell
+        run: |
+          $savedPath = $env:PATH
+          try {
+            $env:PATH = "C:\Windows\System32;C:\Windows;C:\Windows\System32\WindowsPowerShell\v1.0"
+            Push-Location $env:FRESH_ROOT
+            try {
+              & cmd.exe /d /c "START.cmd -DryRun -NonInteractive -NoClear"
+              if ($LASTEXITCODE -ne 0) {
+                throw "Fresh-user START failed with exit code $LASTEXITCODE."
+              }
+            } finally {
+              Pop-Location
+            }
+          } finally {
+            $env:PATH = $savedPath
+          }
+
+      - name: Installed launchers survive source removal
+        shell: powershell
+        run: |
+          Remove-Item -LiteralPath $env:FRESH_ROOT -Recurse -Force
+
+          $desktop = [Environment]::GetFolderPath("Desktop")
+          $folder = Join-Path $desktop "OTAK-ATIK"
+          foreach ($name in @("START.cmd","STATUS.cmd","REPAIR.cmd")) {
+            if (-not (Test-Path -LiteralPath (Join-Path $folder $name))) {
+              throw "Installed launcher missing after source removal: $name"
+            }
+          }
+
+          Push-Location $folder
+          try {
+            & cmd.exe /d /c "START.cmd -DryRun -NonInteractive -NoClear"
+            if ($LASTEXITCODE -ne 0) {
+              throw "Installed START no longer works after source removal."
+            }
+          } finally {
+            Pop-Location
+          }
+
+      - name: Status gives a guided first-run state
+        shell: powershell
+        run: |
+          $desktop = [Environment]::GetFolderPath("Desktop")
+          $statusLauncher = Join-Path $desktop "OTAK-ATIK\STATUS.cmd"
+          $stdout = Join-Path $env:RUNNER_TEMP "fresh-status.json"
+          $stderr = Join-Path $env:RUNNER_TEMP "fresh-status.err"
+
+          $proc = Start-Process cmd.exe -Wait -PassThru -WindowStyle Hidden `
+            -RedirectStandardOutput $stdout -RedirectStandardError $stderr `
+            -ArgumentList @(
+              "/d","/c",
+              ('"' + $statusLauncher + '" -LocalOnly -NonInteractive -AsJson -NoClear')
+            )
+
+          if ($proc.ExitCode -ne 4) {
+            $err = Get-Content -Raw -LiteralPath $stderr -ErrorAction SilentlyContinue
+            throw "Expected first-run STATUS exit 4, got $($proc.ExitCode). $err"
+          }
+
+          $status = (Get-Content -Raw -LiteralPath $stdout) | ConvertFrom-Json
+          if ($status.overall -ne "USER_ACTION") {
+            throw "Expected USER_ACTION before account/runtime setup, got $($status.overall)."
+          }
+
+      - name: Upload Windows user bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: otak-atik-windows-user-bundle
+          path: |
+            dist/OTAK-ATIK-Windows-*.zip
+            dist/OTAK-ATIK-Windows-*.zip.sha256
+          if-no-files-found: error

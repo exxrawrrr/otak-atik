@@ -124,7 +124,7 @@ $result = [ordered]@{
 if (-not $result.config_present) {
   $result.needs_user_action += "Remote GROWTH has not been installed yet."
 }
-if (-not $result.auth_present) {
+if ($result.config_present -and -not $result.auth_present) {
   $result.blocked += "Remote GROWTH access credential is missing."
 }
 if ($result.disabled_marker) {

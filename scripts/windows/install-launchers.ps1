@@ -37,18 +37,13 @@ foreach ($name in $legacyRootLaunchers) {
 $wizardScript = Join-Path $RuntimeRoot "setup-wizard.ps1"
 $statusScript = Join-Path $RuntimeRoot "remote-growth-status.ps1"
 $repairScript = Join-Path $RuntimeRoot "remote-growth-repair.ps1"
-$sourceArg = ""
-if ($SourceRoot) {
-  $safeSourceRoot = $SourceRoot.Replace('"', '')
-  $sourceArg = ' -SourceRoot "' + $safeSourceRoot + '"'
-}
 
 $startContent = @"
 @echo off
 setlocal
 title OTAK-ATIK - Remote AI Setup Wizard
 chcp 65001 >nul 2>&1
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$wizardScript"$sourceArg
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$wizardScript" %*
 set "EXIT_CODE=%ERRORLEVEL%"
 if not "%EXIT_CODE%"=="0" (
   echo.
@@ -65,7 +60,7 @@ $statusContent = @"
 setlocal
 title OTAK-ATIK STATUS
 chcp 65001 >nul 2>&1
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$statusScript"
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$statusScript" %*
 exit /b %ERRORLEVEL%
 "@
 Set-Content -Path (Join-Path $target "STATUS.cmd") -Value $statusContent -Encoding ASCII
@@ -75,7 +70,7 @@ $repairContent = @"
 setlocal
 title OTAK-ATIK REPAIR
 chcp 65001 >nul 2>&1
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$repairScript"
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$repairScript" %*
 exit /b %ERRORLEVEL%
 "@
 Set-Content -Path (Join-Path $target "REPAIR.cmd") -Value $repairContent -Encoding ASCII
