@@ -188,9 +188,10 @@ The guided Windows flow now has implementation for:
 - Tailscale Funnel with conflict detection and fail-closed behavior;
 - HTTP 401 verification for unauthenticated public access;
 - authenticated public 64-tool verification;
-- direct opening of Composio's Add Custom MCP surface;
-- clipboard-safe delivery of the endpoint and bearer credential;
-- explicit 64-tool confirmation before setup is marked complete.
+- API-managed Custom MCP registration using a user-supplied Composio Project API Key held in memory only;
+- creation/reuse of the required API-key auth config for the Custom MCP;
+- hosted Composio connection flow with the Remote GROWTH credential copied to the clipboard;
+- Composio API sync with `synced_count == 64` required before setup is marked complete.
 
 This does **not** yet prove clean-machine reproducibility. CHAT 3 source/package/dry-run behavior is Windows-CI validated, while a real fresh-machine install, dependency download, restart/recovery cycle, and first-time-user acceptance remain CHAT 5 gates.
 
