@@ -2,7 +2,8 @@
 param(
   [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA "otak-atik\remote-growth-stable"),
   [switch]$IncludePublic,
-  [switch]$AsJson
+  [switch]$AsJson,
+  [switch]$NoExit
 )
 
 $ErrorActionPreference = "Stop"
@@ -51,11 +52,18 @@ function Get-UnauthenticatedStatus {
   }
 }
 
+$localGuard = Get-UnauthenticatedStatus -Url $localUrl
 $local = Get-Inventory -Url $localUrl
 $result = [ordered]@{
-  ok = [bool]($local.inventory_match -and [int]$local.count -eq 64)
+  ok = [bool](
+    $localGuard -eq 401 -and
+    $local.inventory_match -and
+    [int]$local.count -eq 64
+  )
   local = [ordered]@{
     url = $localUrl
+    unauthenticated_status = $localGuard
+    auth_guard_ok = ($localGuard -eq 401)
     count = $local.count
     inventory_match = [bool]$local.inventory_match
   }
@@ -87,6 +95,7 @@ if ($AsJson) {
 } else {
   Write-Host ""
   Write-Host "Remote GROWTH acceptance" -ForegroundColor Cyan
+  Write-Host ("Local 401       : " + $(if ($result.local.auth_guard_ok) { "PASS" } else { "FAIL" }))
   Write-Host ("Local inventory : " + $(if ($result.local.inventory_match) { "64 / PASS" } else { "$($result.local.count) / FAIL" }))
   if ($IncludePublic) {
     if ($result.public.configured) {
@@ -98,5 +107,6 @@ if ($AsJson) {
   }
 }
 
+if ($NoExit) { return }
 if ($result.ok) { exit 0 }
 exit 2

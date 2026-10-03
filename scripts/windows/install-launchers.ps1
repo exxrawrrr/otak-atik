@@ -35,6 +35,8 @@ foreach ($name in $legacyRootLaunchers) {
 }
 
 $wizardScript = Join-Path $RuntimeRoot "setup-wizard.ps1"
+$statusScript = Join-Path $RuntimeRoot "remote-growth-status.ps1"
+$repairScript = Join-Path $RuntimeRoot "remote-growth-repair.ps1"
 $sourceArg = ""
 if ($SourceRoot) {
   $safeSourceRoot = $SourceRoot.Replace('"', '')
@@ -57,6 +59,26 @@ exit /b %EXIT_CODE%
 "@
 
 Set-Content -Path (Join-Path $target "START.cmd") -Value $startContent -Encoding ASCII
+
+$statusContent = @"
+@echo off
+setlocal
+title OTAK-ATIK STATUS
+chcp 65001 >nul 2>&1
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$statusScript"
+exit /b %ERRORLEVEL%
+"@
+Set-Content -Path (Join-Path $target "STATUS.cmd") -Value $statusContent -Encoding ASCII
+
+$repairContent = @"
+@echo off
+setlocal
+title OTAK-ATIK REPAIR
+chcp 65001 >nul 2>&1
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$repairScript"
+exit /b %ERRORLEVEL%
+"@
+Set-Content -Path (Join-Path $target "REPAIR.cmd") -Value $repairContent -Encoding ASCII
 
 $advancedLaunchers = @(
   @{ Name = "START REMOTE DESKTOP.bat"; Script = "start-remote-desktop.ps1" },
@@ -85,11 +107,13 @@ if errorlevel 1 pause
 $readme = @"
 OTAK-ATIK
 
-Primary action:
-  START.cmd
+Primary actions:
+  START.cmd   - first-time setup or guided reconnect
+  STATUS.cmd  - simple health check
+  REPAIR.cmd  - safe self-healing and guided recovery
 
 The main folder is intentionally simple so a new user does not need
-to choose between transport implementations.
+to understand MCP, ports, Funnel, bearer authentication, or transport internals.
 
 Advanced / historical utilities are kept under:
   ADVANCED\
@@ -101,5 +125,6 @@ Created by Rafdi D. Ulhaq - exxrawrrr
 
 Set-Content -Path (Join-Path $target "README.txt") -Value $readme -Encoding UTF8
 
-Write-Host ("Desktop launcher ready: " + (Join-Path $target "START.cmd")) -ForegroundColor Green
+Write-Host ("Desktop launchers ready: " + $target) -ForegroundColor Green
+Write-Host "  START.cmd  STATUS.cmd  REPAIR.cmd" -ForegroundColor Cyan
 Write-Host ("Advanced utilities: " + $advanced) -ForegroundColor DarkGray

@@ -18,13 +18,14 @@ Composio
 acceptance checks
 ```
 
-The current CHAT 3 build implements the branded terminal wizard **and** the guided Tailscale + Remote GROWTH + Composio wiring. The flow still does not claim clean-machine release readiness until CHAT 5 reproduces it on a fresh Windows environment.
+The current CHAT 4 build implements the branded terminal wizard, guided Tailscale + Remote GROWTH + Composio wiring, and the user-facing STATUS + REPAIR recovery path. Final fresh-user/release readiness remains a CHAT 5 gate.
 
 ## 1. Requirements
 
 - Windows 10 or 11
-- Node.js 20+
-- Git recommended
+- PowerShell
+- Node.js 20+ optional for repository/developer CLI commands
+- Git recommended for cloning/updating the repository
 - Tailscale is part of the guided remote path
 
 ## 2. Clone
@@ -57,9 +58,9 @@ The installer:
 - creates `~/.otak-atik/`;
 - preserves an existing config unless `-Force` is used;
 - copies Windows helper scripts to the user config directory;
-- links the `otak-atik` CLI;
+- links the `otak-atik` developer CLI when Node.js 20+ is available; guided Windows setup does not depend on that link;
 - creates a Desktop folder named `OTAK-ATIK`;
-- creates one primary user launcher: `START.cmd`;
+- creates three primary user launchers: `START.cmd`, `STATUS.cmd`, and `REPAIR.cmd`;
 - keeps historical/advanced launchers in `OTAK-ATIK\ADVANCED\`;
 - does **not** open a pile of browser tabs automatically.
 
@@ -126,9 +127,65 @@ The portable Remote GROWTH runtime is installed under:
 %LOCALAPPDATA%\otak-atik\remote-growth-stable\
 ```
 
-The installed bearer credential remains local and is never printed by the wizard. The runtime source is also cached under LocalAppData so the guided setup does not depend on keeping the Git checkout forever.
+The installed bearer credential remains local and is never printed by the wizard. The runtime source and nested Windows helpers are also cached outside the Git checkout so normal setup, status, and repair do not depend on keeping the cloned repository forever.
 
 A rerun re-checks the real machine state instead of blindly replaying previous steps.
+
+## STATUS.cmd
+
+`STATUS.cmd` is the normal health-check entrypoint after setup. It presents the system in human language while checking the real components underneath:
+
+- runtime supervisor and current-user auto-start task;
+- ownership of the upstream and gateway ports;
+- local unauthenticated request rejected with HTTP **401**;
+- local authenticated inventory exactly **64 tools**;
+- Tailscale service, account state, and device identity;
+- expected Funnel mapping;
+- public **401** guard and public **64-tool** inventory;
+- last recorded Composio Custom MCP sync.
+
+Status states are intentionally small:
+
+```text
+READY          everything verified
+REPAIR_NEEDED  project-owned component can be repaired safely
+USER_ACTION    an account login/reconnect is required
+BLOCKED        a safety boundary prevents automatic repair
+```
+
+## REPAIR.cmd
+
+`REPAIR.cmd` follows a strict three-stage contract:
+
+```text
+diagnose
+  ↓
+repair only OTAK-ATIK-owned components
+  ↓
+verify again
+```
+
+It may safely:
+
+- recreate the OTAK-ATIK current-user auto-start task;
+- restart the OTAK-ATIK supervisor;
+- restore a missing Windows-MCP upstream or 64-tool gateway;
+- start the Tailscale Windows service;
+- restore the expected Tailscale Funnel mapping when the target is unambiguous;
+- verify local/public authentication and 64-tool inventory again.
+
+It will **not**:
+
+- kill an unrelated process that owns a configured port;
+- overwrite a conflicting Funnel mapping;
+- weaken or bypass bearer authentication;
+- invent a missing Remote GROWTH credential;
+- silently sign in to Tailscale or Composio;
+- silently replace a changed Tailscale identity.
+
+If public authentication protection fails, repair fails closed and disables the expected Funnel exposure instead of leaving a questionable public route online.
+
+CHAT 4 real-machine acceptance deliberately broke an isolated test runtime by removing its recovery task and stopping its processes. `STATUS` correctly reported `REPAIR_NEEDED`, then `REPAIR` rebuilt the recovery task, restarted the runtime, and returned to **HTTP 401 + 64/64 tools + READY**.
 
 ## Advanced utilities
 

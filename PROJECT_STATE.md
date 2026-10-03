@@ -1,7 +1,7 @@
 # Project State
 
 **Updated:** 2026-10-03  
-**Current milestone:** Remote GROWTH Stable v0.7 + Guided Composio onboarding CHAT 3 complete  
+**Current milestone:** Remote GROWTH Stable v0.7 + Guided Composio onboarding CHAT 4 STATUS + REPAIR complete
 **Repository maturity:** active public research lab / real-machine operator experiment  
 **npm package:** 0.1.0-alpha.5  
 **machine runtime:** Remote GROWTH Stable gateway v0.7.0
@@ -20,9 +20,9 @@ The project no longer has only one answer.
 
 ```text
 ChatGPT
-→ Composio Custom MCP
-→ Remote GROWTH Stable
-→ GROWTH
+â†’ Composio Custom MCP
+â†’ Remote GROWTH Stable
+â†’ GROWTH
 ```
 
 Current Composio catalog:
@@ -35,8 +35,8 @@ Current Composio catalog:
 
 ```text
 ChatGPT
-→ Remote Desktop Commander
-→ GROWTH
+â†’ Remote Desktop Commander
+â†’ GROWTH
 ```
 
 Still useful for direct interactive work.
@@ -45,10 +45,10 @@ Still useful for direct interactive work.
 
 ```text
 ChatGPT MCP app / private plugin
-→ OpenAI Secure MCP Tunnel
-→ 127.0.0.1:18768
-→ Remote GROWTH Native Facade
-→ trusted local engines
+â†’ OpenAI Secure MCP Tunnel
+â†’ 127.0.0.1:18768
+â†’ Remote GROWTH Native Facade
+â†’ trusted local engines
 ```
 
 The native facade currently exposes **12 focused tools**.
@@ -71,15 +71,15 @@ The architecture is no longer simply Windows-MCP behind a tunnel.
 
 ```text
 ChatGPT / Composio
-        ↓
+        â†“
 Remote GROWTH Gateway
-        ├─ Windows primitives
-        ├─ Fast Local Engine
-        ├─ Document Engine
-        ├─ Developer / Git Engine
-        ├─ Safe FileOps Engine
-        ├─ SystemOps Engine
-        └─ Workflow Engine
+        â”œâ”€ Windows primitives
+        â”œâ”€ Fast Local Engine
+        â”œâ”€ Document Engine
+        â”œâ”€ Developer / Git Engine
+        â”œâ”€ Safe FileOps Engine
+        â”œâ”€ SystemOps Engine
+        â””â”€ Workflow Engine
 ```
 
 ## Safety model now implemented
@@ -177,7 +177,7 @@ The original GROWTH machine has verified:
 
 ## Guided public onboarding status
 
-CHAT 3 now carries an **identity-neutral portable source package** for the 64-tool Remote GROWTH Stable runtime.
+CHAT 4 now carries the **identity-neutral portable 64-tool runtime plus user-facing STATUS + REPAIR recovery controls**.
 
 The guided Windows flow now has implementation for:
 
@@ -191,11 +191,16 @@ The guided Windows flow now has implementation for:
 - API-managed Custom MCP registration using a user-supplied Composio Project API Key held in memory only;
 - creation/reuse of the required API-key auth config for the Custom MCP;
 - hosted Composio connection flow with the Remote GROWTH credential copied to the clipboard;
-- Composio API sync with `synced_count == 64` required before setup is marked complete.
+- Composio API sync with `synced_count == 64` required before setup is marked complete;
+- `STATUS.cmd` with READY / REPAIR_NEEDED / USER_ACTION / BLOCKED classification;
+- `REPAIR.cmd` with project-owned task/runtime/Tailscale-route recovery and fail-closed security behavior;
+- repo-independent LocalAppData copies of nested helpers and the portable runtime source.
 
-CHAT 3 has real-machine evidence beyond dry-run: an isolated portable runtime was built from the public source on GROWTH using separate test ports and returned **64/64 tools**, then the temporary runtime/processes were removed. The production public route was also checked read-only and returned **HTTP 401 without authentication** plus **64/64 tools with authentication**.
+CHAT 3 established the portable/runtime/transport evidence: an isolated runtime built from public source returned **64/64 tools**, while the production public route returned **HTTP 401 without authentication** and **64/64 tools with authentication**.
 
-The Windows CI workflow now builds a fresh portable runtime on isolated ports and repeats the exact 64-tool acceptance gate. This still does **not** claim reproducibility across every arbitrary Windows device, a full reboot/recovery cycle, or first-time-user acceptance; those remain CHAT 5 gates.
+CHAT 4 then performed destructive-but-isolated recovery acceptance on separate test ports: the test recovery task was removed and all test runtime processes were stopped. STATUS correctly returned **REPAIR_NEEDED** with no false security blocker. REPAIR recreated the current-user task, restarted the supervisor/upstream/gateway, and finished **READY** with local **HTTP 401 + 64/64 tools**. The production ports remained untouched.
+
+The Windows CI workflow now repeats fresh runtime setup plus STATUS/REPAIR self-healing on isolated ports. This still does **not** claim reproducibility across every arbitrary Windows device, a full production reboot/recovery cycle for the new guided package, or first-time-user acceptance; those remain CHAT 5 gates.
 
 ## Important distinction
 
@@ -224,17 +229,18 @@ The repository does not claim:
 
 ## Current next milestone
 
-**Guided Composio onboarding — CHAT 4 + CHAT 5**
+**Guided Composio onboarding — CHAT 5 Fresh-User Acceptance + Release**
+
+CHAT 4 is complete: `STATUS.cmd` and `REPAIR.cmd` now share the same fail-closed health contract, recover only project-owned components, verify local HTTP 401 + 64/64 tools after repair, and refuse to terminate unrelated port owners.
 
 Next acceptance targets:
 
-1. implement the simple user-facing `STATUS.cmd` view;
-2. implement safe `REPAIR.cmd` diagnosis/self-healing without weakening auth or overwriting unrelated port/Funnel owners;
-3. reuse the same local/public 64-tool acceptance contract from setup;
-4. reproduce the installer on a fresh Windows profile/device;
-5. run first-time-user setup without repository/domain knowledge;
-6. verify restart/recovery and Composio 64-tool visibility;
-7. only then mark the guided installer user-ready/release-ready.
+1. reproduce the installer on a fresh Windows profile/device;
+2. run first-time-user setup without repository/domain knowledge;
+3. verify the three-launcher user surface: `START.cmd`, `STATUS.cmd`, `REPAIR.cmd`;
+4. verify restart/recovery after a real reboot;
+5. verify Tailscale Funnel recovery and Composio 64-tool visibility from the fresh-user path;
+6. only then mark the guided installer user-ready/release-ready.
 
 ## Research rule
 

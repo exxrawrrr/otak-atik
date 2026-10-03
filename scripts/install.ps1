@@ -24,16 +24,23 @@ Write-Host "OTAK-ATIK installer" -ForegroundColor Cyan
 Write-Host "Created by Rafdi D. Ulhaq - exxrawrrr" -ForegroundColor DarkGray
 Write-Host "-------------------"
 
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-  throw "Node.js is required (20+)."
+$NodeReady = $false
+$nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+if ($nodeCommand) {
+  try {
+    $NodeMajor = [int](node -p "process.versions.node.split('.')[0]")
+    if ($NodeMajor -ge 20) {
+      $NodeReady = $true
+      Write-Host ("[ok] Node " + (node --version))
+    } else {
+      Write-Warning "Node.js is below 20. Guided Windows setup will still work; developer CLI linking will be skipped."
+    }
+  } catch {
+    Write-Warning "Node.js could not be inspected. Guided Windows setup will still work."
+  }
+} else {
+  Write-Host "[--] Node.js not found (optional for guided Windows setup)" -ForegroundColor DarkGray
 }
-
-$NodeMajor = [int](node -p "process.versions.node.split('.')[0]")
-if ($NodeMajor -lt 20) {
-  throw "Node.js 20+ is required."
-}
-
-Write-Host ("[ok] Node " + (node --version))
 
 if (Get-Command git -ErrorAction SilentlyContinue) {
   Write-Host "[ok] Git detected"
@@ -52,10 +59,15 @@ if ($DryRun) {
   Write-Host ("Would copy portable 64-tool runtime source to: " + $RuntimeSourceRoot)
   Write-Host ("Would prepare browser bridge config: " + $BrowserConfig)
   if (-not $NoDesktopLaunchers) {
-    Write-Host ("Would create primary launcher: " + (Join-Path $desktopTarget "START.cmd"))
+    Write-Host ("Would create primary launchers under: " + $desktopTarget)
+    Write-Host "  START.cmd  STATUS.cmd  REPAIR.cmd"
     Write-Host ("Would keep advanced utilities under: " + (Join-Path $desktopTarget "ADVANCED"))
   }
-  Write-Host "Would run: npm link"
+  if ($NodeReady) {
+    Write-Host "Would run: npm link"
+  } else {
+    Write-Host "Would skip npm link because Node.js 20+ is optional for the guided Windows path."
+  }
   Write-Host "Would preserve existing user config unless -Force is supplied."
   Write-Host "Would NOT open setup pages unless -OpenSetupPages is explicitly supplied."
   Write-Host ""
@@ -88,11 +100,15 @@ Write-Host ("[sync] Windows helpers -> " + $RuntimeRoot)
 Copy-Item (Join-Path $RepoRoot "runtime\remote-growth-stable\*") $RuntimeSourceRoot -Recurse -Force
 Write-Host ("[sync] Remote GROWTH runtime source -> " + $RuntimeSourceRoot)
 
-Push-Location $RepoRoot
-try {
-  npm link
-} finally {
-  Pop-Location
+if ($NodeReady) {
+  Push-Location $RepoRoot
+  try {
+    npm link
+  } finally {
+    Pop-Location
+  }
+} else {
+  Write-Host "[skip] npm link (Node.js 20+ not available; guided Windows setup remains available)"
 }
 
 if (-not $NoDesktopLaunchers) {
