@@ -1,7 +1,7 @@
 # Project State
 
 **Updated:** 2026-10-03  
-**Current milestone:** Guided Composio onboarding CHAT 6 complete; v0.1.0-alpha.7 release lock
+**Current milestone:** Guided Composio onboarding CHAT 6 complete; v0.1.0-alpha.7 released
 **Repository maturity:** active public research lab / real-machine operator experiment  
 **npm package:** 0.1.0-alpha.7  
 **machine runtime:** Remote GROWTH Stable gateway v0.7.0
@@ -258,3 +258,26 @@ Reality outranks roadmap aesthetics.
 A failed experiment stays documented.
 
 A new architecture is only promoted after it survives real-machine verification.
+
+
+## CHAT 6 release evidence
+
+`v0.1.0-alpha.7` is published as a GitHub prerelease.
+
+Release evidence:
+
+- release commit: `50e7b1bd737daa13f03d1a19a3e725b450a23f23`;
+- annotated tag: `v0.1.0-alpha.7`;
+- tag dereference: exact release commit above;
+- final main validate: PASS;
+- final main Windows onboarding + fresh-user bundle: PASS;
+- fresh-user START without Node.js/Git: PASS;
+- installed START survives extracted-source removal: PASS;
+- fresh 64-tool runtime: PASS;
+- STATUS / REPAIR destructive recovery: PASS;
+- foreign-port fail-closed safety: PASS;
+- real GROWTH Windows Terminal read-only smoke: PASS;
+- Windows ZIP: 46 files, 110,743 bytes;
+- Windows ZIP SHA-256: `ffdff59a94f37243ed957c3f83728502b1257850094079412788d8c8482822de`.
+
+The release remains alpha. Account sign-in is user-owned and universal arbitrary-device production readiness is not claimed.
