@@ -21,17 +21,34 @@ Snapshot: **3 October 2026**
 | --- | --- |
 | Remote GROWTH Stable gateway | **v0.7.0** |
 | Gateway inventory | **64 tools** |
-| Guided Composio + Tailscale onboarding | **CHAT 4 STATUS + REPAIR wired; final fresh-user/release acceptance still pending** |
+| Guided Composio + Tailscale onboarding | **CHAT 5 fresh-user Windows ZIP + recovery acceptance verified** |
 | Native ChatGPT facade | **12 focused tools** |
 | Private native plugin package | **v1.0.0 finalized locally** |
 | Public reusable native bootstrap | **validated from a fresh clone** |
 | Core Phase 10 acceptance | **COMPLETE VERIFIED** |
 | Warm native reconnect | **verified** |
 | Cold reboot / lost tunnel process | **manual tunnel start required unless optional local auto-start enrollment is configured** |
-| Standalone npm package line | **0.1.0-alpha.5** |
+| Standalone npm package line | **0.1.0-alpha.6** |
 | License | **Apache-2.0** |
 
 The current release lock is intentionally honest about the remaining cold-start limitation. The public repository does not contain the owner's tunnel runtime key, bearer token, generated private app ID, local credential store, or machine secrets.
+
+---
+
+## Windows quick start
+
+For the guided Windows path, normal users do not need to clone the repository.
+
+```text
+1. Download OTAK-ATIK-Windows-v0.1.0-alpha.6.zip
+2. Extract it
+3. Double-click START.cmd
+4. Follow the terminal when Tailscale or Composio asks you to sign in
+```
+
+The first START creates a durable `Desktop\OTAK-ATIK\` launcher set and caches the required helpers/runtime source under the current Windows profile. `STATUS.cmd` checks health; `REPAIR.cmd` only repairs OTAK-ATIK-owned components and fails closed on ambiguous ownership.
+
+See [Windows guided setup](docs/SETUP-WINDOWS.md) for the complete flow.
 
 ---
 
@@ -171,7 +188,9 @@ On the primary Windows machine, the project has verified:
 - protected-negative and regression acceptance;
 - warm native-backend reconnect.
 
-That is real evidence from one primary machine and one evolving project. It is **not** a claim of universal production readiness.
+CHAT 5 additionally verifies the packaged first-run contract on a clean Windows runner: the release ZIP builds, `START.cmd` bootstraps without Node.js or Git, the extracted source can be deleted, and the installed launchers continue from the cached user-profile copy.
+
+That is real evidence from the primary machine plus clean Windows CI. It is **not** a claim of universal production readiness.
 
 ---
 

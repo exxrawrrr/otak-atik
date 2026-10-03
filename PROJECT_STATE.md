@@ -1,9 +1,9 @@
 # Project State
 
 **Updated:** 2026-10-03  
-**Current milestone:** Remote GROWTH Stable v0.7 + Guided Composio onboarding CHAT 4 STATUS + REPAIR complete
+**Current milestone:** Guided Composio onboarding CHAT 5 complete; v0.1.0-alpha.6 release lock
 **Repository maturity:** active public research lab / real-machine operator experiment  
-**npm package:** 0.1.0-alpha.5  
+**npm package:** 0.1.0-alpha.6  
 **machine runtime:** Remote GROWTH Stable gateway v0.7.0
 
 ## Project thesis
@@ -20,9 +20,9 @@ The project no longer has only one answer.
 
 ```text
 ChatGPT
-â†’ Composio Custom MCP
-â†’ Remote GROWTH Stable
-â†’ GROWTH
+→ Composio Custom MCP
+→ Remote GROWTH Stable
+→ GROWTH
 ```
 
 Current Composio catalog:
@@ -35,8 +35,8 @@ Current Composio catalog:
 
 ```text
 ChatGPT
-â†’ Remote Desktop Commander
-â†’ GROWTH
+→ Remote Desktop Commander
+→ GROWTH
 ```
 
 Still useful for direct interactive work.
@@ -45,10 +45,10 @@ Still useful for direct interactive work.
 
 ```text
 ChatGPT MCP app / private plugin
-â†’ OpenAI Secure MCP Tunnel
-â†’ 127.0.0.1:18768
-â†’ Remote GROWTH Native Facade
-â†’ trusted local engines
+→ OpenAI Secure MCP Tunnel
+→ 127.0.0.1:18768
+→ Remote GROWTH Native Facade
+→ trusted local engines
 ```
 
 The native facade currently exposes **12 focused tools**.
@@ -71,15 +71,15 @@ The architecture is no longer simply Windows-MCP behind a tunnel.
 
 ```text
 ChatGPT / Composio
-        â†“
+        ↓
 Remote GROWTH Gateway
-        â”œâ”€ Windows primitives
-        â”œâ”€ Fast Local Engine
-        â”œâ”€ Document Engine
-        â”œâ”€ Developer / Git Engine
-        â”œâ”€ Safe FileOps Engine
-        â”œâ”€ SystemOps Engine
-        â””â”€ Workflow Engine
+        ├─ Windows primitives
+        ├─ Fast Local Engine
+        ├─ Document Engine
+        ├─ Developer / Git Engine
+        ├─ Safe FileOps Engine
+        ├─ SystemOps Engine
+        └─ Workflow Engine
 ```
 
 ## Safety model now implemented
@@ -177,7 +177,7 @@ The original GROWTH machine has verified:
 
 ## Guided public onboarding status
 
-CHAT 4 now carries the **identity-neutral portable 64-tool runtime plus user-facing STATUS + REPAIR recovery controls**.
+CHAT 5 carries the **identity-neutral portable 64-tool runtime, user-facing STATUS + REPAIR recovery controls, and the user-first Windows release ZIP**.
 
 The guided Windows flow now has implementation for:
 
@@ -200,7 +200,7 @@ CHAT 3 established the portable/runtime/transport evidence: an isolated runtime 
 
 CHAT 4 then performed destructive-but-isolated recovery acceptance on separate test ports: the test recovery task was removed and all test runtime processes were stopped. STATUS correctly returned **REPAIR_NEEDED** with no false security blocker. REPAIR recreated the current-user task, restarted the supervisor/upstream/gateway, and finished **READY** with local **HTTP 401 + 64/64 tools**. The production ports remained untouched.
 
-The Windows CI workflow now repeats fresh runtime setup plus STATUS/REPAIR self-healing on isolated ports. This still does **not** claim reproducibility across every arbitrary Windows device, a full production reboot/recovery cycle for the new guided package, or first-time-user acceptance; those remain CHAT 5 gates.
+The Windows CI workflow repeats fresh runtime setup plus STATUS/REPAIR self-healing on isolated ports. CHAT 5 also builds the Windows ZIP on a clean Windows runner, runs first START without Node.js or Git, removes the extracted source, reruns the installed START from cached files, verifies the first-run status contract, and uploads the release bundle artifact. This is evidence for the tested Windows runner and package path; it is not a claim of universal arbitrary-device production readiness or unattended account provisioning.
 
 ## Important distinction
 
@@ -211,9 +211,10 @@ Do not describe gateway v0.7.0 as npm version 0.7.0.
 Current:
 
 ```text
-npm package: 0.1.0-alpha.5
+npm package: 0.1.0-alpha.6
 Remote GROWTH gateway runtime: 0.7.0
-native private package: 1.0.0 (local-only app binding)\npublic native template: identity-neutral
+native private package: 1.0.0 (local-only app binding)
+public native template: identity-neutral
 ```
 
 ## What is not claimed
@@ -227,20 +228,22 @@ The repository does not claim:
 - public availability of the author's private ChatGPT plugin;
 - permission to publish machine credentials.
 
-## Current next milestone
+## Current milestone
 
-**Guided Composio onboarding — CHAT 5 Fresh-User Acceptance + Release**
+**Guided Composio onboarding — CHAT 5 COMPLETE / v0.1.0-alpha.6 release lock**
 
-CHAT 4 is complete: `STATUS.cmd` and `REPAIR.cmd` now share the same fail-closed health contract, recover only project-owned components, verify local HTTP 401 + 64/64 tools after repair, and refuse to terminate unrelated port owners.
+Verified release gates include:
 
-Next acceptance targets:
+1. user-first Windows ZIP build with bundle-specific identity/secret scanning;
+2. first START on a clean Windows runner with Node.js and Git unavailable to the user path;
+3. Desktop `START.cmd`, `STATUS.cmd`, and `REPAIR.cmd` generation;
+4. installed START still works after the extracted source is removed;
+5. fresh portable runtime acceptance at HTTP 401 + 64/64 tools;
+6. destructive STATUS/REPAIR recovery back to READY + HTTP 401 + 64/64;
+7. foreign-port fail-closed behavior without terminating the unrelated process;
+8. post-merge `main` validation and Windows onboarding jobs passing.
 
-1. reproduce the installer on a fresh Windows profile/device;
-2. run first-time-user setup without repository/domain knowledge;
-3. verify the three-launcher user surface: `START.cmd`, `STATUS.cmd`, `REPAIR.cmd`;
-4. verify restart/recovery after a real reboot;
-5. verify Tailscale Funnel recovery and Composio 64-tool visibility from the fresh-user path;
-6. only then mark the guided installer user-ready/release-ready.
+Account sign-in remains intentionally user-owned. CHAT 5 does not claim unattended Tailscale/Composio enrollment or universal production readiness. Historical real reboot evidence remains documented separately; the release process does not reboot the owner's active workstation.
 
 ## Research rule
 
