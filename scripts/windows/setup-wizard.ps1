@@ -12,7 +12,6 @@ $ErrorActionPreference = "Stop"
 $script:Brand = "Created by Rafdi D. Ulhaq - exxrawrrr"
 $script:AppName = "OTAK-ATIK"
 $script:StateSchema = 2
-$script:ComposioCustomMcpUrl = "https://dashboard.composio.dev/~/org/connect/apps?add-custom-mcp=true"
 $script:PublicHttpsPort = 443
 
 function Get-UserDataRoot {
@@ -565,7 +564,7 @@ if ($DryRun) {
     exit 2
   }
   Write-Step 4 5 "Connect Composio"
-  Write-Status "INFO" "Would open the dedicated Composio Add Custom MCP page only after public security checks pass."
+  Write-Status "INFO" "Would register the protected Custom MCP through Composio API only after public security checks pass."
   Write-Step 5 5 "Final check"
   Write-Status "INFO" "Would require public HTTP 401 without auth and authenticated tools/list == 64."
   Write-Footer
@@ -666,83 +665,84 @@ Save-SetupState $state
 Write-Step 4 5 "Connect Composio"
 Write-Host " Your protected MCP server is ready." -ForegroundColor White
 Write-Host ""
-Write-Host " Composio setup values:" -ForegroundColor Cyan
-Write-Host "   Name           : Remote GROWTH Stable"
-Write-Host "   Transport      : HTTP / Streamable HTTP"
-Write-Host ("   MCP URL        : " + $publicUrl)
-Write-Host "   Authentication : Bearer"
-Write-Host ""
-Write-Host " If Composio asks for a header instead of a token field:" -ForegroundColor DarkGray
-Write-Host "   Header name    : Authorization" -ForegroundColor DarkGray
-Write-Host "   Header value   : Bearer <secure access code>" -ForegroundColor DarkGray
-Write-Host ""
-Write-Host " The access code is never printed here." -ForegroundColor DarkGray
-Write-Host ""
+Write-Status "INFO" "Composio Custom MCP is API-managed while the feature remains experimental."
+Write-Status "INFO" "Your Composio Project API Key is used in memory only and is never saved."
 
-try {
-  Start-Process $script:ComposioCustomMcpUrl
-  Write-Status "OK" "Opened Composio Add Custom MCP"
-} catch {
-  Write-Status "INFO" ("Open this page in your browser: " + $script:ComposioCustomMcpUrl)
-}
+$composioMetaPath = Join-Path $script:RemoteInstallRoot "composio.json"
+$composioReady = $false
+$composioMeta = $null
 
-$authFile = Join-Path $script:RemoteInstallRoot "auth.key"
-$state.state = "COMPOSIO_WAITING"
-$state.next_action = "CONFIRM_COMPOSIO"
-Save-SetupState $state
-
-$confirmedCount = $null
-while ($null -eq $confirmedCount) {
-  Write-Host ""
-  Write-Host " [C] Copy MCP URL" -ForegroundColor Cyan
-  Write-Host " [K] Copy secure access code" -ForegroundColor Cyan
-  Write-Host " [O] Open Composio again" -ForegroundColor Cyan
-  Write-Host " [ENTER] I connected it; check the tool count" -ForegroundColor Green
-  Write-Host " [Q] Save progress and exit" -ForegroundColor DarkGray
-  $choice = Read-Host "Choose"
-
-  switch -Regex ($choice) {
-    "^[Cc]$" {
-      Copy-TextValue -Value $publicUrl -Label "MCP URL"
-      continue
-    }
-    "^[Kk]$" {
-      $token = (Get-Content -Raw -LiteralPath $authFile).Trim()
-      Copy-TextValue -Value $token -Label "Secure access code"
-      Remove-Variable token -ErrorAction SilentlyContinue
-      continue
-    }
-    "^[Oo]$" {
-      try { Start-Process $script:ComposioCustomMcpUrl } catch {}
-      continue
-    }
-    "^[Qq]$" {
-      Write-Status "INFO" "Progress saved. Run START.cmd again to continue."
-      Write-Footer
-      exit 0
-    }
-    "^$" {
-      $rawCount = Read-Host "How many tools does Composio show? Enter the number"
-      $parsed = 0
-      if ([int]::TryParse($rawCount, [ref]$parsed)) {
-        $confirmedCount = $parsed
-      } else {
-        Write-Status "WAIT" "Enter the tool count shown by Composio."
-      }
-      continue
-    }
-    default {
-      Write-Status "INFO" "Choose C, K, O, ENTER, or Q."
-    }
+if (Test-Path -LiteralPath $composioMetaPath) {
+  try {
+    $composioMeta = Get-Content -Raw -LiteralPath $composioMetaPath | ConvertFrom-Json
+    $composioReady = (
+      [string]$composioMeta.publicMcpUrl -eq $publicUrl -and
+      [int]$composioMeta.syncedCount -eq 64 -and
+      [string]$composioMeta.slug
+    )
+  } catch {
+    $composioReady = $false
   }
 }
 
-if ($confirmedCount -ne 64) {
-  Write-Status "FAIL" ("Composio shows " + $confirmedCount + " tools; this release requires exactly 64.")
-  Write-Status "INFO" "The connection is not marked complete. Re-open START.cmd after fixing the Composio connection."
-  $state.composio_confirmed_count = $confirmedCount
-  $state.composio_confirmation = "user-observed"
-  $state.next_action = "CONFIRM_COMPOSIO"
+if ($composioReady) {
+  Write-Status "OK" "Existing Composio Custom MCP metadata already records a successful 64-tool sync"
+} else {
+  $composioHelper = Resolve-RemoteHelper -Name "connect-composio.ps1"
+
+  if (-not $composioHelper) {
+    Write-Status "FAIL" "Composio setup helper is missing from this install."
+    $state.state = "COMPOSIO_WAITING"
+    $state.next_action = "CONNECT_COMPOSIO"
+    Save-SetupState $state
+    Write-Footer
+    exit 2
+  }
+
+  $state.state = "COMPOSIO_WAITING"
+  $state.next_action = "CONNECT_COMPOSIO"
+  Save-SetupState $state
+
+  try {
+    & $composioHelper -InstallRoot $script:RemoteInstallRoot
+    $composioExit = $LASTEXITCODE
+  } catch {
+    Write-LogLine ("Composio helper failed: " + $_.Exception.Message)
+    $composioExit = 2
+  }
+
+  if ($composioExit -ne 0) {
+    Write-Status "FAIL" "Composio Custom MCP setup is not complete yet."
+    Write-Status "INFO" "Your Tailscale and Remote GROWTH setup remain intact; run START.cmd again to continue."
+    $state.state = "COMPOSIO_WAITING"
+    $state.next_action = "CONNECT_COMPOSIO"
+    Save-SetupState $state
+    Write-Footer
+    exit 2
+  }
+
+  if (-not (Test-Path -LiteralPath $composioMetaPath)) {
+    Write-Status "FAIL" "Composio returned success but the local non-secret connection receipt is missing."
+    Write-Footer
+    exit 2
+  }
+
+  try {
+    $composioMeta = Get-Content -Raw -LiteralPath $composioMetaPath | ConvertFrom-Json
+    $composioReady = (
+      [string]$composioMeta.publicMcpUrl -eq $publicUrl -and
+      [int]$composioMeta.syncedCount -eq 64 -and
+      [string]$composioMeta.slug
+    )
+  } catch {
+    $composioReady = $false
+  }
+}
+
+if (-not $composioReady) {
+  Write-Status "FAIL" "Composio did not verify the expected 64-tool Custom MCP sync."
+  $state.state = "COMPOSIO_WAITING"
+  $state.next_action = "CONNECT_COMPOSIO"
   Save-SetupState $state
   Write-Footer
   exit 2
@@ -751,9 +751,11 @@ if ($confirmedCount -ne 64) {
 $state.state = "COMPOSIO_CONNECTED"
 $state.next_action = "FINAL_ACCEPTANCE"
 $state.composio_confirmed_count = 64
-$state.composio_confirmation = "user-observed"
+$state.composio_confirmation = "api-synced"
 Save-SetupState $state
-Write-Status "OK" "Composio tool count confirmed: 64"
+
+Write-Status "OK" ("Composio toolkit: " + [string]$composioMeta.slug)
+Write-Status "OK" "Composio API sync verified exactly 64 tools"
 
 Write-Step 5 5 "Final check"
 $tsFinal = Get-TailscaleState
@@ -767,7 +769,7 @@ $acceptanceOk = [bool]($publicFinal -and $publicFinal.ok)
 Write-Status $(if ($tailscaleOk) { "OK" } else { "FAIL" }) "Tailscale connection"
 Write-Status $(if ($funnelOk) { "OK" } else { "FAIL" }) "Secure public route"
 Write-Status $(if ($acceptanceOk) { "OK" } else { "FAIL" }) "Authentication + public 64-tool inventory"
-Write-Status "OK" "Composio: 64 tools confirmed by the user"
+Write-Status "OK" "Composio API receipt: 64 tools synced"
 
 if (-not ($tailscaleOk -and $funnelOk -and $acceptanceOk)) {
   $state.next_action = "FINAL_ACCEPTANCE"
