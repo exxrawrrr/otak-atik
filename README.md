@@ -21,7 +21,7 @@ Snapshot: **3 October 2026**
 | --- | --- |
 | Remote GROWTH Stable gateway | **v0.7.0** |
 | Gateway inventory | **64 tools** |
-| Guided Composio + Tailscale onboarding | **CHAT 3 wired; final user/release acceptance still pending** |
+| Guided Composio + Tailscale onboarding | **CHAT 4 STATUS + REPAIR wired; final fresh-user/release acceptance still pending** |
 | Native ChatGPT facade | **12 focused tools** |
 | Private native plugin package | **v1.0.0 finalized locally** |
 | Public reusable native bootstrap | **validated from a fresh clone** |
@@ -146,6 +146,7 @@ The important part is not the number of tools. The important part is that higher
 On the primary Windows machine, the project has verified:
 
 - authenticated remote transport and unauthenticated rejection;
+- isolated STATUS + REPAIR acceptance: missing recovery task + stopped runtime was detected, repaired, and reverified at HTTP 401 + 64/64 tools;
 - loopback-only native bindings;
 - real Windows reboot recovery on the earlier remote path;
 - 64-tool gateway inventory;
