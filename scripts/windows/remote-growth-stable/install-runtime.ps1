@@ -6,7 +6,7 @@ param(
   [string]$TailscaleExe = "",
   [int]$GatewayPort = 18765,
   [int]$UpstreamPort = 18766,
-  [ValidateSet(443,8443,10000)][int]$PublicHttpsPort = 8443,
+  [ValidateSet(443,8443,10000)][int]$PublicHttpsPort = 443,
   [switch]$InstallPrerequisites,
   [switch]$Force,
   [switch]$DryRun,
