@@ -133,7 +133,21 @@ UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP
 - [x] CHAT 2 — Beautiful Terminal Wizard
 - [x] CHAT 3 — Tailscale + Composio Guided Wiring
 - [x] CHAT 4 — STATUS + REPAIR
-- [ ] CHAT 5 — Fresh-User Acceptance + Release
+- [x] CHAT 5 — Fresh-User Acceptance + Release
+
+### Release checkpoint
+
+- [x] user-first Windows ZIP builder
+- [x] bundle-specific secret / identity scan
+- [x] SHA-256 sidecar
+- [x] first START on clean Windows CI without Node.js or Git in the user path
+- [x] Desktop START / STATUS / REPAIR survive extracted-source removal
+- [x] fresh runtime HTTP 401 + 64/64
+- [x] STATUS / REPAIR destructive recovery acceptance
+- [x] foreign-port fail-closed acceptance
+- [x] post-merge main validation + Windows onboarding
+
+The public release remains alpha and does not claim unattended account provisioning or universal arbitrary-device production readiness.
 
 ## Portability / public reproduction
 
