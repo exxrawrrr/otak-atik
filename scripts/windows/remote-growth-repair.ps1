@@ -9,6 +9,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $Brand = "Created by Rafdi D. Ulhaq - exxrawrrr"
+$TuiScript = Join-Path $PSScriptRoot "premium-tui.ps1"
+if (Test-Path -LiteralPath $TuiScript) { . $TuiScript }
 
 function Write-Line {
   param(
@@ -16,6 +18,10 @@ function Write-Line {
     [string]$Message
   )
   if ($AsJson) { return }
+  if (Get-Command Write-OtakStatus -ErrorAction SilentlyContinue) {
+    Write-OtakStatus -Kind $Kind -Message $Message
+    return
+  }
   $color = switch ($Kind) {
     "OK"   { "Green" }
     "WAIT" { "Yellow" }
@@ -29,15 +35,21 @@ function Write-Line {
 
 function Write-Header {
   if ($AsJson) { return }
+  if (Get-Command Initialize-OtakTui -ErrorAction SilentlyContinue) {
+    Initialize-OtakTui -Title "OTAK-ATIK REPAIR" -NoClear:$NoClear
+    Write-OtakLogo -Subtitle "REMOTE AI x COMPOSIO SETUP" -Mode "SAFE REPAIR"
+    Write-OtakNotice -Title "SAFE SELF-HEALING" -Lines @(
+      "Only OTAK-ATIK-owned components may be restarted or recreated.",
+      "Foreign port owners and unrelated services are never terminated.",
+      "Authentication protection is re-verified before success."
+    ) -Kind "INFO"
+    return
+  }
   if (-not $NoClear) { Clear-Host }
   try { [Console]::Title = "OTAK-ATIK REPAIR" } catch {}
   Write-Host ""
-  Write-Host "+======================================================+" -ForegroundColor DarkCyan
-  Write-Host "|                    OTAK-ATIK REPAIR                  |" -ForegroundColor Cyan
-  Write-Host "|                                                      |" -ForegroundColor DarkCyan
-  Write-Host "|       Created by Rafdi D. Ulhaq - exxrawrrr          |" -ForegroundColor White
-  Write-Host "+======================================================+" -ForegroundColor DarkCyan
-  Write-Host ""
+  Write-Host "OTAK-ATIK REPAIR" -ForegroundColor Cyan
+  Write-Host $Brand -ForegroundColor Gray
 }
 
 function Get-Health {
@@ -160,15 +172,24 @@ function Start-Supervisor {
 
 function Wait-LocalReady {
   for ($i = 0; $i -lt 45; $i++) {
+    if (-not $AsJson -and (Get-Command Write-OtakActivity -ErrorAction SilentlyContinue)) {
+      Write-OtakActivity -Message "Restarting protected runtime components..." -Frame $i
+    }
     Start-Sleep -Seconds 1
     $quick = Get-Health -Quick
     if ($quick.blocked.Count -gt 0) { return $quick }
     if ($quick.gateway.state -eq "owned" -and $quick.upstream.state -eq "owned") {
+      if (-not $AsJson -and (Get-Command Complete-OtakActivity -ErrorAction SilentlyContinue)) {
+        Complete-OtakActivity -Message "Runtime listeners are back online"
+      }
       break
     }
   }
 
   for ($attempt = 0; $attempt -lt 2; $attempt++) {
+    if (-not $AsJson) {
+      Write-Line "WAIT" "Re-validating HTTP 401 protection and the complete 64-tool inventory..."
+    }
     $health = Get-Health
     if ($health.local.auth_guard_ok -and $health.local.inventory_match -and [int]$health.local.count -eq 64) {
       return $health
@@ -227,15 +248,41 @@ function Emit-Final {
   } else {
     Write-Host ""
     if ($ExitCode -eq 0) {
-      Write-Host " Repair complete. Everything is ready." -ForegroundColor Green
+      if (Get-Command Write-OtakNotice -ErrorAction SilentlyContinue) {
+        Write-OtakNotice -Title "REPAIR COMPLETE" -Lines @(
+          "OTAK-ATIK-owned components are healthy again.",
+          "Authentication protection is active.",
+          "64 / 64 tools verified."
+        ) -Kind "OK"
+      } else {
+        Write-Host " Repair complete. Everything is ready." -ForegroundColor Green
+      }
     } elseif ($Health.overall -eq "USER_ACTION") {
-      Write-Host " Automatic repair is complete; one account-owned action remains." -ForegroundColor Yellow
+      if (Get-Command Write-OtakNotice -ErrorAction SilentlyContinue) {
+        Write-OtakNotice -Title "ACTION REQUIRED" -Lines @(
+          "Automatic repair is complete.",
+          "One account-owned action remains for you."
+        ) -Kind "WARN"
+      } else {
+        Write-Host " Automatic repair is complete; one account-owned action remains." -ForegroundColor Yellow
+      }
     } else {
-      Write-Host " Repair stopped at a safety boundary." -ForegroundColor Red
+      if (Get-Command Write-OtakNotice -ErrorAction SilentlyContinue) {
+        Write-OtakNotice -Title "SAFETY BOUNDARY" -Lines @(
+          "Repair stopped safely.",
+          "OTAK-ATIK did not take ownership of an unrelated process or route."
+        ) -Kind "ERROR"
+      } else {
+        Write-Host " Repair stopped at a safety boundary." -ForegroundColor Red
+      }
     }
-    Write-Host ""
-    Write-Host (" " + $Brand) -ForegroundColor DarkGray
-    Write-Host ""
+    if (Get-Command Write-OtakFooter -ErrorAction SilentlyContinue) {
+      Write-OtakFooter -Brand $Brand
+    } else {
+      Write-Host ""
+      Write-Host (" " + $Brand) -ForegroundColor DarkGray
+      Write-Host ""
+    }
     if (-not $NonInteractive) { [void](Read-Host "Press ENTER to close") }
   }
   exit $ExitCode

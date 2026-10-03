@@ -4,6 +4,29 @@ All notable changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.7] - 2026-10-03
+
+### Premium terminal installer
+
+Upgraded the guided Windows installer presentation without weakening the CHAT 1–5 safety contract:
+
+- added a shared premium terminal renderer for START, STATUS, and REPAIR;
+- added a branded OTAK-ATIK ASCII header with `Created by Rafdi D. Ulhaq - exxrawrrr`;
+- added step progress, live activity indicators, human-readable status rows, action-required panels, success panels, and safety-boundary panels;
+- interactive launches automatically reopen in Windows Terminal when available;
+- Windows Terminal launches maximized and in focus mode for a clean installer-like experience;
+- systems without Windows Terminal fall back to the current PowerShell console;
+- non-interactive, JSON, dry-run, and GitHub Actions paths remain headless and automation-safe;
+- failed or resumable interactive setup keeps the terminal visible instead of disappearing immediately.
+
+### Safety / compatibility
+
+- Tailscale, Funnel, bearer authentication, Composio, and exact 64-tool acceptance logic are unchanged;
+- STATUS JSON/exit-code behavior remains compatible;
+- REPAIR remains fail-closed and still refuses unrelated port owners;
+- Desktop START / STATUS / REPAIR launchers use the same premium wrapper after the downloaded source folder is removed;
+- onboarding contract regression expanded to cover the premium human-vs-headless boundary.
+
 ## [0.1.0-alpha.6] - 2026-10-03
 
 ### Guided Windows onboarding

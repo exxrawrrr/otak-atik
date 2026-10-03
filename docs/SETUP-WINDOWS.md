@@ -115,14 +115,31 @@ It performs real checks and guided actions for:
 - opening Composio's hosted connection page with the Remote GROWTH access code copied to the clipboard;
 - syncing the Custom MCP through Composio and requiring API-reported `synced_count = 64` before setup is marked complete.
 
+### Premium terminal experience
+
+For a normal interactive user, START / STATUS / REPAIR automatically use Windows Terminal when it is available:
+
+- maximized window;
+- focus mode for a clean installer-like surface;
+- OTAK-ATIK ASCII branding;
+- step progress bars;
+- live activity indicators during waits;
+- explicit action-required panels for account-owned steps;
+- success and safety-boundary panels;
+- the terminal stays visible when setup pauses or fails so the user can actually read what happened.
+
+If Windows Terminal is unavailable, the same logic safely falls back to PowerShell.
+
+Automation is intentionally different: `-DryRun`, `-NonInteractive`, `-AsJson`, and GitHub Actions stay headless and do not open a GUI terminal.
+
 It uses human-readable statuses:
 
 ```text
-[OK]
-[WAIT]
-[FIX]
-[INFO]
-[FAIL]
+[+] success
+[>] waiting / user action
+[~] repair in progress
+[i] information
+[!] blocked / failure
 ```
 
 ## Resumable setup state

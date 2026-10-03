@@ -34,25 +34,16 @@ foreach ($name in $legacyRootLaunchers) {
   }
 }
 
-$wizardScript = Join-Path $RuntimeRoot "setup-wizard.ps1"
-$statusScript = Join-Path $RuntimeRoot "remote-growth-status.ps1"
-$repairScript = Join-Path $RuntimeRoot "remote-growth-repair.ps1"
+$premiumLauncher = Join-Path $RuntimeRoot "premium-launcher.ps1"
 
 $startContent = @"
 @echo off
 setlocal
-title OTAK-ATIK - Remote AI Setup Wizard
+title OTAK-ATIK - Remote AI Setup
 chcp 65001 >nul 2>&1
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$wizardScript" %*
-set "EXIT_CODE=%ERRORLEVEL%"
-if not "%EXIT_CODE%"=="0" (
-  echo.
-  echo OTAK-ATIK stopped safely with code %EXIT_CODE%.
-  pause
-)
-exit /b %EXIT_CODE%
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$premiumLauncher" -Mode Start %*
+exit /b %ERRORLEVEL%
 "@
-
 Set-Content -Path (Join-Path $target "START.cmd") -Value $startContent -Encoding ASCII
 
 $statusContent = @"
@@ -60,7 +51,7 @@ $statusContent = @"
 setlocal
 title OTAK-ATIK STATUS
 chcp 65001 >nul 2>&1
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$statusScript" %*
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$premiumLauncher" -Mode Status %*
 exit /b %ERRORLEVEL%
 "@
 Set-Content -Path (Join-Path $target "STATUS.cmd") -Value $statusContent -Encoding ASCII
@@ -70,7 +61,7 @@ $repairContent = @"
 setlocal
 title OTAK-ATIK REPAIR
 chcp 65001 >nul 2>&1
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$repairScript" %*
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$premiumLauncher" -Mode Repair %*
 exit /b %ERRORLEVEL%
 "@
 Set-Content -Path (Join-Path $target "REPAIR.cmd") -Value $repairContent -Encoding ASCII
@@ -107,13 +98,15 @@ Primary actions:
   STATUS.cmd  - simple health check
   REPAIR.cmd  - safe self-healing and guided recovery
 
+START, STATUS, and REPAIR automatically open the premium OTAK-ATIK terminal UI
+when Windows Terminal is available. CI/headless usage falls back safely to
+plain PowerShell output.
+
 The main folder is intentionally simple so a new user does not need
 to understand MCP, ports, Funnel, bearer authentication, or transport internals.
 
 Advanced / historical utilities are kept under:
   ADVANCED\
-
-The guided setup wizard owns the recommended user journey.
 
 Created by Rafdi D. Ulhaq - exxrawrrr
 "@

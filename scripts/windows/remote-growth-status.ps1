@@ -9,12 +9,18 @@ param(
 
 $ErrorActionPreference = "Stop"
 $Brand = "Created by Rafdi D. Ulhaq - exxrawrrr"
+$TuiScript = Join-Path $PSScriptRoot "premium-tui.ps1"
+if (Test-Path -LiteralPath $TuiScript) { . $TuiScript }
 
 function Write-Line {
   param(
     [ValidateSet("OK","WAIT","FIX","INFO","FAIL")][string]$Kind,
     [string]$Message
   )
+  if (Get-Command Write-OtakStatus -ErrorAction SilentlyContinue) {
+    Write-OtakStatus -Kind $Kind -Message $Message
+    return
+  }
   $color = switch ($Kind) {
     "OK"   { "Green" }
     "WAIT" { "Yellow" }
@@ -27,15 +33,17 @@ function Write-Line {
 }
 
 function Write-Header {
+  if (Get-Command Initialize-OtakTui -ErrorAction SilentlyContinue) {
+    Initialize-OtakTui -Title "OTAK-ATIK STATUS" -NoClear:$NoClear
+    Write-OtakLogo -Subtitle "REMOTE AI x COMPOSIO SETUP" -Mode "SYSTEM STATUS"
+    Write-OtakProgress -Current 1 -Total 1 -Label "Checking installed components"
+    return
+  }
   if (-not $NoClear) { Clear-Host }
   try { [Console]::Title = "OTAK-ATIK STATUS" } catch {}
   Write-Host ""
-  Write-Host "+======================================================+" -ForegroundColor DarkCyan
-  Write-Host "|                    OTAK-ATIK STATUS                  |" -ForegroundColor Cyan
-  Write-Host "|                                                      |" -ForegroundColor DarkCyan
-  Write-Host "|       Created by Rafdi D. Ulhaq - exxrawrrr          |" -ForegroundColor White
-  Write-Host "+======================================================+" -ForegroundColor DarkCyan
-  Write-Host ""
+  Write-Host "OTAK-ATIK STATUS" -ForegroundColor Cyan
+  Write-Host $Brand -ForegroundColor Gray
 }
 
 $healthScript = Join-Path $PSScriptRoot "remote-growth-stable\get-health.ps1"
@@ -156,22 +164,49 @@ if (-not $LocalOnly) {
 Write-Host ""
 switch ([string]$health.overall) {
   "READY" {
-    Write-Host " Everything is ready." -ForegroundColor Green
+    if (Get-Command Write-OtakNotice -ErrorAction SilentlyContinue) {
+      Write-OtakNotice -Title "SYSTEM READY" -Lines @(
+        "Remote GROWTH is healthy.",
+        "Authentication protection is active.",
+        "The verified tool inventory is available."
+      ) -Kind "OK"
+    } else {
+      Write-Host " Everything is ready." -ForegroundColor Green
+    }
     $exitCode = 0
   }
   "REPAIR_NEEDED" {
-    Write-Host " One or more project-owned components need repair." -ForegroundColor Yellow
-    Write-Host " Open REPAIR.cmd  -  no technical diagnosis is required." -ForegroundColor Gray
+    if (Get-Command Write-OtakNotice -ErrorAction SilentlyContinue) {
+      Write-OtakNotice -Title "REPAIR RECOMMENDED" -Lines @(
+        "One or more OTAK-ATIK-owned components need repair.",
+        "Open REPAIR.cmd. No technical diagnosis is required."
+      ) -Kind "WARN"
+    } else {
+      Write-Host " One or more project-owned components need repair." -ForegroundColor Yellow
+    }
     $exitCode = 3
   }
   "USER_ACTION" {
-    Write-Host " The computer is safe, but one account-owned action is still required." -ForegroundColor Yellow
-    Write-Host " Open REPAIR.cmd to continue the guided recovery." -ForegroundColor Gray
+    if (Get-Command Write-OtakNotice -ErrorAction SilentlyContinue) {
+      Write-OtakNotice -Title "ACTION REQUIRED" -Lines @(
+        "The computer is safe.",
+        "One account-owned step still needs you.",
+        "Open REPAIR.cmd to continue the guided recovery."
+      ) -Kind "WARN"
+    } else {
+      Write-Host " The computer is safe, but one account-owned action is still required." -ForegroundColor Yellow
+    }
     $exitCode = 4
   }
   default {
-    Write-Host " OTAK-ATIK stopped at a safety boundary." -ForegroundColor Red
-    Write-Host " REPAIR.cmd will diagnose it, but will not overwrite unrelated services." -ForegroundColor Gray
+    if (Get-Command Write-OtakNotice -ErrorAction SilentlyContinue) {
+      Write-OtakNotice -Title "SAFETY BOUNDARY" -Lines @(
+        "OTAK-ATIK stopped instead of taking ownership of an ambiguous state.",
+        "REPAIR.cmd will diagnose it without overwriting unrelated services."
+      ) -Kind "ERROR"
+    } else {
+      Write-Host " OTAK-ATIK stopped at a safety boundary." -ForegroundColor Red
+    }
     $exitCode = 5
   }
 }
