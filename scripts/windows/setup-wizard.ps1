@@ -162,7 +162,7 @@ function Load-SetupState {
 }
 
 function Save-SetupState {
-  param([hashtable]$State)
+  param($State)
 
   if ($DryRun) { return }
 
@@ -255,7 +255,7 @@ function Get-Preflight {
 }
 
 function Show-Preflight {
-  param([hashtable]$Preflight)
+  param($Preflight)
 
   if ($Preflight.windows) {
     Write-Status "OK" "Windows detected"
@@ -293,7 +293,7 @@ function Show-Preflight {
 }
 
 function Test-CorePreflight {
-  param([hashtable]$Preflight)
+  param($Preflight)
 
   return (
     $Preflight.windows -and
