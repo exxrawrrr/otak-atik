@@ -1,7 +1,7 @@
 # Project State
 
 **Updated:** 2026-10-03  
-**Current milestone:** Guided Composio onboarding CHAT 5 complete; v0.1.0-alpha.6 release lock
+**Current milestone:** Guided Composio onboarding CHAT 5 complete; v0.1.0-alpha.6 released
 **Repository maturity:** active public research lab / real-machine operator experiment  
 **npm package:** 0.1.0-alpha.6  
 **machine runtime:** Remote GROWTH Stable gateway v0.7.0
@@ -230,7 +230,7 @@ The repository does not claim:
 
 ## Current milestone
 
-**Guided Composio onboarding — CHAT 5 COMPLETE / v0.1.0-alpha.6 release lock**
+**Guided Composio onboarding — CHAT 5 COMPLETE / v0.1.0-alpha.6 RELEASED**
 
 Verified release gates include:
 
@@ -241,7 +241,11 @@ Verified release gates include:
 5. fresh portable runtime acceptance at HTTP 401 + 64/64 tools;
 6. destructive STATUS/REPAIR recovery back to READY + HTTP 401 + 64/64;
 7. foreign-port fail-closed behavior without terminating the unrelated process;
-8. post-merge `main` validation and Windows onboarding jobs passing.
+8. post-merge `main` validation and Windows onboarding jobs passing;
+9. immutable annotated tag `v0.1.0-alpha.6` dereferencing to release commit `7bbb62e4`;
+10. GitHub prerelease published with Windows ZIP + SHA-256 sidecar.
+
+Release asset SHA-256: `2d613c92884ca69532bd86a6c435702a484549901a958ee155b756918ca58fef`.
 
 Account sign-in remains intentionally user-owned. CHAT 5 does not claim unattended Tailscale/Composio enrollment or universal production readiness. Historical real reboot evidence remains documented separately; the release process does not reboot the owner's active workstation.
 
