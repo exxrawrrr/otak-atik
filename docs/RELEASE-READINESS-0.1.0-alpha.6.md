@@ -1,7 +1,7 @@
 # Release Readiness — v0.1.0-alpha.6
 
 Date: 2026-10-03
-Candidate branch: `chat5-fresh-user-release`
+Candidate branch: `release-lock-alpha6`
 Target branch: `main`
 
 ## Release intent
@@ -21,27 +21,27 @@ It does not rename the Remote GROWTH gateway runtime. The npm/repository release
 
 ## Required gates before tagging
 
-- [ ] package version and changelog agree on `0.1.0-alpha.6`;
-- [ ] PowerShell scripts parse;
-- [ ] workflow YAML parses;
-- [ ] `npm run check` passes;
-- [ ] `npm run release:check` passes;
-- [ ] strict repository hygiene returns zero high/medium findings;
-- [ ] Windows release ZIP builds successfully;
-- [ ] ZIP-specific private identity / secret scan passes;
-- [ ] ZIP has a SHA-256 sidecar;
-- [ ] clean Windows CI runs first `START.cmd` from the extracted ZIP without Node.js or Git;
-- [ ] clean Windows CI creates Desktop `START.cmd`, `STATUS.cmd`, and `REPAIR.cmd`;
-- [ ] clean Windows CI deletes the extracted source and reruns installed `START.cmd` from cached files;
-- [ ] clean Windows CI reports a guided first-run STATUS rather than crashing when account/runtime setup is incomplete;
-- [ ] existing fresh portable runtime acceptance returns HTTP 401 + 64/64;
-- [ ] existing STATUS/REPAIR destructive recovery acceptance returns READY + HTTP 401 + 64/64;
-- [ ] foreign-port fail-closed acceptance leaves the foreign process alive;
-- [ ] PR Linux/Windows validation passes;
-- [ ] PR fresh-user-bundle job passes;
-- [ ] merge to `main` completes;
-- [ ] post-merge `main` validation passes;
-- [ ] post-merge `main` fresh-user-bundle job passes;
+- [x] package version and changelog agree on `0.1.0-alpha.6`;
+- [x] PowerShell scripts parse;
+- [x] workflow YAML parses;
+- [x] `npm run check` passes;
+- [x] `npm run release:check` passes;
+- [x] strict repository hygiene returns zero high/medium findings;
+- [x] Windows release ZIP builds successfully;
+- [x] ZIP-specific private identity / secret scan passes;
+- [x] ZIP has a SHA-256 sidecar;
+- [x] clean Windows CI runs first `START.cmd` from the extracted ZIP without Node.js or Git;
+- [x] clean Windows CI creates Desktop `START.cmd`, `STATUS.cmd`, and `REPAIR.cmd`;
+- [x] clean Windows CI deletes the extracted source and reruns installed `START.cmd` from cached files;
+- [x] clean Windows CI reports a guided first-run STATUS rather than crashing when account/runtime setup is incomplete;
+- [x] existing fresh portable runtime acceptance returns HTTP 401 + 64/64;
+- [x] existing STATUS/REPAIR destructive recovery acceptance returns READY + HTTP 401 + 64/64;
+- [x] foreign-port fail-closed acceptance leaves the foreign process alive;
+- [x] PR Linux/Windows validation passes;
+- [x] PR fresh-user-bundle job passes;
+- [x] merge to `main` completes;
+- [x] post-merge `main` validation passes;
+- [x] post-merge `main` fresh-user-bundle job passes;
 - [ ] release ZIP is rebuilt from the verified `main` commit;
 - [ ] Git tag `v0.1.0-alpha.6` points to that verified `main` commit;
 - [ ] GitHub release includes the Windows ZIP and SHA-256 sidecar.
@@ -86,4 +86,13 @@ Existing tags must never be moved.
 
 ## Current decision
 
-**CANDIDATE — DO NOT TAG YET.**
+**MAIN GATES PASS — READY FOR FINAL RELEASE-LOCK MERGE, REBUILD, TAG, AND ASSET PUBLISH.**
+
+
+## Verified GitHub evidence
+
+- PR #26 final head `e5f7752`: validate PASS; windows-onboarding PASS; fresh-user-bundle PASS.
+- Merged `main` commit `12df8aa`: validate PASS; windows-onboarding PASS; fresh-user-bundle PASS.
+- Post-merge Windows artifact `otak-atik-windows-user-bundle` was generated from `12df8aa`.
+
+The first PR attempt exposed a wrong expected first-run STATUS code. That test failed closed, the classification was corrected, and both the final PR head and post-merge main run passed afterward.
