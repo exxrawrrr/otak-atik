@@ -118,10 +118,20 @@ jobs:
         shell: powershell
         run: |
           $runtime = Join-Path $env:RUNNER_TEMP "otak-atik-remote-growth"
-          $json = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-status.ps1 -InstallRoot $runtime -LocalOnly -NonInteractive -AsJson -NoClear
-          $code = $LASTEXITCODE
-          if ($code -ne 3) {
-            throw "Expected STATUS exit 3 (REPAIR_NEEDED), got $code."
+          $stdout = Join-Path $env:RUNNER_TEMP "status-missing.json"
+          $stderr = Join-Path $env:RUNNER_TEMP "status-missing.err"
+          $proc = Start-Process powershell.exe -Wait -PassThru -WindowStyle Hidden `
+            -RedirectStandardOutput $stdout -RedirectStandardError $stderr `
+            -ArgumentList @(
+              "-NoLogo","-NoProfile","-ExecutionPolicy","Bypass",
+              "-File",".\scripts\windows\remote-growth-status.ps1",
+              "-InstallRoot",$runtime,
+              "-LocalOnly","-NonInteractive","-AsJson","-NoClear"
+            )
+          $json = Get-Content -Raw -LiteralPath $stdout
+          if ($proc.ExitCode -ne 3) {
+            $err = Get-Content -Raw -LiteralPath $stderr -ErrorAction SilentlyContinue
+            throw "Expected STATUS exit 3 (REPAIR_NEEDED), got $($proc.ExitCode). $err"
           }
           $status = $json | ConvertFrom-Json
           if ($status.overall -ne "REPAIR_NEEDED") {
@@ -183,14 +193,33 @@ jobs:
           try {
             Start-Sleep -Seconds 2
 
-            $statusJson = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-status.ps1 -InstallRoot $conflict -LocalOnly -NonInteractive -AsJson -NoClear
-            $statusCode = $LASTEXITCODE
-            $repairJson = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-repair.ps1 -InstallRoot $conflict -LocalOnly -NonInteractive -AsJson -NoClear
-            $repairCode = $LASTEXITCODE
+            $statusOut = Join-Path $env:RUNNER_TEMP "foreign-status.json"
+            $statusErr = Join-Path $env:RUNNER_TEMP "foreign-status.err"
+            $statusProc = Start-Process powershell.exe -Wait -PassThru -WindowStyle Hidden `
+              -RedirectStandardOutput $statusOut -RedirectStandardError $statusErr `
+              -ArgumentList @(
+                "-NoLogo","-NoProfile","-ExecutionPolicy","Bypass",
+                "-File",".\scripts\windows\remote-growth-status.ps1",
+                "-InstallRoot",$conflict,
+                "-LocalOnly","-NonInteractive","-AsJson","-NoClear"
+              )
+            $statusJson = Get-Content -Raw -LiteralPath $statusOut
+
+            $repairOut = Join-Path $env:RUNNER_TEMP "foreign-repair.json"
+            $repairErr = Join-Path $env:RUNNER_TEMP "foreign-repair.err"
+            $repairProc = Start-Process powershell.exe -Wait -PassThru -WindowStyle Hidden `
+              -RedirectStandardOutput $repairOut -RedirectStandardError $repairErr `
+              -ArgumentList @(
+                "-NoLogo","-NoProfile","-ExecutionPolicy","Bypass",
+                "-File",".\scripts\windows\remote-growth-repair.ps1",
+                "-InstallRoot",$conflict,
+                "-LocalOnly","-NonInteractive","-AsJson","-NoClear"
+              )
+            $repairJson = Get-Content -Raw -LiteralPath $repairOut
             $alive = [bool](Get-Process -Id $foreign.Id -ErrorAction SilentlyContinue)
 
-            if ($statusCode -ne 5) { throw "STATUS did not block a foreign port owner." }
-            if ($repairCode -ne 5) { throw "REPAIR did not fail closed on a foreign port owner." }
+            if ($statusProc.ExitCode -ne 5) { throw "STATUS did not block a foreign port owner." }
+            if ($repairProc.ExitCode -ne 5) { throw "REPAIR did not fail closed on a foreign port owner." }
             if (-not $alive) { throw "REPAIR terminated a foreign process." }
 
             $status = $statusJson | ConvertFrom-Json
