@@ -241,6 +241,7 @@ Start here:
 - [Roadmap](ROADMAP.md)
 - [Current Remote GROWTH / Native ChatGPT architecture](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
 - [Reusable native setup/bootstrap](examples/remote-growth-native/README.md)
+- [Composio + Tailscale user setup UX](docs/COMPOSIO-TAILSCALE-SETUP-UX.md)
 - [Historical Rafdi Remote GROWTH evidence](docs/RAFDI-REMOTE-GROWTH.md)
 - [What I actually use](docs/WHAT-I-ACTUALLY-USE.md)
 - [Security](SECURITY.md)
