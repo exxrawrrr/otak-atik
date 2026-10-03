@@ -229,17 +229,18 @@ The repository does not claim:
 
 ## Current next milestone
 
-**Guided Composio onboarding â€” CHAT 4 + CHAT 5**
+**Guided Composio onboarding — CHAT 5 Fresh-User Acceptance + Release**
+
+CHAT 4 is complete: `STATUS.cmd` and `REPAIR.cmd` now share the same fail-closed health contract, recover only project-owned components, verify local HTTP 401 + 64/64 tools after repair, and refuse to terminate unrelated port owners.
 
 Next acceptance targets:
 
-1. implement the simple user-facing `STATUS.cmd` view;
-2. implement safe `REPAIR.cmd` diagnosis/self-healing without weakening auth or overwriting unrelated port/Funnel owners;
-3. reuse the same local/public 64-tool acceptance contract from setup;
-4. reproduce the installer on a fresh Windows profile/device;
-5. run first-time-user setup without repository/domain knowledge;
-6. verify restart/recovery and Composio 64-tool visibility;
-7. only then mark the guided installer user-ready/release-ready.
+1. reproduce the installer on a fresh Windows profile/device;
+2. run first-time-user setup without repository/domain knowledge;
+3. verify the three-launcher user surface: `START.cmd`, `STATUS.cmd`, `REPAIR.cmd`;
+4. verify restart/recovery after a real reboot;
+5. verify Tailscale Funnel recovery and Composio 64-tool visibility from the fresh-user path;
+6. only then mark the guided installer user-ready/release-ready.
 
 ## Research rule
 
