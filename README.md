@@ -15,12 +15,13 @@ It is **not** presented as a universal remote-desktop product or as proof that a
 
 ## Current status
 
-Snapshot: **1 October 2026**
+Snapshot: **3 October 2026**
 
 | Surface | Current state |
 | --- | --- |
 | Remote GROWTH Stable gateway | **v0.7.0** |
 | Gateway inventory | **64 tools** |
+| Guided Composio + Tailscale onboarding | **CHAT 3 wired; final user/release acceptance still pending** |
 | Native ChatGPT facade | **12 focused tools** |
 | Private native plugin package | **v1.0.0 finalized locally** |
 | Public reusable native bootstrap | **validated from a fresh clone** |
@@ -46,6 +47,8 @@ Remote Desktop Commander **still works and remains useful** as a practical inter
 ChatGPT
   ↓
 Composio Custom MCP
+  ↓
+Tailscale Funnel
   ↓
 Remote GROWTH Stable Gateway v0.7.0
   ↓
@@ -241,6 +244,7 @@ Start here:
 - [Roadmap](ROADMAP.md)
 - [Current Remote GROWTH / Native ChatGPT architecture](docs/REMOTE-GROWTH-NATIVE-CHATGPT.md)
 - [Reusable native setup/bootstrap](examples/remote-growth-native/README.md)
+- [Windows guided setup](docs/SETUP-WINDOWS.md)
 - [Composio + Tailscale user setup UX](docs/COMPOSIO-TAILSCALE-SETUP-UX.md)
 - [Historical Rafdi Remote GROWTH evidence](docs/RAFDI-REMOTE-GROWTH.md)
 - [What I actually use](docs/WHAT-I-ACTUALLY-USE.md)

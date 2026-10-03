@@ -427,7 +427,7 @@ function Copy-TextValue {
 }
 
 function Get-Preflight {
-  $isWindows = ($env:OS -eq "Windows_NT")
+  $isWindows = ([System.Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT)
   $psVersion = $PSVersionTable.PSVersion.ToString()
   $nodeFound = [bool](Get-Command "node" -ErrorAction SilentlyContinue)
   $nodeVersion = $null
@@ -462,9 +462,9 @@ function Show-Preflight {
 
   Write-Status "OK" ("PowerShell " + $Preflight.powershell_version)
 
-  if ($Preflight.node_supported) { Write-Status "OK" ("Node.js " + $Preflight.node_version) }
-  elseif ($Preflight.node_found) { Write-Status "FIX" ("Node.js " + $Preflight.node_version + " found; version 20+ is required") }
-  else { Write-Status "FIX" "Node.js 20+ needs to be installed" }
+  if ($Preflight.node_supported) { Write-Status "OK" ("Node.js " + $Preflight.node_version + " (developer CLI)") }
+  elseif ($Preflight.node_found) { Write-Status "INFO" ("Node.js " + $Preflight.node_version + " found; 20+ is only needed for optional repository/developer commands") }
+  else { Write-Status "INFO" "Node.js is optional for Remote GROWTH setup; install 20+ only for repository/developer commands" }
 
   if ($Preflight.git_found) { Write-Status "OK" "Git detected" }
   else { Write-Status "INFO" "Git not detected; it is recommended for updates and development" }
@@ -515,33 +515,7 @@ if (-not $preflight.windows) {
 }
 
 if (-not $preflight.node_supported) {
-  if ($DryRun) {
-    Write-Status "INFO" "Would offer automatic Node.js LTS installation before continuing."
-  } else {
-    $winget = Get-Command "winget.exe" -ErrorAction SilentlyContinue
-    if (-not $winget) {
-      Write-Status "FAIL" "Node.js 20+ is required and winget is unavailable for automatic installation."
-      Write-Footer
-      exit 2
-    }
-    if (-not (Read-Continue -Prompt "Press ENTER to install/upgrade Node.js LTS or Q to exit")) {
-      Write-Footer
-      exit 0
-    }
-    & $winget.Source install --id OpenJS.NodeJS.LTS -e --accept-source-agreements --accept-package-agreements
-    if ($LASTEXITCODE -ne 0) {
-      Write-Status "FAIL" "Node.js installation/upgrade did not complete successfully."
-      Write-Footer
-      exit 2
-    }
-    $preflight = Get-Preflight
-    if (-not $preflight.node_supported) {
-      Write-Status "WAIT" "Node.js was installed, but this terminal has not picked up the new PATH yet."
-      Write-Status "INFO" "Close this window and run START.cmd again."
-      Write-Footer
-      exit 0
-    }
-  }
+  Write-Status "INFO" "Node.js 20+ is optional for repository/developer commands; Remote GROWTH setup can continue without it."
 }
 
 $state.state = "PREFLIGHT_OK"

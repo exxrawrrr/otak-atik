@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import fnmatch
@@ -179,7 +179,7 @@ def canonical_json_hash(obj: Any) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 def health() -> dict[str, Any]:
-    for p in (PLAN_ROOT, RECEIPT_ROOT, BACKUP_ROOT, D_QUARANTINE):
+    for p in (PLAN_ROOT, RECEIPT_ROOT, BACKUP_ROOT, QUARANTINE_ROOT):
         p.mkdir(parents=True, exist_ok=True)
     return {
         "ok": True,
@@ -189,7 +189,7 @@ def health() -> dict[str, Any]:
         "plan_root": str(PLAN_ROOT),
         "receipt_root": str(RECEIPT_ROOT),
         "backup_root": str(BACKUP_ROOT),
-        "quarantine": {"C": str(C_QUARANTINE), "D": str(D_QUARANTINE)},
+        "quarantine_root": str(QUARANTINE_ROOT),
         "batch_semantics": "plan -> validate preconditions -> execute -> verify -> receipt",
         "delete_semantics": "quarantine, not permanent delete",
         "rollback_supported": ["copy", "move", "rename", "delete", "mkdir"],

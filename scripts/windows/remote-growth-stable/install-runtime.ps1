@@ -7,10 +7,12 @@ param(
   [int]$GatewayPort = 18765,
   [int]$UpstreamPort = 18766,
   [ValidateSet(443,8443,10000)][int]$PublicHttpsPort = 443,
+  [string]$TaskName = "OtakAtik Remote GROWTH Stable",
   [switch]$InstallPrerequisites,
   [switch]$Force,
   [switch]$DryRun,
-  [switch]$NoStart
+  [switch]$NoStart,
+  [switch]$SkipAutoStartTask
 )
 
 $ErrorActionPreference = "Stop"
@@ -55,7 +57,7 @@ function Get-PublicUrl {
   return "https://$($DnsName):$HttpsPort/mcp"
 }
 
-if ($env:OS -ne "Windows_NT") {
+if ([System.Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
   throw "Remote GROWTH Stable portable runtime currently supports Windows only."
 }
 
@@ -68,13 +70,26 @@ $uvFallbacks = @(
   (Join-Path $env:USERPROFILE ".local\bin\uv.exe"),
   (Join-Path $env:APPDATA "Python\Scripts\uv.exe")
 )
+$wingetPackages = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Packages"
+if (Test-Path -LiteralPath $wingetPackages) {
+  $wingetUv = Get-ChildItem -LiteralPath $wingetPackages -Filter "uv.exe" -Recurse -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -match "astral-sh\.uv" } |
+    Select-Object -First 1
+  if ($wingetUv) { $uvFallbacks += $wingetUv.FullName }
+}
 $uv = Resolve-Exe "uv.exe" $uvFallbacks
 
-if (-not $uv -and $InstallPrerequisites) {
+if (-not $uv -and $InstallPrerequisites -and -not $DryRun) {
   if (-not $winget) { throw "winget is required for automatic uv installation." }
-  & $winget install --id astral-sh.uv -e --accept-source-agreements --accept-package-agreements
-  if ($LASTEXITCODE -ne 0) { throw "uv installation failed." }
+  & $winget install --id astral-sh.uv -e --accept-source-agreements --accept-package-agreements | Out-Host
   $uv = Resolve-Exe "uv.exe" $uvFallbacks
+  if (-not $uv -and (Test-Path -LiteralPath $wingetPackages)) {
+    $wingetUv = Get-ChildItem -LiteralPath $wingetPackages -Filter "uv.exe" -Recurse -ErrorAction SilentlyContinue |
+      Where-Object { $_.FullName -match "astral-sh\.uv" } |
+      Select-Object -First 1
+    if ($wingetUv) { $uv = $wingetUv.FullName }
+  }
+  if (-not $uv) { throw "uv installation did not produce a discoverable executable." }
 }
 if (-not $uv -and -not $DryRun) {
   throw "uv is required. Re-run with -InstallPrerequisites."
@@ -95,7 +110,6 @@ $WindowsMcpExe = Join-Path $VenvRoot "Scripts\windows-mcp.exe"
 $AuthFile = Join-Path $InstallRoot "auth.key"
 $ConfigPath = Join-Path $InstallRoot "config.json"
 $SupervisorPath = Join-Path $InstallRoot "supervisor.ps1"
-$TaskName = "OtakAtik Remote GROWTH Stable"
 
 if ($DryRun) {
   Write-Host "Remote GROWTH Stable runtime dry run" -ForegroundColor Cyan
@@ -107,7 +121,7 @@ if ($DryRun) {
   Write-Host ("Tailscale DNS  : " + $(if ($TailscaleDnsName) { "<provided>" } else { "<not provided>" }))
   Write-Host "Would create an isolated Python 3.14 environment and install pinned dependencies."
   Write-Host "Would generate/preserve a local bearer key without printing it."
-  Write-Host "Would create a current-user auto-start task."
+  Write-Host $(if ($SkipAutoStartTask) { "Would skip auto-start task registration." } else { "Would create a current-user auto-start task." })
   Write-Host "Would require authenticated tools/list == 64 before reporting runtime ready."
   exit 0
 }
@@ -192,12 +206,14 @@ $config | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ConfigPath -Encodi
 
 Copy-Item -LiteralPath (Join-Path $AppRoot "supervisor.ps1") -Destination $SupervisorPath -Force
 
-$identity = [Security.Principal.WindowsIdentity]::GetCurrent().Name
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument ('-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $SupervisorPath + '"')
-$trigger = New-ScheduledTaskTrigger -AtLogOn -User $identity
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
-$principal = New-ScheduledTaskPrincipal -UserId $identity -LogonType Interactive -RunLevel Limited
-Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Starts the portable OTAK-ATIK Remote GROWTH Stable runtime at logon." -Force | Out-Null
+if (-not $SkipAutoStartTask) {
+  $identity = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+  $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument ('-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $SupervisorPath + '"')
+  $trigger = New-ScheduledTaskTrigger -AtLogOn -User $identity
+  $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+  $principal = New-ScheduledTaskPrincipal -UserId $identity -LogonType Interactive -RunLevel Limited
+  Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Starts the portable OTAK-ATIK Remote GROWTH Stable runtime at logon." -Force | Out-Null
+}
 
 if (-not $NoStart) {
   $escaped = [regex]::Escape($SupervisorPath)

@@ -82,7 +82,7 @@ Created by Rafdi D. Ulhaq - exxrawrrr
 
 It performs real checks and guided actions for:
 
-- Windows, PowerShell, Node.js 20+, and Git;
+- Windows and PowerShell as core requirements, with Node.js 20+ and Git treated as optional developer/repository tools;
 - Tailscale installation, Windows service state, user login, and device DNS identity;
 - an isolated portable Remote GROWTH Stable runtime under LocalAppData;
 - a local authenticated `tools/list` inventory of exactly **64 tools**;
@@ -174,6 +174,15 @@ Account-owned login and approval steps remain explicit user actions.
 
 ### CHAT 3 validation boundary
 
-The portable source, PowerShell scripts, installer dry-run, runtime packaging, and wizard dry-run are validated in Windows CI. The original GROWTH architecture is already proven with a 64-tool gateway and Tailscale Funnel. A full fresh-machine install/download/start/reboot acceptance remains intentionally deferred to **CHAT 5**.
+CHAT 3 now has real-machine evidence beyond syntax and dry-run checks:
+
+- an isolated portable runtime was built from the public source on GROWTH using separate test ports and returned exactly **64/64 tools**;
+- the temporary acceptance runtime/processes were removed after verification;
+- the production Funnel route was checked read-only and returned **HTTP 401 without authentication**;
+- the authenticated production MCP route returned exactly **64/64 tools**;
+- the portable runtime source is scanned to reject owner-specific paths, Windows usernames, and the original Tailscale hostname;
+- Windows CI builds a fresh portable runtime on isolated ports and repeats the exact 64-tool acceptance gate.
+
+This still does **not** claim arbitrary-device reproducibility, a complete reboot/recovery cycle, or first-time-user acceptance. Those remain CHAT 5 gates.
 
 See [Composio + Tailscale User Setup UX](COMPOSIO-TAILSCALE-SETUP-UX.md) for the locked onboarding contract.

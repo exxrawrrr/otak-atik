@@ -88,8 +88,19 @@ function Start-Upstream {
   )
 
   Write-SupervisorLog "Starting Windows-MCP upstream on 127.0.0.1:$port."
-  Start-Process -FilePath ([string]$Config.windowsMcpExe) -ArgumentList $args -WindowStyle Hidden -RedirectStandardOutput $UpstreamOut -RedirectStandardError $UpstreamErr | Out-Null
-  return $true
+  $child = Start-Process -FilePath ([string]$Config.windowsMcpExe) -ArgumentList $args -WindowStyle Hidden -RedirectStandardOutput $UpstreamOut -RedirectStandardError $UpstreamErr -PassThru
+  for ($i = 0; $i -lt 90; $i++) {
+    Start-Sleep -Milliseconds 500
+    if (Test-OwnedPort -Port $port -Patterns @("windows-mcp", [regex]::Escape([string]$port))) {
+      return $true
+    }
+    if ($child.HasExited) {
+      Write-SupervisorLog "ERROR: Windows-MCP upstream exited before binding port $port."
+      return $false
+    }
+  }
+  Write-SupervisorLog "ERROR: Windows-MCP upstream did not bind port $port within the startup window."
+  return $false
 }
 
 function Start-Gateway {
@@ -136,8 +147,19 @@ function Start-Gateway {
   )
 
   Write-SupervisorLog "Starting 64-tool gateway on 127.0.0.1:$port."
-  Start-Process -FilePath ([string]$Config.pythonExe) -ArgumentList $args -WindowStyle Hidden -RedirectStandardOutput $GatewayOut -RedirectStandardError $GatewayErr | Out-Null
-  return $true
+  $child = Start-Process -FilePath ([string]$Config.pythonExe) -ArgumentList $args -WindowStyle Hidden -RedirectStandardOutput $GatewayOut -RedirectStandardError $GatewayErr -PassThru
+  for ($i = 0; $i -lt 90; $i++) {
+    Start-Sleep -Milliseconds 500
+    if (Test-OwnedPort -Port $port -Patterns @("gateway\.py", [regex]::Escape([string]$port))) {
+      return $true
+    }
+    if ($child.HasExited) {
+      Write-SupervisorLog "ERROR: 64-tool gateway exited before binding port $port."
+      return $false
+    }
+  }
+  Write-SupervisorLog "ERROR: 64-tool gateway did not bind port $port within the startup window."
+  return $false
 }
 
 if (-not (Test-Path -LiteralPath $ConfigPath)) {
@@ -157,7 +179,8 @@ try {
   exit 2
 }
 
-$mutex = New-Object Threading.Mutex($false, "Local\OtakAtikRemoteGrowthStableSupervisor")
+$mutexName = "Local\OtakAtikRemoteGrowthStableSupervisor-$([int]$config.gatewayPort)"
+$mutex = New-Object Threading.Mutex($false, $mutexName)
 if (-not $mutex.WaitOne(0, $false)) { exit 0 }
 
 Write-SupervisorLog "Supervisor started."

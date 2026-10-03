@@ -9,7 +9,6 @@ param(
 
 $ErrorActionPreference = "Stop"
 $script:BaseUrl = "https://backend.composio.dev/api/v3.1"
-$script:ApiKey = ""
 
 function Emit-Result {
   param(
@@ -64,7 +63,7 @@ function Invoke-ComposioApi {
   )
 
   $headers = @{
-    "x-api-key" = $script:ApiKey
+    "x-api-key" = $ComposioApiKey
   }
 
   $request = @{
@@ -372,7 +371,6 @@ if (-not $ComposioApiKey) {
   }) 2
 }
 
-$script:ApiKey = $ComposioApiKey
 $slugSeed = New-StableSlugSeed -Value $publicUrl
 $slug = ""
 $authConfigId = ""
@@ -399,8 +397,7 @@ try {
   $slug = [string]$upsert.slug
 } catch {
   $message = Get-ApiErrorMessage -ErrorRecord $_
-  $script:ApiKey = ""
-  $ComposioApiKey = ""
+    $ComposioApiKey = ""
 
   Emit-Result ([ordered]@{
     ok = $false
@@ -410,8 +407,7 @@ try {
 }
 
 if (-not $slug) {
-  $script:ApiKey = ""
-  $ComposioApiKey = ""
+    $ComposioApiKey = ""
 
   Emit-Result ([ordered]@{
     ok = $false
@@ -432,8 +428,7 @@ try {
   $authConfigId = [string]$authConfig.id
 } catch {
   $message = Get-ApiErrorMessage -ErrorRecord $_
-  $script:ApiKey = ""
-  $ComposioApiKey = ""
+    $ComposioApiKey = ""
 
   Emit-Result ([ordered]@{
     ok = $false
@@ -444,8 +439,7 @@ try {
 }
 
 if (-not $authConfigId) {
-  $script:ApiKey = ""
-  $ComposioApiKey = ""
+    $ComposioApiKey = ""
 
   Emit-Result ([ordered]@{
     ok = $false
@@ -472,8 +466,7 @@ if (-not $accountActive) {
     $link = New-ConnectionLink -AuthConfigId $authConfigId -UserIdValue $UserId
   } catch {
     $message = Get-ApiErrorMessage -ErrorRecord $_
-    $script:ApiKey = ""
-    $ComposioApiKey = ""
+        $ComposioApiKey = ""
 
     Emit-Result ([ordered]@{
       ok = $false
@@ -487,8 +480,7 @@ if (-not $accountActive) {
   $redirectUrl = [string]$link.redirect_url
 
   if (-not $accountId -or -not $redirectUrl) {
-    $script:ApiKey = ""
-    $ComposioApiKey = ""
+        $ComposioApiKey = ""
 
     Emit-Result ([ordered]@{
       ok = $false
@@ -501,8 +493,7 @@ if (-not $accountActive) {
   Save-Metadata -Path $metaPath -PublicUrl $publicUrl -Slug $slug -AuthConfigId $authConfigId -ConnectedAccountId $accountId -UserIdValue $UserId -SyncedCount $null
 
   if ($NonInteractive) {
-    $script:ApiKey = ""
-    $ComposioApiKey = ""
+        $ComposioApiKey = ""
 
     Emit-Result ([ordered]@{
       ok = $false
@@ -525,8 +516,7 @@ if (-not $accountActive) {
     Write-Host ""
     Write-Host "Clipboard copy failed. Re-run setup after clipboard access is available." -ForegroundColor Red
     $remoteAccessKey = ""
-    $script:ApiKey = ""
-    $ComposioApiKey = ""
+        $ComposioApiKey = ""
 
     Emit-Result ([ordered]@{
       ok = $false
@@ -563,8 +553,7 @@ if (-not $accountActive) {
 
   Save-Metadata -Path $metaPath -PublicUrl $publicUrl -Slug $slug -AuthConfigId $authConfigId -ConnectedAccountId $accountId -UserIdValue $UserId -SyncedCount $null
 
-  $script:ApiKey = ""
-  $ComposioApiKey = ""
+    $ComposioApiKey = ""
 
   Emit-Result ([ordered]@{
     ok = $false
@@ -599,8 +588,7 @@ if (-not $synced -or [int]$synced.synced_count -ne 64) {
 
   Save-Metadata -Path $metaPath -PublicUrl $publicUrl -Slug $slug -AuthConfigId $authConfigId -ConnectedAccountId $accountId -UserIdValue $UserId -SyncedCount $count
 
-  $script:ApiKey = ""
-  $ComposioApiKey = ""
+    $ComposioApiKey = ""
 
   Emit-Result ([ordered]@{
     ok = $false
@@ -613,7 +601,6 @@ if (-not $synced -or [int]$synced.synced_count -ne 64) {
 
 Save-Metadata -Path $metaPath -PublicUrl $publicUrl -Slug $slug -AuthConfigId $authConfigId -ConnectedAccountId $accountId -UserIdValue $UserId -SyncedCount 64
 
-$script:ApiKey = ""
 $ComposioApiKey = ""
 
 Emit-Result ([ordered]@{

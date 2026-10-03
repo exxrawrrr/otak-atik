@@ -193,7 +193,9 @@ The guided Windows flow now has implementation for:
 - hosted Composio connection flow with the Remote GROWTH credential copied to the clipboard;
 - Composio API sync with `synced_count == 64` required before setup is marked complete.
 
-This does **not** yet prove clean-machine reproducibility. CHAT 3 source/package/dry-run behavior is Windows-CI validated, while a real fresh-machine install, dependency download, restart/recovery cycle, and first-time-user acceptance remain CHAT 5 gates.
+CHAT 3 has real-machine evidence beyond dry-run: an isolated portable runtime was built from the public source on GROWTH using separate test ports and returned **64/64 tools**, then the temporary runtime/processes were removed. The production public route was also checked read-only and returned **HTTP 401 without authentication** plus **64/64 tools with authentication**.
+
+The Windows CI workflow now builds a fresh portable runtime on isolated ports and repeats the exact 64-tool acceptance gate. This still does **not** claim reproducibility across every arbitrary Windows device, a full reboot/recovery cycle, or first-time-user acceptance; those remain CHAT 5 gates.
 
 ## Important distinction
 
