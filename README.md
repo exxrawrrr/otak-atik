@@ -21,7 +21,7 @@ Snapshot: **3 October 2026**
 | --- | --- |
 | Remote GROWTH Stable gateway | **v0.7.0** |
 | Gateway inventory | **64 tools** |
-| Guided Composio + Tailscale onboarding | **CHAT 6 complete; premium terminal alpha.7 release lock** |
+| Guided Composio + Tailscale onboarding | **CHAT 6 complete; premium terminal alpha.7 prerelease published** |
 | Native ChatGPT facade | **12 focused tools** |
 | Private native plugin package | **v1.0.0 finalized locally** |
 | Public reusable native bootstrap | **validated from a fresh clone** |
@@ -35,21 +35,20 @@ The current release lock is intentionally honest about the remaining cold-start 
 
 ---
 
-## Current release line
+## Current public prerelease
 
-The published stable-alpha baseline remains **v0.1.0-alpha.6** while **v0.1.0-alpha.7** is in final release lock.
+**v0.1.0-alpha.7** is published as a GitHub prerelease with:
 
-Alpha.7 adds the premium Windows installer surface:
+- `OTAK-ATIK-Windows-v0.1.0-alpha.7.zip`
+- `OTAK-ATIK-Windows-v0.1.0-alpha.7.zip.sha256`
 
-- automatic Windows Terminal launch for interactive users when available;
-- maximized + focus-mode presentation;
-- OTAK-ATIK ASCII branding;
-- live progress/activity indicators;
-- action-required, success, and safety-boundary panels;
-- the same premium wrapper for START / STATUS / REPAIR;
-- headless compatibility for DryRun / NonInteractive / AsJson / GitHub Actions.
+Release bundle SHA-256:
 
-The alpha.6 tag remains immutable. Alpha.7 will receive its own immutable tag only after the final docs-locked main SHA passes Windows acceptance again.
+`ffdff59a94f37243ed957c3f83728502b1257850094079412788d8c8482822de`
+
+The immutable annotated tag `v0.1.0-alpha.7` dereferences to release commit `50e7b1bd737daa13f03d1a19a3e725b450a23f23`.
+
+Alpha.7 adds the premium Windows installer surface while preserving the CHAT 1–5 transport, authentication, 64-tool, and fail-closed recovery contracts.
 
 ---
 
@@ -58,7 +57,7 @@ The alpha.6 tag remains immutable. Alpha.7 will receive its own immutable tag on
 For the guided Windows path, normal users do not need to clone the repository.
 
 ```text
-1. Download the latest OTAK-ATIK-Windows prerelease ZIP
+1. Download `OTAK-ATIK-Windows-v0.1.0-alpha.7.zip`
 2. Extract it
 3. Double-click START.cmd
 4. Follow the premium terminal when Tailscale or Composio asks you to sign in
