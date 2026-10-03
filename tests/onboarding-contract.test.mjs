@@ -64,3 +64,24 @@ test("Windows launcher installer creates remote, browser and local-Codex paths",
   assert.match(script, /06 - SETUP CODEX LOCAL MCP - NO REMOTE QUOTA\.bat/);
   assert.match(script, /07 - WHICH MODE SHOULD I USE\.bat/);
 });
+
+
+test("Windows user release bootstraps from START and remains repo-independent", () => {
+  const start = fs.readFileSync("START.cmd", "utf8");
+  const installer = fs.readFileSync("scripts/windows/install-launchers.ps1", "utf8");
+  const builder = fs.readFileSync("scripts/build-windows-bundle.ps1", "utf8");
+
+  assert.match(start, /scripts\\install\.ps1/i);
+  assert.match(start, /\.otak-atik\\windows\\setup-wizard\.ps1/i);
+  assert.match(start, /%\*/);
+
+  assert.match(installer, /-File "\$wizardScript" %\*/);
+  assert.match(installer, /-File "\$statusScript" %\*/);
+  assert.match(installer, /-File "\$repairScript" %\*/);
+
+  assert.match(builder, /README-FIRST\.txt/);
+  assert.match(builder, /Compress-Archive/);
+  assert.match(builder, /Get-FileHash -Algorithm SHA256/);
+  assert.match(builder, /auth\.key/);
+  assert.match(builder, /setup-state\.json/);
+});

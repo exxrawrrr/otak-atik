@@ -18,6 +18,7 @@ $RuntimeSourceRoot = Join-Path $GuidedDataRoot "runtime-source\remote-growth-sta
 $BrowserConfig = Join-Path $Target "mcp-superassistant.json"
 $BrowserConfigSource = Join-Path $RepoRoot "config\browser-bridge\mcp-superassistant.json"
 $FirstRunMarker = Join-Path $Target "install.complete"
+$PackageManifest = Join-Path $RepoRoot "package.json"
 
 Write-Host ""
 Write-Host "OTAK-ATIK installer" -ForegroundColor Cyan
@@ -51,6 +52,8 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
 $desktop = [Environment]::GetFolderPath("Desktop")
 $desktopTarget = if ($desktop) { Join-Path $desktop "OTAK-ATIK" } else { "<unresolved>" }
 
+$CanLinkCli = [bool]($NodeReady -and (Test-Path -LiteralPath $PackageManifest))
+
 if ($DryRun) {
   Write-Host ""
   Write-Host "DRY RUN" -ForegroundColor Yellow
@@ -63,8 +66,10 @@ if ($DryRun) {
     Write-Host "  START.cmd  STATUS.cmd  REPAIR.cmd"
     Write-Host ("Would keep advanced utilities under: " + (Join-Path $desktopTarget "ADVANCED"))
   }
-  if ($NodeReady) {
+  if ($CanLinkCli) {
     Write-Host "Would run: npm link"
+  } elseif ($NodeReady) {
+    Write-Host "Would skip npm link because this user bundle does not include the developer package."
   } else {
     Write-Host "Would skip npm link because Node.js 20+ is optional for the guided Windows path."
   }
@@ -100,13 +105,15 @@ Write-Host ("[sync] Windows helpers -> " + $RuntimeRoot)
 Copy-Item (Join-Path $RepoRoot "runtime\remote-growth-stable\*") $RuntimeSourceRoot -Recurse -Force
 Write-Host ("[sync] Remote GROWTH runtime source -> " + $RuntimeSourceRoot)
 
-if ($NodeReady) {
+if ($CanLinkCli) {
   Push-Location $RepoRoot
   try {
     npm link
   } finally {
     Pop-Location
   }
+} elseif ($NodeReady) {
+  Write-Host "[skip] npm link (user bundle does not include the developer package)"
 } else {
   Write-Host "[skip] npm link (Node.js 20+ not available; guided Windows setup remains available)"
 }

@@ -4,6 +4,38 @@ All notable changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.6] - 2026-10-03
+
+### Guided Windows onboarding
+
+Added a user-first Windows release path for the 64-tool Remote GROWTH + Tailscale + Composio experiment:
+
+- branded terminal setup wizard;
+- user-owned Tailscale and Composio login/approval flow;
+- portable identity-neutral 64-tool runtime;
+- local HTTP 401 + exact 64-tool acceptance before public exposure;
+- Tailscale Funnel conflict detection and fail-closed publication;
+- Composio Custom MCP API sync requiring exactly 64 tools;
+- `START.cmd`, `STATUS.cmd`, and `REPAIR.cmd` as the primary user surface;
+- safe recovery that only restarts project-owned components and refuses foreign port owners.
+
+### Fresh-user distribution
+
+- added a Windows ZIP release builder with its own secret/machine-identity scan;
+- first `START.cmd` bootstraps the local installation automatically;
+- Git and Node.js are not required for the guided Windows user path;
+- installed Desktop launchers run from cached helpers/runtime source and remain usable after the downloaded ZIP is removed;
+- release bundle includes a SHA-256 sidecar and a short non-technical `README-FIRST.txt`.
+
+### Acceptance
+
+- isolated real-machine recovery returned READY with HTTP 401 + 64/64 tools;
+- foreign-port negative test remained BLOCKED without terminating the foreign process;
+- clean Windows CI builds the user ZIP, runs first START without Node/Git, deletes the extracted source, and reruns the installed START from cached files;
+- existing repository regression remains 43/43 tests with strict hygiene clean.
+
+This remains an **alpha** release. Account sign-in is intentionally user-owned, and universal multi-machine production readiness is not claimed.
+
 ### Remote GROWTH Stable v0.7 operator stack
 
 The original Rafdi Remote transport experiment has grown into a layered local operator gateway.

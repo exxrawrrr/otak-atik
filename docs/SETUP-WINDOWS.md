@@ -18,28 +18,46 @@ Composio
 acceptance checks
 ```
 
-The current CHAT 4 build implements the branded terminal wizard, guided Tailscale + Remote GROWTH + Composio wiring, and the user-facing STATUS + REPAIR recovery path. Final fresh-user/release readiness remains a CHAT 5 gate.
+The CHAT 5 candidate adds a user-first Windows release ZIP on top of the branded terminal wizard, guided Tailscale + Remote GROWTH + Composio wiring, and the user-facing STATUS + REPAIR recovery path. Clean-runner and post-merge release gates determine whether the candidate may be tagged.
 
 ## 1. Requirements
 
 - Windows 10 or 11
 - PowerShell
-- Node.js 20+ optional for repository/developer CLI commands
-- Git recommended for cloning/updating the repository
-- Tailscale is part of the guided remote path
+- Tailscale and Composio accounts are used by the guided remote path
+- Node.js 20+ is optional and only needed for repository/developer CLI commands
+- Git is optional and only needed for cloning/updating the developer repository
 
-## 2. Clone
+## 2. Recommended user install — release ZIP
+
+For a normal Windows user, Git is not the starting point.
+
+1. Download the `OTAK-ATIK-Windows-v0.1.0-alpha.6.zip` release asset.
+2. Extract the ZIP to a normal folder.
+3. Double-click `START.cmd`.
+4. Follow the terminal and sign in only when Tailscale or Composio asks you.
+
+The first START automatically:
+
+- installs the durable helper copy under the current Windows profile;
+- caches the portable 64-tool runtime source outside the downloaded folder;
+- creates the Desktop `OTAK-ATIK` folder with `START.cmd`, `STATUS.cmd`, and `REPAIR.cmd`;
+- then launches the guided setup from the installed copy.
+
+After that bootstrap, normal operation does not depend on keeping the downloaded ZIP folder.
+
+The release ZIP includes `README-FIRST.txt` and a SHA-256 sidecar.
+
+### Developer / repository install
+
+Developers can still clone the repository:
 
 ```powershell
 git clone https://github.com/exxrawrrr/otak-atik.git
 cd otak-atik
 ```
 
-A user can preview the setup experience immediately with:
-
-```text
-START.cmd
-```
+Running the repository-root `START.cmd` uses the same bootstrap path.
 
 ## 3. Installer dry run
 
