@@ -73,6 +73,12 @@ Branding:
 
 `Created by Rafdi D. Ulhaq - exxrawrrr`
 
+### Installer preview
+
+<img src="docs/assets/terminal/premium-installer-alpha7.png" width="100%" alt="OTAK-ATIK premium Windows Terminal installer preview" />
+
+> Neutral preview generated from the alpha.7 TUI layout. The actual font, terminal theme, transparency, and background follow the user's Windows Terminal settings.
+
 See [Windows guided setup](docs/SETUP-WINDOWS.md) for the complete flow.
 
 ---
