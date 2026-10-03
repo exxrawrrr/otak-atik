@@ -4,6 +4,9 @@ on:
   push:
     branches: ["main"]
     paths:
+      - "START.cmd"
+      - "STATUS.cmd"
+      - "REPAIR.cmd"
       - "scripts/install.ps1"
       - "scripts/windows/**"
       - "runtime/remote-growth-stable/**"
@@ -11,6 +14,9 @@ on:
       - ".github/workflows/windows-onboarding.yml"
   pull_request:
     paths:
+      - "START.cmd"
+      - "STATUS.cmd"
+      - "REPAIR.cmd"
       - "scripts/install.ps1"
       - "scripts/windows/**"
       - "runtime/remote-growth-stable/**"
@@ -103,9 +109,99 @@ jobs:
             -InstallRoot $runtime `
             -GatewayPort 19765 `
             -UpstreamPort 19766 `
+            -TaskName "OtakAtik CHAT4 CI" `
             -SkipAutoStartTask `
             -Force
           .\scripts\windows\remote-growth-stable\test-runtime.ps1 -InstallRoot $runtime -AsJson
+
+      - name: Status detects missing recovery task
+        shell: powershell
+        run: |
+          $runtime = Join-Path $env:RUNNER_TEMP "otak-atik-remote-growth"
+          $json = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-status.ps1 -InstallRoot $runtime -LocalOnly -NonInteractive -AsJson -NoClear
+          $code = $LASTEXITCODE
+          if ($code -ne 3) {
+            throw "Expected STATUS exit 3 (REPAIR_NEEDED), got $code."
+          }
+          $status = $json | ConvertFrom-Json
+          if ($status.overall -ne "REPAIR_NEEDED") {
+            throw "Expected REPAIR_NEEDED, got $($status.overall)."
+          }
+
+      - name: Simulate stopped portable runtime
+        shell: powershell
+        run: |
+          $runtime = Join-Path $env:RUNNER_TEMP "otak-atik-remote-growth"
+          Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+            Where-Object {
+              $_.ProcessId -ne $PID -and
+              [string]$_.CommandLine -like "*$runtime*"
+            } |
+            ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+          Start-Sleep -Seconds 2
+
+      - name: Repair portable runtime acceptance
+        shell: powershell
+        run: |
+          $runtime = Join-Path $env:RUNNER_TEMP "otak-atik-remote-growth"
+          $json = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-repair.ps1 -InstallRoot $runtime -LocalOnly -NonInteractive -AsJson -NoClear
+          if ($LASTEXITCODE -ne 0) {
+            throw "REPAIR did not recover the portable runtime."
+          }
+          $result = $json | ConvertFrom-Json
+          if (-not $result.ok -or $result.overall -ne "READY") {
+            throw "REPAIR did not return READY."
+          }
+          if (-not $result.health.local.auth_guard_ok -or [int]$result.health.local.count -ne 64) {
+            throw "REPAIR did not restore 401 guard + 64 tools."
+          }
+
+      - name: Status ready after repair
+        shell: powershell
+        run: |
+          $runtime = Join-Path $env:RUNNER_TEMP "otak-atik-remote-growth"
+          $json = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-status.ps1 -InstallRoot $runtime -LocalOnly -NonInteractive -AsJson -NoClear
+          if ($LASTEXITCODE -ne 0) {
+            throw "STATUS did not return READY after repair."
+          }
+          $status = $json | ConvertFrom-Json
+          if (-not $status.ok -or $status.overall -ne "READY") {
+            throw "STATUS did not verify READY after repair."
+          }
+
+      - name: Foreign port fail-closed acceptance
+        shell: powershell
+        run: |
+          $conflict = Join-Path $env:RUNNER_TEMP "otak-atik-conflict"
+          New-Item -ItemType Directory -Force -Path $conflict | Out-Null
+          '{"gatewayPort":19965,"upstreamPort":19966,"taskName":"OtakAtik CHAT4 Conflict"}' |
+            Set-Content -LiteralPath (Join-Path $conflict "config.json") -Encoding UTF8
+          'ci-placeholder' |
+            Set-Content -LiteralPath (Join-Path $conflict "auth.key") -Encoding ASCII
+
+          $foreign = Start-Process python -ArgumentList @("-m","http.server","19965","--bind","127.0.0.1") -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 2
+
+            $statusJson = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-status.ps1 -InstallRoot $conflict -LocalOnly -NonInteractive -AsJson -NoClear
+            $statusCode = $LASTEXITCODE
+            $repairJson = & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\remote-growth-repair.ps1 -InstallRoot $conflict -LocalOnly -NonInteractive -AsJson -NoClear
+            $repairCode = $LASTEXITCODE
+            $alive = [bool](Get-Process -Id $foreign.Id -ErrorAction SilentlyContinue)
+
+            if ($statusCode -ne 5) { throw "STATUS did not block a foreign port owner." }
+            if ($repairCode -ne 5) { throw "REPAIR did not fail closed on a foreign port owner." }
+            if (-not $alive) { throw "REPAIR terminated a foreign process." }
+
+            $status = $statusJson | ConvertFrom-Json
+            $repair = $repairJson | ConvertFrom-Json
+            if ($status.overall -ne "BLOCKED" -or $repair.overall -ne "BLOCKED") {
+              throw "Foreign-port classification was not BLOCKED."
+            }
+          } finally {
+            Stop-Process -Id $foreign.Id -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $conflict -Recurse -Force -ErrorAction SilentlyContinue
+          }
 
       - name: Cleanup portable runtime acceptance
         if: always()
@@ -120,6 +216,8 @@ jobs:
           Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
             Where-Object { $_.ProcessId -ne $PID -and [string]$_.CommandLine -like '*otak-atik-remote-growth*' } |
             ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+          Get-ScheduledTask -TaskName "OtakAtik CHAT4 CI" -ErrorAction SilentlyContinue |
+            Unregister-ScheduledTask -Confirm:$false -ErrorAction SilentlyContinue
 
       - name: Installer dry run
         shell: powershell
@@ -142,6 +240,8 @@ jobs:
 
           $expected = @(
             "START.cmd",
+            "STATUS.cmd",
+            "REPAIR.cmd",
             "README.txt",
             "ADVANCED\START REMOTE DESKTOP.bat",
             "ADVANCED\LEGACY STATUS.bat"
