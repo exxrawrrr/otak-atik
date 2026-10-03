@@ -75,6 +75,8 @@ test("Windows user release bootstraps from START and remains repo-independent", 
   assert.match(start, /premium-launcher\.ps1/i);
   assert.match(start, /-Mode Start/i);
   assert.match(start, /-BootstrapRoot/i);
+  assert.match(start, /%~dp0\./i);
+  assert.doesNotMatch(start, /-BootstrapRoot\s+"%~dp0"/i);
   assert.match(start, /%\*/);
 
   assert.match(premium, /scripts\\install\.ps1/i);
