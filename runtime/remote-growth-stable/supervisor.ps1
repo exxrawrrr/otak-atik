@@ -112,13 +112,19 @@ function Start-Gateway {
   $env:REMOTE_GROWTH_AUTH_FILE = $AuthFile
   $env:REMOTE_GROWTH_PYTHON = [string]$Config.pythonExe
   $env:REMOTE_GROWTH_TAILSCALE_EXE = [string]$Config.tailscaleExe
-  $env:REMOTE_GROWTH_ALLOWED_HOSTS = ((@([string]$Config.tailscaleDnsName, "localhost", "127.0.0.1") | Where-Object { $_ }) -join ",")
+  $dnsName = [string]$Config.tailscaleDnsName
+  $allowedHosts = @("localhost","localhost:*","127.0.0.1","127.0.0.1:*")
+  if ($dnsName) {
+    $allowedHosts = @($dnsName, ($dnsName + ":*")) + $allowedHosts
+  }
+  $env:REMOTE_GROWTH_ALLOWED_HOSTS = ($allowedHosts -join ",")
   $env:REMOTE_GROWTH_ALLOWED_ROOTS_JSON = ($Config.allowedRoots | ConvertTo-Json -Compress)
   $env:REMOTE_GROWTH_PROTECTED_ROOTS_JSON = (@(
     $env:WINDIR,
     $env:ProgramFiles,
+    [Environment]::GetFolderPath("ProgramFilesX86"),
     $env:ProgramData,
-    $InstallRoot
+    (Split-Path -Parent $InstallRoot)
   ) | Where-Object { $_ } | ConvertTo-Json -Compress)
 
   $args = @(
