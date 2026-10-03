@@ -70,20 +70,30 @@ jobs:
           if (-not (Test-Path $folder)) {
             throw "OTAK-ATIK Desktop launcher folder was not created."
           }
+
           $expected = @(
-            "01 - START REMOTE DESKTOP.bat",
-            "02 - STATUS.bat",
-            "03 - OPEN SETUP PAGES.bat",
-            "04 - START BROWSER BRIDGE - OPTIONAL.bat",
-            "05 - STOP REMOTE DESKTOP.bat",
-            "README.txt"
+            "START.cmd",
+            "README.txt",
+            "ADVANCED\START REMOTE DESKTOP.bat",
+            "ADVANCED\LEGACY STATUS.bat"
           )
+
           foreach ($name in $expected) {
             $path = Join-Path $folder $name
             if (-not (Test-Path $path)) {
               throw "Missing generated launcher: $path"
             }
           }
+
+          $old = Join-Path $folder "01 - START REMOTE DESKTOP.bat"
+          if (Test-Path $old) {
+            throw "Legacy launcher leaked back into the primary user surface: $old"
+          }
+
+      - name: Wizard non-interactive dry run
+        shell: powershell
+        run: |
+          .\scripts\windows\setup-wizard.ps1 -DryRun -NonInteractive -NoClear -SourceRoot $PWD
 
       - name: CLI doctor
         shell: powershell
