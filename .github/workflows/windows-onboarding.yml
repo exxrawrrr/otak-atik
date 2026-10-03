@@ -52,6 +52,19 @@ jobs:
             throw "PowerShell parse errors detected."
           }
 
+      - name: Compile portable Remote GROWTH Python
+        shell: powershell
+        run: |
+          Get-ChildItem .\runtime\remote-growth-stable -Filter *.py -Recurse | ForEach-Object {
+            python -m py_compile $_.FullName
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Runtime installer dry run
+        shell: powershell
+        run: |
+          .\scripts\windows\remote-growth-stable\install-runtime.ps1 -SourceRuntimeRoot .\runtime\remote-growth-stable -TailscaleDnsName example-device.example.ts.net -DryRun
+
       - name: Installer dry run
         shell: powershell
         run: |
@@ -88,6 +101,17 @@ jobs:
           $old = Join-Path $folder "01 - START REMOTE DESKTOP.bat"
           if (Test-Path $old) {
             throw "Legacy launcher leaked back into the primary user surface: $old"
+          }
+
+          $guidedRoot = Join-Path $env:LOCALAPPDATA "otak-atik"
+          $runtimeSource = Join-Path $guidedRoot "runtime-source\remote-growth-stable\MCP_GATEWAY\gateway.py"
+          if (-not (Test-Path $runtimeSource)) {
+            throw "Portable runtime source was not cached for repo-independent setup: $runtimeSource"
+          }
+
+          $nestedHelper = Join-Path $HOME ".otak-atik\windows\remote-growth-stable\install-runtime.ps1"
+          if (-not (Test-Path $nestedHelper)) {
+            throw "Nested Remote GROWTH installer helper was not copied: $nestedHelper"
           }
 
       - name: Wizard non-interactive dry run
