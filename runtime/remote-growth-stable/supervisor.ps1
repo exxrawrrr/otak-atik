@@ -127,8 +127,9 @@ function Start-Gateway {
     (Split-Path -Parent $InstallRoot)
   ) | Where-Object { $_ } | ConvertTo-Json -Compress)
 
+  $gatewayArg = '"' + $gateway.Replace('"','') + '"'
   $args = @(
-    $gateway,
+    $gatewayArg,
     "--host","127.0.0.1",
     "--port",[string]$port,
     "--upstream-port",[string]$Config.upstreamPort
