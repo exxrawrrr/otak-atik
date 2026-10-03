@@ -1,6 +1,6 @@
 {
   "name": "otak-atik",
-  "version": "0.1.0-alpha.6",
+  "version": "0.1.0-alpha.7",
   "description": "Local-first AI operator lab with standalone project utilities, MCP routing, skills, policy, evidence, and verification.",
   "type": "module",
   "license": "Apache-2.0",

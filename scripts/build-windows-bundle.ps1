@@ -50,6 +50,12 @@ FIRST TIME
 2. Double-click START.cmd.
 3. Follow the terminal. Sign in only when Tailscale or Composio asks you.
 
+TERMINAL EXPERIENCE
+- If Windows Terminal is available, START / STATUS / REPAIR open there automatically.
+- The installer uses a maximized focus view, progress bars, live activity, and clear action panels.
+- If Windows Terminal is unavailable, OTAK-ATIK safely falls back to PowerShell.
+- Automation and JSON modes stay headless.
+
 AFTER SETUP
 START.cmd  = continue setup / reconnect an account
 STATUS.cmd = check whether everything is healthy

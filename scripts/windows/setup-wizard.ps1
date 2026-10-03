@@ -26,8 +26,14 @@ $script:StatePath = Join-Path $script:DataRoot "setup-state.json"
 $script:LogRoot = Join-Path $script:DataRoot "logs"
 $script:LogPath = Join-Path $script:LogRoot ("setup-" + (Get-Date -Format "yyyyMMdd") + ".log")
 $script:RemoteInstallRoot = Join-Path $script:DataRoot "remote-growth-stable"
+$script:TuiScript = Join-Path $PSScriptRoot "premium-tui.ps1"
+if (Test-Path -LiteralPath $script:TuiScript) { . $script:TuiScript }
 
 function Initialize-Console {
+  if (Get-Command Initialize-OtakTui -ErrorAction SilentlyContinue) {
+    Initialize-OtakTui -Title "OTAK-ATIK - Remote AI Setup Wizard" -NoClear:$NoClear
+    return
+  }
   try { [Console]::Title = "OTAK-ATIK - Remote AI Setup Wizard" } catch {}
   try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {}
   if (-not $NoClear) { Clear-Host }
@@ -46,22 +52,29 @@ function Write-LogLine {
 }
 
 function Write-BrandHeader {
+  if (Get-Command Write-OtakLogo -ErrorAction SilentlyContinue) {
+    Write-OtakLogo -Subtitle "REMOTE AI x COMPOSIO SETUP" -Mode "GUIDED INSTALLER"
+    Write-OtakNotice -Title "KEEP THIS WINDOW OPEN" -Lines @(
+      "OTAK-ATIK is preparing your secure Remote GROWTH workspace.",
+      "You only need to act when the terminal asks you to sign in.",
+      "Closing the window stops safely; running START again resumes."
+    ) -Kind "INFO"
+    return
+  }
   Write-Host ""
-  Write-Host "+======================================================+" -ForegroundColor DarkCyan
-  Write-Host "|                      OTAK-ATIK                       |" -ForegroundColor Cyan
-  Write-Host "|                Remote AI Setup Wizard                |" -ForegroundColor Cyan
-  Write-Host "|                                                      |" -ForegroundColor DarkCyan
-  Write-Host "|       Created by Rafdi D. Ulhaq - exxrawrrr          |" -ForegroundColor White
-  Write-Host "+======================================================+" -ForegroundColor DarkCyan
-  Write-Host ""
+  Write-Host "OTAK-ATIK - Remote AI Setup Wizard" -ForegroundColor Cyan
+  Write-Host $script:Brand -ForegroundColor Gray
 }
 
 function Write-Step {
   param([int]$Number,[int]$Total,[string]$Title)
+  if (Get-Command Write-OtakStep -ErrorAction SilentlyContinue) {
+    Write-OtakStep -Number $Number -Total $Total -Title $Title
+    return
+  }
   Write-Host ""
   Write-Host (" STEP {0} OF {1} " -f $Number, $Total) -NoNewline -ForegroundColor Black -BackgroundColor Cyan
   Write-Host ("  " + $Title) -ForegroundColor Cyan
-  Write-Host (" " + ("-" * 54)) -ForegroundColor DarkGray
 }
 
 function Write-Status {
@@ -69,19 +82,27 @@ function Write-Status {
     [ValidateSet("OK","WAIT","FIX","INFO","FAIL")][string]$Kind,
     [string]$Message
   )
-  $color = switch ($Kind) {
-    "OK"   { "Green" }
-    "WAIT" { "Yellow" }
-    "FIX"  { "Yellow" }
-    "INFO" { "Gray" }
-    "FAIL" { "Red" }
+  if (Get-Command Write-OtakStatus -ErrorAction SilentlyContinue) {
+    Write-OtakStatus -Kind $Kind -Message $Message
+  } else {
+    $color = switch ($Kind) {
+      "OK"   { "Green" }
+      "WAIT" { "Yellow" }
+      "FIX"  { "Yellow" }
+      "INFO" { "Gray" }
+      "FAIL" { "Red" }
+    }
+    Write-Host (" [{0}]" -f $Kind.PadRight(4)) -NoNewline -ForegroundColor $color
+    Write-Host (" " + $Message)
   }
-  Write-Host (" [{0}]" -f $Kind.PadRight(4)) -NoNewline -ForegroundColor $color
-  Write-Host (" " + $Message)
   Write-LogLine ("[{0}] {1}" -f $Kind, $Message)
 }
 
 function Write-Footer {
+  if (Get-Command Write-OtakFooter -ErrorAction SilentlyContinue) {
+    Write-OtakFooter -Brand $script:Brand
+    return
+  }
   Write-Host ""
   Write-Host (" " + $script:Brand) -ForegroundColor DarkGray
   Write-Host ""
@@ -90,6 +111,9 @@ function Write-Footer {
 function Read-Continue {
   param([string]$Prompt = "Press ENTER to continue or Q to exit")
   if ($NonInteractive) { return $true }
+  if (Get-Command Read-OtakAction -ErrorAction SilentlyContinue) {
+    return (Read-OtakAction -Prompt $Prompt)
+  }
   Write-Host ""
   $answer = Read-Host $Prompt
   return ($answer -notmatch "^[Qq]$")
@@ -259,9 +283,17 @@ function Ensure-TailscaleConnected {
     }
 
     for ($i = 0; $i -lt 20; $i++) {
+      if (Get-Command Write-OtakActivity -ErrorAction SilentlyContinue) {
+        Write-OtakActivity -Message "Waiting for Tailscale account connection..." -Frame $i
+      }
       Start-Sleep -Seconds 2
       $ts = Get-TailscaleState
-      if ($ts.connected -and $ts.dns_name) { break }
+      if ($ts.connected -and $ts.dns_name) {
+        if (Get-Command Complete-OtakActivity -ErrorAction SilentlyContinue) {
+          Complete-OtakActivity -Message "Tailscale account connection detected"
+        }
+        break
+      }
     }
   }
 
@@ -386,9 +418,15 @@ function Enable-GuidedFunnel {
   }
 
   for ($i = 0; $i -lt 12; $i++) {
+    if (Get-Command Write-OtakActivity -ErrorAction SilentlyContinue) {
+      Write-OtakActivity -Message "Waiting for the secure Funnel route..." -Frame $i
+    }
     Start-Sleep -Seconds 2
     $status = Get-FunnelStatus -TailscaleExe $TailscaleExe
     if (Test-ExpectedFunnel -Status $status -DnsName $DnsName -HttpsPort $HttpsPort -TargetPort $TargetPort) {
+      if (Get-Command Complete-OtakActivity -ErrorAction SilentlyContinue) {
+        Complete-OtakActivity -Message "Secure public route is active"
+      }
       Write-Status "OK" "Secure public route points to the verified gateway"
       return $true
     }
@@ -578,6 +616,7 @@ try {
   exit 2
 }
 
+Write-Status "WAIT" "Verifying local authentication and the complete 64-tool inventory..."
 $localAcceptance = Invoke-RuntimeAcceptance
 if (-not $localAcceptance -or -not $localAcceptance.ok -or [int]$localAcceptance.local.count -ne 64) {
   Write-Status "FAIL" "Local gateway exists, but the expected 64-tool inventory was not verified."
@@ -603,8 +642,16 @@ if (-not (Enable-GuidedFunnel -TailscaleExe ([string]$ts.executable) -DnsName ([
 Write-Status "WAIT" "Checking the public route and authentication boundary..."
 $publicAcceptance = $null
 for ($i = 0; $i -lt 15; $i++) {
+  if (Get-Command Write-OtakActivity -ErrorAction SilentlyContinue) {
+    Write-OtakActivity -Message "Verifying public HTTP 401 + authenticated 64/64..." -Frame $i
+  }
   $publicAcceptance = Invoke-RuntimeAcceptance -Public
-  if ($publicAcceptance -and $publicAcceptance.ok) { break }
+  if ($publicAcceptance -and $publicAcceptance.ok) {
+    if (Get-Command Complete-OtakActivity -ErrorAction SilentlyContinue) {
+      Complete-OtakActivity -Message "Public security contract verified"
+    }
+    break
+  }
   Start-Sleep -Seconds 3
 }
 
@@ -757,13 +804,22 @@ $state.state = "ACCEPTANCE_PASSED"
 $state.next_action = "READY"
 Save-SetupState $state
 
-Write-Host ""
-Write-Host "+======================================================+" -ForegroundColor Green
-Write-Host "|                   SETUP COMPLETE                     |" -ForegroundColor Green
-Write-Host "|                                                      |" -ForegroundColor Green
-Write-Host "|       Remote GROWTH + Composio is ready.             |" -ForegroundColor White
-Write-Host "|                 64 tools verified.                   |" -ForegroundColor White
-Write-Host "+======================================================+" -ForegroundColor Green
+if (Get-Command Write-OtakComplete -ErrorAction SilentlyContinue) {
+  Write-OtakComplete -Title "SETUP COMPLETE" -Lines @(
+    "Remote GROWTH + Composio is ready.",
+    "Tailscale secure route verified.",
+    "Authentication guard verified.",
+    "64 / 64 tools verified.",
+    "",
+    "START  - resume or reconnect",
+    "STATUS - health check",
+    "REPAIR - safe self-healing"
+  )
+} else {
+  Write-Host ""
+  Write-Host "SETUP COMPLETE - Remote GROWTH + Composio is ready." -ForegroundColor Green
+  Write-Host "64 tools verified." -ForegroundColor White
+}
 Write-Footer
 
 if (-not $NonInteractive) { [void](Read-Host "Press ENTER to close") }
