@@ -1,6 +1,6 @@
 # Composio + Tailscale User Setup UX
 
-Status: **CHAT 1 — UX CONTRACT LOCKED**  
+Status: **CHAT 3 — UX CONTRACT IMPLEMENTED; STATUS/REPAIR + FRESH-MACHINE RELEASE GATES PENDING**  
 Owner branding: **Created by Rafdi D. Ulhaq — exxrawrrr**  
 Target platform: **Windows 10/11**  
 Primary route:
@@ -624,13 +624,13 @@ CHAT 1 is complete when all of the following are true:
 
 CHAT 1 does **not** claim that the new wizard already exists.
 
-Implementation belongs to later chats:
+Implementation status:
 
 ```text
-CHAT 2 — Beautiful Terminal Wizard
-CHAT 3 — Tailscale + Composio Guided Wiring
-CHAT 4 — STATUS + REPAIR
-CHAT 5 — Fresh-User Acceptance + Release
+CHAT 2 — Beautiful Terminal Wizard                    DONE
+CHAT 3 — Tailscale + Composio Guided Wiring           DONE
+CHAT 4 — STATUS + REPAIR                              PENDING
+CHAT 5 — Fresh-User Acceptance + Release              PENDING
 ```
 
-CHAT 2 must implement this contract rather than inventing a different setup flow ad hoc.
+CHAT 3 implements the guided path but does not replace the final clean-machine acceptance gate in CHAT 5.
