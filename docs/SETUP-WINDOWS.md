@@ -89,9 +89,12 @@ It performs real checks and guided actions for:
 - Tailscale Funnel mapping to the verified gateway only;
 - public unauthenticated rejection with HTTP **401**;
 - authenticated public `tools/list` inventory of exactly **64 tools**;
-- opening Composio directly at its **Add Custom MCP** surface;
-- copy-to-clipboard actions for the public MCP URL and local bearer code;
-- a final user-observed Composio count of exactly **64** before setup is marked complete.
+- asking for the user's **Composio Project API Key** only when first-time Custom MCP registration is required;
+- keeping that project key in memory only, never persisting it;
+- registering the Custom MCP through Composio's current v3.1 API;
+- creating/reusing the required API-key auth config;
+- opening Composio's hosted connection page with the Remote GROWTH access code copied to the clipboard;
+- syncing the Custom MCP through Composio and requiring API-reported `synced_count = 64` before setup is marked complete.
 
 It uses human-readable statuses:
 
@@ -161,7 +164,7 @@ They are intentionally removed from the main launcher surface so a new user does
 The installer and wizard do not silently:
 
 - sign into Tailscale;
-- sign into Composio;
+- sign into Composio and provide their own Project API Key during first-time Custom MCP registration;
 - sign into ChatGPT;
 - approve OAuth;
 - weaken authentication;
