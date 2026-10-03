@@ -205,7 +205,8 @@ if (-not $NoStart) {
     $_.Name -eq "powershell.exe" -and [string]$_.CommandLine -match $escaped
   })
   if ($existing.Count -eq 0) {
-    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File",$SupervisorPath)
+    $quotedSupervisor = '"' + $SupervisorPath.Replace('"','') + '"'
+    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File",$quotedSupervisor)
   }
 
   $verified = $false
