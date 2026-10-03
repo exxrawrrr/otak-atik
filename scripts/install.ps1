@@ -18,7 +18,8 @@ $BrowserConfigSource = Join-Path $RepoRoot "config\browser-bridge\mcp-superassis
 $FirstRunMarker = Join-Path $Target "install.complete"
 
 Write-Host ""
-Write-Host "otak-atik installer" -ForegroundColor Cyan
+Write-Host "OTAK-ATIK installer" -ForegroundColor Cyan
+Write-Host "Created by Rafdi D. Ulhaq - exxrawrrr" -ForegroundColor DarkGray
 Write-Host "-------------------"
 
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
@@ -48,16 +49,16 @@ if ($DryRun) {
   Write-Host ("Would copy Windows helpers to: " + $RuntimeRoot)
   Write-Host ("Would prepare browser bridge config: " + $BrowserConfig)
   if (-not $NoDesktopLaunchers) {
-    Write-Host ("Would create Desktop launchers: " + $desktopTarget)
+    Write-Host ("Would create primary launcher: " + (Join-Path $desktopTarget "START.cmd"))
+    Write-Host ("Would keep advanced utilities under: " + (Join-Path $desktopTarget "ADVANCED"))
   }
   Write-Host "Would run: npm link"
   Write-Host "Would preserve existing user config unless -Force is supplied."
+  Write-Host "Would NOT open setup pages unless -OpenSetupPages is explicitly supplied."
   Write-Host ""
   Write-Host "No modifications performed."
   exit 0
 }
-
-$firstInstall = -not (Test-Path $FirstRunMarker)
 
 New-Item -ItemType Directory -Force -Path $Target | Out-Null
 New-Item -ItemType Directory -Force -Path $RuntimeRoot | Out-Null
@@ -87,12 +88,12 @@ try {
 }
 
 if (-not $NoDesktopLaunchers) {
-  & (Join-Path $RuntimeRoot "install-launchers.ps1") -RuntimeRoot $RuntimeRoot
+  & (Join-Path $RuntimeRoot "install-launchers.ps1") -RuntimeRoot $RuntimeRoot -SourceRoot $RepoRoot
 }
 
 Set-Content -Path $FirstRunMarker -Value (Get-Date).ToString("o") -Encoding ASCII
 
-$shouldOpen = $OpenSetupPages -or ($firstInstall -and -not $NoOpenSetupPages)
+$shouldOpen = $OpenSetupPages -and -not $NoOpenSetupPages
 if ($shouldOpen) {
   & (Join-Path $RuntimeRoot "open-setup-pages.ps1")
 }
@@ -100,7 +101,6 @@ if ($shouldOpen) {
 Write-Host ""
 Write-Host "Installed." -ForegroundColor Green
 Write-Host "Recommended next step:"
-Write-Host ("  " + (Join-Path $desktopTarget "01 - START REMOTE DESKTOP.bat"))
+Write-Host ("  " + (Join-Path $desktopTarget "START.cmd")) -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Remote MCP endpoint:"
-Write-Host "  https://mcp.desktopcommander.app/mcp"
+Write-Host "The guided wizard will tell the user when an external login page is actually needed."

@@ -130,7 +130,7 @@ UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP
 
 ### Remaining implementation
 
-- [ ] CHAT 2 — Beautiful Terminal Wizard
+- [x] CHAT 2 — Beautiful Terminal Wizard
 - [ ] CHAT 3 — Tailscale + Composio Guided Wiring
 - [ ] CHAT 4 — STATUS + REPAIR
 - [ ] CHAT 5 — Fresh-User Acceptance + Release
