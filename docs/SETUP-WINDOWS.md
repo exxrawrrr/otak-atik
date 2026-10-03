@@ -18,7 +18,7 @@ Composio
 acceptance checks
 ```
 
-The CHAT 5 candidate adds a user-first Windows release ZIP on top of the branded terminal wizard, guided Tailscale + Remote GROWTH + Composio wiring, and the user-facing STATUS + REPAIR recovery path. Clean-runner and post-merge release gates determine whether the candidate may be tagged.
+CHAT 5 adds a user-first Windows release ZIP on top of the branded terminal wizard, guided Tailscale + Remote GROWTH + Composio wiring, and the user-facing STATUS + REPAIR recovery path. Clean-runner and post-merge acceptance have passed for the alpha.6 release lock.
 
 ## 1. Requirements
 
@@ -205,6 +205,22 @@ If public authentication protection fails, repair fails closed and disables the 
 
 CHAT 4 real-machine acceptance deliberately broke an isolated test runtime by removing its recovery task and stopping its processes. `STATUS` correctly reported `REPAIR_NEEDED`, then `REPAIR` rebuilt the recovery task, restarted the runtime, and returned to **HTTP 401 + 64/64 tools + READY**.
 
+## CHAT 5 release acceptance
+
+Verified on the release path:
+
+- Windows ZIP builds with a bundle-specific identity/secret scan;
+- SHA-256 sidecar is generated;
+- first START succeeds on a clean Windows runner with Node.js/Git removed from the user PATH;
+- Desktop START / STATUS / REPAIR are generated;
+- the extracted download folder can be deleted and installed START still runs from the cached user-profile copy;
+- fresh portable runtime acceptance verifies HTTP 401 + 64/64 tools;
+- STATUS/REPAIR recovery returns READY + HTTP 401 + 64/64;
+- a foreign process occupying the configured port remains untouched and the system fails closed;
+- final PR and post-merge `main` Windows workflows pass.
+
+The first-time account boundary remains explicit: users sign in to their own Tailscale and Composio accounts, and no account credential ships with the bundle.
+
 ## Advanced utilities
 
 Older provider-specific helpers remain available under:
@@ -258,6 +274,6 @@ CHAT 3 now has real-machine evidence beyond syntax and dry-run checks:
 - the portable runtime source is scanned to reject owner-specific paths, Windows usernames, and the original Tailscale hostname;
 - Windows CI builds a fresh portable runtime on isolated ports and repeats the exact 64-tool acceptance gate.
 
-This still does **not** claim arbitrary-device reproducibility, a complete reboot/recovery cycle, or first-time-user acceptance. Those remain CHAT 5 gates.
+CHAT 5 now verifies the packaged first-run contract on clean Windows CI, including START without Node.js/Git, source removal, installed launcher survival, and the first-run STATUS contract. This still does **not** claim universal arbitrary-device production readiness, unattended Tailscale/Composio enrollment, or a brand-new human/device completing an unattended real reboot.
 
 See [Composio + Tailscale User Setup UX](COMPOSIO-TAILSCALE-SETUP-UX.md) for the locked onboarding contract.
