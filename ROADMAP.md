@@ -112,6 +112,29 @@ Updated: **2026-10-01**
 - [ ] optional zero-touch cold tunnel restart / reboot enrollment
 - [x] final release/checkpoint lock with manual cold-start limitation documented
 
+## Guided Composio onboarding — user-ready track
+
+### CHAT 1 — UX + setup flow
+
+- [x] define the non-technical user journey
+- [x] keep Tailscale in the architecture while hiding unnecessary transport jargon
+- [x] separate user-owned login/approval actions from installer-owned automation
+- [x] define Remote GROWTH identity/auth verification before Composio connection
+- [x] define Composio guided connection and copy/open behavior
+- [x] define 64-tool acceptance target
+- [x] define START / STATUS / REPAIR launcher responsibilities
+- [x] define resumable onboarding state and human-readable error states
+- [x] lock branding: `Created by Rafdi D. Ulhaq — exxrawrrr`
+
+UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP-UX.md)
+
+### Remaining implementation
+
+- [ ] CHAT 2 — Beautiful Terminal Wizard
+- [ ] CHAT 3 — Tailscale + Composio Guided Wiring
+- [ ] CHAT 4 — STATUS + REPAIR
+- [ ] CHAT 5 — Fresh-User Acceptance + Release
+
 ## Portability / public reproduction
 
 After the private Phase 10 acceptance is complete:
