@@ -18,7 +18,7 @@ Composio
 acceptance checks
 ```
 
-The current CHAT 2 build implements the branded terminal wizard, real preflight checks, and resumable local setup state. The secure-route and Composio wiring is intentionally not reported as complete until the later implementation phases make those checks real.
+The current CHAT 3 build implements the branded terminal wizard **and** the guided Tailscale + Remote GROWTH + Composio wiring. The flow still does not claim clean-machine release readiness until CHAT 5 reproduces it on a fresh Windows environment.
 
 ## 1. Requirements
 
@@ -80,13 +80,18 @@ Remote AI Setup Wizard
 Created by Rafdi D. Ulhaq - exxrawrrr
 ```
 
-It currently performs real checks for:
+It performs real checks and guided actions for:
 
-- Windows;
-- PowerShell;
-- Node.js 20+;
-- Git;
-- Tailscale installation/service/account state.
+- Windows, PowerShell, Node.js 20+, and Git;
+- Tailscale installation, Windows service state, user login, and device DNS identity;
+- an isolated portable Remote GROWTH Stable runtime under LocalAppData;
+- a local authenticated `tools/list` inventory of exactly **64 tools**;
+- Tailscale Funnel mapping to the verified gateway only;
+- public unauthenticated rejection with HTTP **401**;
+- authenticated public `tools/list` inventory of exactly **64 tools**;
+- opening Composio directly at its **Add Custom MCP** surface;
+- copy-to-clipboard actions for the public MCP URL and local bearer code;
+- a final user-observed Composio count of exactly **64** before setup is marked complete.
 
 It uses human-readable statuses:
 
@@ -111,6 +116,14 @@ Setup logs live under:
 ```text
 %LOCALAPPDATA%\otak-atik\logs\
 ```
+
+The portable Remote GROWTH runtime is installed under:
+
+```text
+%LOCALAPPDATA%\otak-atik\remote-growth-stable\
+```
+
+The installed bearer credential remains local and is never printed by the wizard. The runtime source is also cached under LocalAppData so the guided setup does not depend on keeping the Git checkout forever.
 
 A rerun re-checks the real machine state instead of blindly replaying previous steps.
 
@@ -155,5 +168,9 @@ The installer and wizard do not silently:
 - expose an unverified local service to the public internet.
 
 Account-owned login and approval steps remain explicit user actions.
+
+### CHAT 3 validation boundary
+
+The portable source, PowerShell scripts, installer dry-run, runtime packaging, and wizard dry-run are validated in Windows CI. The original GROWTH architecture is already proven with a 64-tool gateway and Tailscale Funnel. A full fresh-machine install/download/start/reboot acceptance remains intentionally deferred to **CHAT 5**.
 
 See [Composio + Tailscale User Setup UX](COMPOSIO-TAILSCALE-SETUP-UX.md) for the locked onboarding contract.
