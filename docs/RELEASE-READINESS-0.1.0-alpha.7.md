@@ -1,7 +1,7 @@
 # Release Readiness - v0.1.0-alpha.7
 
 Date: 2026-10-03
-Candidate branch: `chat6-premium-terminal-tui`
+Candidate branch: `release-lock-alpha7`
 
 ## Intent
 
@@ -29,14 +29,14 @@ It upgrades the Windows user experience to a premium live terminal installer whi
 - [x] alpha.7 Windows ZIP builds
 - [x] bundle identity/secret scan passes
 - [x] premium TUI and premium launcher are included in the ZIP
-- [ ] clean Windows fresh-user START still works with Node/Git unavailable to the user path
-- [ ] installed START survives source removal
+- [x] clean Windows fresh-user START still works with Node/Git unavailable to the user path
+- [x] installed START survives source removal
 - [x] STATUS headless JSON contract passes
-- [ ] fresh 64-tool runtime acceptance passes
-- [ ] STATUS / REPAIR destructive recovery passes
-- [ ] foreign-port fail-closed test passes
-- [ ] PR validate passes
-- [ ] PR Windows onboarding + fresh-user bundle pass
+- [x] fresh 64-tool runtime acceptance passes
+- [x] STATUS / REPAIR destructive recovery passes
+- [x] foreign-port fail-closed test passes
+- [x] PR validate passes
+- [x] PR Windows onboarding + fresh-user bundle pass
 - [ ] post-merge main validation passes
 - [ ] post-merge Windows onboarding + fresh-user bundle pass
 - [ ] final ZIP rebuilt from exact verified main commit
@@ -55,7 +55,7 @@ Local candidate bundle before GitHub CI: 46 files, 110,663 bytes, SHA-256 `b281c
 
 ## Current decision
 
-**CANDIDATE - DO NOT TAG YET.**
+**IMPLEMENTATION GATES PASS - READY FOR RELEASE-LOCK MERGE + FINAL MAIN REVALIDATION.**
 
 ## Local candidate evidence
 
@@ -64,3 +64,15 @@ Local candidate bundle before GitHub CI: 46 files, 110,663 bytes, SHA-256 `b281c
 - production ports 18765 / 18766 remained listening after the GUI smoke;
 - candidate Windows ZIP contains 46 files including `premium-tui.ps1` and `premium-launcher.ps1`;
 - candidate ZIP size at the latest local build: 110,663 bytes; final release digest is intentionally deferred until rebuild from the exact verified `main` commit.
+
+
+## Verified PR evidence
+
+- PR #29 final head: `eb206e606d746b94908cc77bfbcc366275de74ea`.
+- `validate` run #79: PASS.
+- `windows-onboarding` run #35: PASS.
+- fresh-user-bundle: PASS, including first START without Node/Git, source removal, installed launcher survival, and guided first-run STATUS.
+- onboarding: PASS, including fresh 64-tool runtime, missing-task detection, stopped-runtime simulation, REPAIR recovery, READY status, and foreign-port fail-closed acceptance.
+- implementation merged to `main` as `934e6e2f092cc6a239613ae69e830275b88df74c`.
+
+The first PR run exposed a trailing-backslash quoting bug in the root first-start launcher. The release was held, `START.cmd` was corrected to pass `%~dp0.`, a regression test was added, and the replacement PR head passed both workflows.

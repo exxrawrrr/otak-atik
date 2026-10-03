@@ -21,32 +21,35 @@ Snapshot: **3 October 2026**
 | --- | --- |
 | Remote GROWTH Stable gateway | **v0.7.0** |
 | Gateway inventory | **64 tools** |
-| Guided Composio + Tailscale onboarding | **CHAT 5 complete; Windows prerelease published** |
+| Guided Composio + Tailscale onboarding | **CHAT 6 complete; premium terminal alpha.7 release lock** |
 | Native ChatGPT facade | **12 focused tools** |
 | Private native plugin package | **v1.0.0 finalized locally** |
 | Public reusable native bootstrap | **validated from a fresh clone** |
 | Core Phase 10 acceptance | **COMPLETE VERIFIED** |
 | Warm native reconnect | **verified** |
 | Cold reboot / lost tunnel process | **manual tunnel start required unless optional local auto-start enrollment is configured** |
-| Standalone npm package line | **0.1.0-alpha.6** |
+| Standalone npm package line | **0.1.0-alpha.7** |
 | License | **Apache-2.0** |
 
 The current release lock is intentionally honest about the remaining cold-start limitation. The public repository does not contain the owner's tunnel runtime key, bearer token, generated private app ID, local credential store, or machine secrets.
 
 ---
 
-## Current public prerelease
+## Current release line
 
-**v0.1.0-alpha.6** is published as a GitHub prerelease with:
+The published stable-alpha baseline remains **v0.1.0-alpha.6** while **v0.1.0-alpha.7** is in final release lock.
 
-- `OTAK-ATIK-Windows-v0.1.0-alpha.6.zip`
-- `OTAK-ATIK-Windows-v0.1.0-alpha.6.zip.sha256`
+Alpha.7 adds the premium Windows installer surface:
 
-Release bundle SHA-256:
+- automatic Windows Terminal launch for interactive users when available;
+- maximized + focus-mode presentation;
+- OTAK-ATIK ASCII branding;
+- live progress/activity indicators;
+- action-required, success, and safety-boundary panels;
+- the same premium wrapper for START / STATUS / REPAIR;
+- headless compatibility for DryRun / NonInteractive / AsJson / GitHub Actions.
 
-`2d613c92884ca69532bd86a6c435702a484549901a958ee155b756918ca58fef`
-
-The release tag is immutable and dereferences to commit `7bbb62e4ebc75ba86ecc7cac3973600aa294d0ca`.
+The alpha.6 tag remains immutable. Alpha.7 will receive its own immutable tag only after the final docs-locked main SHA passes Windows acceptance again.
 
 ---
 
@@ -55,13 +58,21 @@ The release tag is immutable and dereferences to commit `7bbb62e4ebc75ba86ecc7ca
 For the guided Windows path, normal users do not need to clone the repository.
 
 ```text
-1. Download OTAK-ATIK-Windows-v0.1.0-alpha.6.zip
+1. Download the latest OTAK-ATIK-Windows prerelease ZIP
 2. Extract it
 3. Double-click START.cmd
-4. Follow the terminal when Tailscale or Composio asks you to sign in
+4. Follow the premium terminal when Tailscale or Composio asks you to sign in
 ```
 
 The first START creates a durable `Desktop\OTAK-ATIK\` launcher set and caches the required helpers/runtime source under the current Windows profile. `STATUS.cmd` checks health; `REPAIR.cmd` only repairs OTAK-ATIK-owned components and fails closed on ambiguous ownership.
+
+### Premium terminal UX
+
+On a normal interactive Windows machine, START / STATUS / REPAIR automatically reopen in Windows Terminal when it is available. The window uses maximized + focus mode, branded progress, live activity, and explicit action panels. Systems without Windows Terminal fall back to PowerShell. Automation modes stay headless and do not spawn a GUI terminal.
+
+Branding:
+
+`Created by Rafdi D. Ulhaq - exxrawrrr`
 
 See [Windows guided setup](docs/SETUP-WINDOWS.md) for the complete flow.
 

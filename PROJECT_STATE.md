@@ -1,9 +1,9 @@
 # Project State
 
 **Updated:** 2026-10-03  
-**Current milestone:** Guided Composio onboarding CHAT 5 complete; v0.1.0-alpha.6 released
+**Current milestone:** Guided Composio onboarding CHAT 6 complete; v0.1.0-alpha.7 release lock
 **Repository maturity:** active public research lab / real-machine operator experiment  
-**npm package:** 0.1.0-alpha.6  
+**npm package:** 0.1.0-alpha.7  
 **machine runtime:** Remote GROWTH Stable gateway v0.7.0
 
 ## Project thesis
@@ -177,7 +177,7 @@ The original GROWTH machine has verified:
 
 ## Guided public onboarding status
 
-CHAT 5 carries the **identity-neutral portable 64-tool runtime, user-facing STATUS + REPAIR recovery controls, and the user-first Windows release ZIP**.
+CHAT 6 carries the **identity-neutral portable 64-tool runtime, user-facing START / STATUS / REPAIR controls, and the premium Windows Terminal installer surface**.
 
 The guided Windows flow now has implementation for:
 
@@ -194,13 +194,15 @@ The guided Windows flow now has implementation for:
 - Composio API sync with `synced_count == 64` required before setup is marked complete;
 - `STATUS.cmd` with READY / REPAIR_NEEDED / USER_ACTION / BLOCKED classification;
 - `REPAIR.cmd` with project-owned task/runtime/Tailscale-route recovery and fail-closed security behavior;
-- repo-independent LocalAppData copies of nested helpers and the portable runtime source.
+- repo-independent LocalAppData copies of nested helpers and the portable runtime source;
+- premium Windows Terminal presentation with OTAK-ATIK branding, progress/activity indicators, action-required panels, and safe PowerShell fallback;
+- branding locked as `Created by Rafdi D. Ulhaq - exxrawrrr`.
 
 CHAT 3 established the portable/runtime/transport evidence: an isolated runtime built from public source returned **64/64 tools**, while the production public route returned **HTTP 401 without authentication** and **64/64 tools with authentication**.
 
 CHAT 4 then performed destructive-but-isolated recovery acceptance on separate test ports: the test recovery task was removed and all test runtime processes were stopped. STATUS correctly returned **REPAIR_NEEDED** with no false security blocker. REPAIR recreated the current-user task, restarted the supervisor/upstream/gateway, and finished **READY** with local **HTTP 401 + 64/64 tools**. The production ports remained untouched.
 
-The Windows CI workflow repeats fresh runtime setup plus STATUS/REPAIR self-healing on isolated ports. CHAT 5 also builds the Windows ZIP on a clean Windows runner, runs first START without Node.js or Git, removes the extracted source, reruns the installed START from cached files, verifies the first-run status contract, and uploads the release bundle artifact. This is evidence for the tested Windows runner and package path; it is not a claim of universal arbitrary-device production readiness or unattended account provisioning.
+The Windows CI workflow repeats fresh runtime setup plus STATUS/REPAIR self-healing on isolated ports. CHAT 5 established the user-first ZIP path. CHAT 6 adds the premium presentation layer without changing the underlying transport/security contract: interactive START / STATUS / REPAIR use Windows Terminal maximized + focus mode when available, while DryRun / NonInteractive / AsJson / GitHub Actions stay headless. PR #29 passed Linux/Windows validation, clean fresh-user ZIP bootstrap, source-removal launcher survival, fresh 64-tool runtime acceptance, destructive STATUS/REPAIR recovery, and foreign-port fail-closed acceptance. This is evidence for the tested Windows runner and package path; it is not a claim of universal arbitrary-device production readiness or unattended account provisioning.
 
 ## Important distinction
 
