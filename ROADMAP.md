@@ -146,6 +146,9 @@ UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP
 - [x] STATUS / REPAIR destructive recovery acceptance
 - [x] foreign-port fail-closed acceptance
 - [x] post-merge main validation + Windows onboarding
+- [x] immutable `v0.1.0-alpha.6` tag on verified release commit
+- [x] v0.1.0-alpha.6 GitHub prerelease published
+- [x] Windows ZIP + SHA-256 sidecar attached
 
 The public release remains alpha and does not claim unattended account provisioning or universal arbitrary-device production readiness.
 

@@ -21,7 +21,7 @@ Snapshot: **3 October 2026**
 | --- | --- |
 | Remote GROWTH Stable gateway | **v0.7.0** |
 | Gateway inventory | **64 tools** |
-| Guided Composio + Tailscale onboarding | **CHAT 5 fresh-user Windows ZIP + recovery acceptance verified** |
+| Guided Composio + Tailscale onboarding | **CHAT 5 complete; Windows prerelease published** |
 | Native ChatGPT facade | **12 focused tools** |
 | Private native plugin package | **v1.0.0 finalized locally** |
 | Public reusable native bootstrap | **validated from a fresh clone** |
@@ -32,6 +32,21 @@ Snapshot: **3 October 2026**
 | License | **Apache-2.0** |
 
 The current release lock is intentionally honest about the remaining cold-start limitation. The public repository does not contain the owner's tunnel runtime key, bearer token, generated private app ID, local credential store, or machine secrets.
+
+---
+
+## Current public prerelease
+
+**v0.1.0-alpha.6** is published as a GitHub prerelease with:
+
+- `OTAK-ATIK-Windows-v0.1.0-alpha.6.zip`
+- `OTAK-ATIK-Windows-v0.1.0-alpha.6.zip.sha256`
+
+Release bundle SHA-256:
+
+`2d613c92884ca69532bd86a6c435702a484549901a958ee155b756918ca58fef`
+
+The release tag is immutable and dereferences to commit `7bbb62e4ebc75ba86ecc7cac3973600aa294d0ca`.
 
 ---
 

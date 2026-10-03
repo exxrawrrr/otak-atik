@@ -42,9 +42,9 @@ It does not rename the Remote GROWTH gateway runtime. The npm/repository release
 - [x] merge to `main` completes;
 - [x] post-merge `main` validation passes;
 - [x] post-merge `main` fresh-user-bundle job passes;
-- [ ] release ZIP is rebuilt from the verified `main` commit;
-- [ ] Git tag `v0.1.0-alpha.6` points to that verified `main` commit;
-- [ ] GitHub release includes the Windows ZIP and SHA-256 sidecar.
+- [x] release ZIP is rebuilt from the verified `main` commit;
+- [x] Git tag `v0.1.0-alpha.6` points to that verified `main` commit;
+- [x] GitHub release includes the Windows ZIP and SHA-256 sidecar.
 
 ## Account-owned boundary
 
@@ -86,7 +86,7 @@ Existing tags must never be moved.
 
 ## Current decision
 
-**MAIN GATES PASS — READY FOR FINAL RELEASE-LOCK MERGE, REBUILD, TAG, AND ASSET PUBLISH.**
+**RELEASED — v0.1.0-alpha.6 published as a GitHub prerelease.**
 
 
 ## Verified GitHub evidence
@@ -96,3 +96,14 @@ Existing tags must never be moved.
 - Post-merge Windows artifact `otak-atik-windows-user-bundle` was generated from `12df8aa`.
 
 The first PR attempt exposed a wrong expected first-run STATUS code. That test failed closed, the classification was corrected, and both the final PR head and post-merge main run passed afterward.
+
+
+## Published release evidence
+
+- release commit: `7bbb62e4ebc75ba86ecc7cac3973600aa294d0ca`;
+- annotated tag: `v0.1.0-alpha.6`;
+- tag dereference: `v0.1.0-alpha.6^{} -> 7bbb62e4ebc75ba86ecc7cac3973600aa294d0ca`;
+- release state: prerelease, not draft;
+- Windows ZIP size: 105,491 bytes;
+- Windows ZIP SHA-256: `2d613c92884ca69532bd86a6c435702a484549901a958ee155b756918ca58fef`;
+- assets: Windows ZIP + SHA-256 sidecar.
