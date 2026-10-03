@@ -13,7 +13,8 @@ $Target = Join-Path $HOME ".otak-atik"
 $TargetConfig = Join-Path $Target "config.json"
 $SourceConfig = Join-Path $RepoRoot "config\default.json"
 $RuntimeRoot = Join-Path $Target "windows"
-$RuntimeSourceRoot = Join-Path $Target "runtime-source\remote-growth-stable"
+$GuidedDataRoot = if ($env:LOCALAPPDATA) { Join-Path $env:LOCALAPPDATA "otak-atik" } else { $Target }
+$RuntimeSourceRoot = Join-Path $GuidedDataRoot "runtime-source\remote-growth-stable"
 $BrowserConfig = Join-Path $Target "mcp-superassistant.json"
 $BrowserConfigSource = Join-Path $RepoRoot "config\browser-bridge\mcp-superassistant.json"
 $FirstRunMarker = Join-Path $Target "install.complete"
@@ -64,6 +65,7 @@ if ($DryRun) {
 
 New-Item -ItemType Directory -Force -Path $Target | Out-Null
 New-Item -ItemType Directory -Force -Path $RuntimeRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $GuidedDataRoot | Out-Null
 New-Item -ItemType Directory -Force -Path $RuntimeSourceRoot | Out-Null
 
 if ((Test-Path $TargetConfig) -and -not $Force) {
