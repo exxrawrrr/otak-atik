@@ -153,10 +153,10 @@ UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP
 - [x] premium Windows Terminal TUI implemented for START / STATUS / REPAIR
 - [x] real GROWTH read-only Windows Terminal smoke
 - [x] PR #29 validate + Windows fresh-user/onboarding acceptance
-- [ ] alpha.7 release lock merged to main
-- [ ] final main Windows onboarding + fresh-user bundle
-- [ ] immutable `v0.1.0-alpha.7` tag
-- [ ] v0.1.0-alpha.7 GitHub prerelease + ZIP + SHA-256 sidecar
+- [x] alpha.7 release lock merged to main
+- [x] final main Windows onboarding + fresh-user bundle
+- [x] immutable `v0.1.0-alpha.7` tag
+- [x] v0.1.0-alpha.7 GitHub prerelease + ZIP + SHA-256 sidecar
 
 The public release remains alpha and does not claim unattended account provisioning or universal arbitrary-device production readiness.
 
