@@ -134,6 +134,7 @@ UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP
 - [x] CHAT 3 — Tailscale + Composio Guided Wiring
 - [x] CHAT 4 — STATUS + REPAIR
 - [x] CHAT 5 — Fresh-User Acceptance + Release
+- [x] CHAT 6 — Premium Terminal UX / Installer TUI
 
 ### Release checkpoint
 
@@ -149,6 +150,13 @@ UX contract: [docs/COMPOSIO-TAILSCALE-SETUP-UX.md](docs/COMPOSIO-TAILSCALE-SETUP
 - [x] immutable `v0.1.0-alpha.6` tag on verified release commit
 - [x] v0.1.0-alpha.6 GitHub prerelease published
 - [x] Windows ZIP + SHA-256 sidecar attached
+- [x] premium Windows Terminal TUI implemented for START / STATUS / REPAIR
+- [x] real GROWTH read-only Windows Terminal smoke
+- [x] PR #29 validate + Windows fresh-user/onboarding acceptance
+- [ ] alpha.7 release lock merged to main
+- [ ] final main Windows onboarding + fresh-user bundle
+- [ ] immutable `v0.1.0-alpha.7` tag
+- [ ] v0.1.0-alpha.7 GitHub prerelease + ZIP + SHA-256 sidecar
 
 The public release remains alpha and does not claim unattended account provisioning or universal arbitrary-device production readiness.
 
