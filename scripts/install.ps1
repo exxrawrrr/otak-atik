@@ -13,6 +13,7 @@ $Target = Join-Path $HOME ".otak-atik"
 $TargetConfig = Join-Path $Target "config.json"
 $SourceConfig = Join-Path $RepoRoot "config\default.json"
 $RuntimeRoot = Join-Path $Target "windows"
+$RuntimeSourceRoot = Join-Path $Target "runtime-source\remote-growth-stable"
 $BrowserConfig = Join-Path $Target "mcp-superassistant.json"
 $BrowserConfigSource = Join-Path $RepoRoot "config\browser-bridge\mcp-superassistant.json"
 $FirstRunMarker = Join-Path $Target "install.complete"
@@ -47,6 +48,7 @@ if ($DryRun) {
   Write-Host "DRY RUN" -ForegroundColor Yellow
   Write-Host ("Would create/update: " + $Target)
   Write-Host ("Would copy Windows helpers to: " + $RuntimeRoot)
+  Write-Host ("Would copy portable 64-tool runtime source to: " + $RuntimeSourceRoot)
   Write-Host ("Would prepare browser bridge config: " + $BrowserConfig)
   if (-not $NoDesktopLaunchers) {
     Write-Host ("Would create primary launcher: " + (Join-Path $desktopTarget "START.cmd"))
@@ -62,6 +64,7 @@ if ($DryRun) {
 
 New-Item -ItemType Directory -Force -Path $Target | Out-Null
 New-Item -ItemType Directory -Force -Path $RuntimeRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $RuntimeSourceRoot | Out-Null
 
 if ((Test-Path $TargetConfig) -and -not $Force) {
   Write-Host ("[keep] Existing config: " + $TargetConfig)
@@ -77,8 +80,11 @@ if (-not (Test-Path $BrowserConfig) -or $Force) {
   Write-Host ("[keep] Existing browser bridge config: " + $BrowserConfig)
 }
 
-Copy-Item (Join-Path $RepoRoot "scripts\windows\*.ps1") $RuntimeRoot -Force
+Copy-Item (Join-Path $RepoRoot "scripts\windows\*") $RuntimeRoot -Recurse -Force
 Write-Host ("[sync] Windows helpers -> " + $RuntimeRoot)
+
+Copy-Item (Join-Path $RepoRoot "runtime\remote-growth-stable\*") $RuntimeSourceRoot -Recurse -Force
+Write-Host ("[sync] Remote GROWTH runtime source -> " + $RuntimeSourceRoot)
 
 Push-Location $RepoRoot
 try {
