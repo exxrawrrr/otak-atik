@@ -37,11 +37,11 @@ It upgrades the Windows user experience to a premium live terminal installer whi
 - [x] foreign-port fail-closed test passes
 - [x] PR validate passes
 - [x] PR Windows onboarding + fresh-user bundle pass
-- [ ] post-merge main validation passes
-- [ ] post-merge Windows onboarding + fresh-user bundle pass
-- [ ] final ZIP rebuilt from exact verified main commit
-- [ ] immutable annotated tag `v0.1.0-alpha.7` points to that commit
-- [ ] GitHub prerelease publishes ZIP + SHA-256 sidecar
+- [x] post-merge main validation passes
+- [x] post-merge Windows onboarding + fresh-user bundle pass
+- [x] final ZIP rebuilt from exact verified main commit
+- [x] immutable annotated tag `v0.1.0-alpha.7` points to that commit
+- [x] GitHub prerelease publishes ZIP + SHA-256 sidecar
 
 ## GUI boundary
 
@@ -55,7 +55,7 @@ Local candidate bundle before GitHub CI: 46 files, 110,663 bytes, SHA-256 `b281c
 
 ## Current decision
 
-**IMPLEMENTATION GATES PASS - READY FOR RELEASE-LOCK MERGE + FINAL MAIN REVALIDATION.**
+**RELEASED - v0.1.0-alpha.7 published as a GitHub prerelease.**
 
 ## Local candidate evidence
 
@@ -76,3 +76,18 @@ Local candidate bundle before GitHub CI: 46 files, 110,663 bytes, SHA-256 `b281c
 - implementation merged to `main` as `934e6e2f092cc6a239613ae69e830275b88df74c`.
 
 The first PR run exposed a trailing-backslash quoting bug in the root first-start launcher. The release was held, `START.cmd` was corrected to pass `%~dp0.`, a regression test was added, and the replacement PR head passed both workflows.
+
+
+## Published release evidence
+
+- final release commit: `50e7b1bd737daa13f03d1a19a3e725b450a23f23`;
+- final `validate` push run: PASS;
+- final manually dispatched `windows-onboarding` run: PASS;
+- fresh-user-bundle: PASS;
+- annotated tag: `v0.1.0-alpha.7`;
+- tag dereference: `v0.1.0-alpha.7^{} -> 50e7b1bd737daa13f03d1a19a3e725b450a23f23`;
+- release state: prerelease, not draft;
+- final Windows ZIP files: 46;
+- final Windows ZIP size: 110,743 bytes;
+- final Windows ZIP SHA-256: `ffdff59a94f37243ed957c3f83728502b1257850094079412788d8c8482822de`;
+- published assets: Windows ZIP + SHA-256 sidecar.
