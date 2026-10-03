@@ -17,8 +17,8 @@ function Emit-Result {
   } else {
     Write-Host ""
     Write-Host "Composio connection" -ForegroundColor Cyan
-    Write-Host ("Toolkit : " + $(if ($Value.slug) { $Value.slug } else { "<not created>" }))
-    Write-Host ("Tools   : " + $(if ($Value.synced_count -eq 64) { "64 / PASS" } else { "$($Value.synced_count) / FAIL" }))
+    if ($Value.slug) { Write-Host ("Toolkit : " + $Value.slug) }
+    Write-Host ("Tools   : " + $(if ($Value.synced_count -eq 64) { "64 / PASS" } else { "$($Value.synced_count) / NOT READY" }))
   }
   exit $ExitCode
 }
@@ -30,12 +30,48 @@ function ConvertFrom-Secure {
   finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr) }
 }
 
+function Invoke-Composio {
+  param(
+    [ValidateSet("GET","POST","PATCH","DELETE")][string]$Method,
+    [string]$Path,
+    $Body = $null
+  )
+  $headers = @{ "x-api-key" = $script:ApiKey }
+  $params = @{
+    Method = $Method
+    Uri = ($BaseUrl + $Path)
+    Headers = $headers
+    TimeoutSec = 45
+  }
+  if ($null -ne $Body) {
+    $params.ContentType = "application/json"
+    $params.Body = ($Body | ConvertTo-Json -Depth 12)
+  }
+  return Invoke-RestMethod @params
+}
+
+function New-StableSlugSeed {
+  param([string]$Value)
+  $sha = [Security.Cryptography.SHA256]::Create()
+  try {
+    $bytes = [Text.Encoding]::UTF8.GetBytes($Value)
+    $hash = $sha.ComputeHash($bytes)
+    $short = ([BitConverter]::ToString($hash).Replace("-","").ToLowerInvariant()).Substring(0,10)
+  } finally {
+    $sha.Dispose()
+  }
+  $machine = ($env:COMPUTERNAME -replace "[^A-Za-z0-9]","_").Trim("_")
+  if (-not $machine) { $machine = "WINDOWS" }
+  return ("REMOTE_GROWTH_" + $machine + "_" + $short).ToUpperInvariant()
+}
+
 $configPath = Join-Path $InstallRoot "config.json"
 $authFile = Join-Path $InstallRoot "auth.key"
 $metaPath = Join-Path $InstallRoot "composio.json"
 if (-not (Test-Path -LiteralPath $configPath) -or -not (Test-Path -LiteralPath $authFile)) {
   Emit-Result ([ordered]@{ok=$false; error="Remote GROWTH runtime is not installed"; synced_count=$null}) 2
 }
+
 $config = Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
 $publicUrl = [string]$config.publicMcpUrl
 if (-not $publicUrl) {
@@ -50,95 +86,135 @@ if (-not $UserId) {
 
 if (-not $ComposioApiKey) {
   if ($NonInteractive) {
-    Emit-Result ([ordered]@{ok=$false; error="Composio project API key required"; needs_user_action=$true; synced_count=$null}) 3
+    Emit-Result ([ordered]@{
+      ok=$false
+      needs_user_action=$true
+      action="COMPOSIO_PROJECT_API_KEY"
+      error="Composio Project API Key is required once for setup."
+      synced_count=$null
+    }) 3
   }
 
   Write-Host ""
   Write-Host "STEP — Connect Composio" -ForegroundColor Cyan
-  Write-Host "A Composio Project API Key is needed once to create your private Custom MCP connection." -ForegroundColor White
-  Write-Host "The key is used in memory only and is not saved by OTAK-ATIK." -ForegroundColor DarkGray
-  Write-Host "Opening Composio Platform..." -ForegroundColor Gray
-  Start-Process "https://dashboard.composio.dev"
+  Write-Host "Composio Custom MCP is currently API-managed." -ForegroundColor White
+  Write-Host "OTAK-ATIK needs your Composio Project API Key once to register this private connection." -ForegroundColor White
+  Write-Host "The project key is used in memory only and is not saved." -ForegroundColor DarkGray
+  Write-Host "Opening Composio..." -ForegroundColor Gray
+  try { Start-Process "https://dashboard.composio.dev" } catch {}
   $secure = Read-Host "Paste your Composio Project API Key" -AsSecureString
   $ComposioApiKey = ConvertFrom-Secure -Secure $secure
 }
+
 if (-not $ComposioApiKey) {
-  Emit-Result ([ordered]@{ok=$false; error="Composio API key was empty"; synced_count=$null}) 2
+  Emit-Result ([ordered]@{ok=$false; error="Composio Project API Key was empty"; synced_count=$null}) 2
 }
+$script:ApiKey = $ComposioApiKey
 
-$headers = @{
-  "x-api-key" = $ComposioApiKey
-  "Content-Type" = "application/json"
-}
-
+$slugSeed = New-StableSlugSeed -Value $publicUrl
 $slug = ""
 $accountId = ""
-$redirectUrl = ""
+$authConfigId = ""
+
+try {
+  $upsert = Invoke-Composio -Method POST -Path "/custom/toolkits/upsert" -Body @{
+    slug = $slugSeed
+    toolkit_config = @{
+      name = ("Remote GROWTH " + $env:COMPUTERNAME)
+      app_url = $publicUrl
+      auth_schemes = @(
+        @{
+          mode = "API_KEY"
+          headers = @{ Authorization = "Bearer {{generic_api_key}}" }
+        }
+      )
+    }
+  }
+  $slug = [string]$upsert.slug
+} catch {
+  $message = $_.Exception.Message
+  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $message = $_.ErrorDetails.Message }
+  Emit-Result ([ordered]@{
+    ok=$false
+    error=("Composio Custom MCP registration failed: " + $message)
+    synced_count=$null
+  }) 2
+}
+
+if (-not $slug) {
+  Emit-Result ([ordered]@{ok=$false; error="Composio did not return a Custom MCP toolkit slug"; synced_count=$null}) 2
+}
+
+try {
+  $authConfigs = Invoke-Composio -Method GET -Path ("/auth_configs?toolkit_slug=" + [uri]::EscapeDataString($slug) + "&limit=50")
+  $candidate = @($authConfigs.items | Where-Object {
+    [string]$_.auth_scheme -eq "API_KEY" -and [string]$_.status -ne "DISABLED"
+  } | Select-Object -First 1)
+  if ($candidate.Count -gt 0) {
+    $authConfigId = [string]$candidate[0].id
+  }
+} catch {
+  $authConfigId = ""
+}
+
+if (-not $authConfigId) {
+  Emit-Result ([ordered]@{
+    ok=$false
+    slug=$slug
+    error="The Custom MCP toolkit exists, but its API-key auth config was not discoverable."
+    synced_count=$null
+  }) 2
+}
 
 if (Test-Path -LiteralPath $metaPath) {
   try {
     $old = Get-Content -Raw -LiteralPath $metaPath | ConvertFrom-Json
-    if ([string]$old.publicMcpUrl -eq $publicUrl) {
-      $slug = [string]$old.slug
+    if ([string]$old.publicMcpUrl -eq $publicUrl -and [string]$old.slug -eq $slug) {
       $accountId = [string]$old.connectedAccountId
     }
   } catch {}
 }
 
-if (-not $slug -or -not $accountId) {
-  $createBody = [ordered]@{
-    name = "Remote GROWTH $env:COMPUTERNAME"
-    app_url = $publicUrl
-    auth_schemes = @(
-      [ordered]@{
-        mode = "API_KEY"
-        headers = [ordered]@{
-          Authorization = "Bearer {{generic_api_key}}"
-        }
-      }
-    )
-    user_id = $UserId
-  } | ConvertTo-Json -Depth 8
-
+$accountActive = $false
+if ($accountId) {
   try {
-    $created = Invoke-RestMethod -Method Post -Uri ($BaseUrl + "/custom/toolkits") -Headers $headers -Body $createBody -TimeoutSec 45
+    $existingAccount = Invoke-Composio -Method GET -Path ("/connected_accounts/" + [uri]::EscapeDataString($accountId))
+    $accountActive = ([string]$existingAccount.status -eq "ACTIVE")
+  } catch {
+    $accountActive = $false
+    $accountId = ""
+  }
+}
+
+if (-not $accountActive) {
+  try {
+    $link = Invoke-Composio -Method POST -Path "/connected_accounts/link" -Body @{
+      auth_config_id = $authConfigId
+      user_id = $UserId
+      alias = ("remote-growth-" + $env:COMPUTERNAME.ToLowerInvariant())
+    }
   } catch {
     $message = $_.Exception.Message
     if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $message = $_.ErrorDetails.Message }
     Emit-Result ([ordered]@{
       ok=$false
-      error=("Composio Custom MCP creation failed: " + $message)
-      note="Custom MCP is experimental. If an old private toolkit for this same URL already exists, remove/reconnect it in Composio Platform before retrying."
+      slug=$slug
+      error=("Could not create the Composio secure connection page: " + $message)
       synced_count=$null
     }) 2
   }
 
-  $slug = [string]$created.slug
-  if ($created.connect_link) {
-    $redirectUrl = [string]$created.connect_link.redirect_url
-    $accountId = [string]$created.connect_link.connected_account_id
-  }
-
-  if (-not $slug -or -not $redirectUrl -or -not $accountId) {
-    Emit-Result ([ordered]@{ok=$false; error="Composio did not return a private connect link"; slug=$slug; synced_count=$null}) 2
-  }
-
-  try {
-    $patchBody = @{
-      api_key_field = @{
-        display_name = "Remote GROWTH access code"
-        description = "Paste the secure access code copied by OTAK-ATIK."
-      }
-    } | ConvertTo-Json -Depth 5
-    Invoke-RestMethod -Method Patch -Uri ($BaseUrl + "/custom/toolkits/" + [uri]::EscapeDataString($slug)) -Headers $headers -Body $patchBody -TimeoutSec 30 | Out-Null
-  } catch {
-    # Friendly field copy is optional and must not block connection setup.
+  $accountId = [string]$link.connected_account_id
+  $redirectUrl = [string]$link.redirect_url
+  if (-not $accountId -or -not $redirectUrl) {
+    Emit-Result ([ordered]@{ok=$false; slug=$slug; error="Composio did not return a connection URL"; synced_count=$null}) 2
   }
 
   $meta = [ordered]@{
     schemaVersion = 1
     publicMcpUrl = $publicUrl
     slug = $slug
+    authConfigId = $authConfigId
     connectedAccountId = $accountId
     userId = $UserId
     syncedCount = $null
@@ -147,28 +223,63 @@ if (-not $slug -or -not $accountId) {
   $meta | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $metaPath -Encoding UTF8
 
   if ($NonInteractive) {
-    Emit-Result ([ordered]@{ok=$false; needs_user_action=$true; redirect_url=$redirectUrl; slug=$slug; connected_account_id=$accountId; synced_count=$null}) 3
+    Emit-Result ([ordered]@{
+      ok=$false
+      needs_user_action=$true
+      action="COMPOSIO_CONNECT"
+      redirect_url=$redirectUrl
+      slug=$slug
+      connected_account_id=$accountId
+      synced_count=$null
+    }) 3
   }
 
-  $token = (Get-Content -Raw -LiteralPath $authFile).Trim()
-  Set-Clipboard -Value $token
-  $token = $null
+  $remoteAccessKey = (Get-Content -Raw -LiteralPath $authFile).Trim()
+  Set-Clipboard -Value $remoteAccessKey
+  $remoteAccessKey = $null
 
   Write-Host ""
-  Write-Host "Your Remote GROWTH access code has been copied to the clipboard." -ForegroundColor Green
-  Write-Host "Composio will now ask for it. Paste it into the access-code field and connect." -ForegroundColor White
-  Start-Process $redirectUrl
-  [void](Read-Host "Finish the Composio connection in your browser, then press ENTER")
+  Write-Host "Remote GROWTH access code copied to the clipboard." -ForegroundColor Green
+  Write-Host "A Composio connection page will open." -ForegroundColor White
+  Write-Host "Paste the copied access code when Composio asks for the API key, then connect." -ForegroundColor White
+  try { Start-Process $redirectUrl } catch {
+    Write-Host ("Open this address: " + $redirectUrl) -ForegroundColor Yellow
+  }
+
+  Write-Host ""
+  Write-Host "Waiting for Composio..." -ForegroundColor Gray
+  for ($i = 0; $i -lt 90; $i++) {
+    Start-Sleep -Seconds 2
+    try {
+      $account = Invoke-Composio -Method GET -Path ("/connected_accounts/" + [uri]::EscapeDataString($accountId))
+      if ([string]$account.status -eq "ACTIVE") {
+        $accountActive = $true
+        break
+      }
+      if ([string]$account.status -in @("FAILED","REVOKED","EXPIRED")) {
+        break
+      }
+    } catch {}
+  }
+}
+
+if (-not $accountActive) {
+  Emit-Result ([ordered]@{
+    ok=$false
+    slug=$slug
+    connected_account_id=$accountId
+    error="Composio connection is not ACTIVE yet. Run START.cmd again after completing the connection page."
+    synced_count=$null
+  }) 2
 }
 
 $synced = $null
 for ($i = 0; $i -lt 12; $i++) {
   try {
-    $body = @{
+    $synced = Invoke-Composio -Method POST -Path "/custom/toolkits/sync" -Body @{
       slug = $slug
       connected_account_id = $accountId
-    } | ConvertTo-Json -Depth 4
-    $synced = Invoke-RestMethod -Method Post -Uri ($BaseUrl + "/custom/toolkits/sync") -Headers $headers -Body $body -TimeoutSec 45
+    }
     if ([int]$synced.synced_count -eq 64) { break }
   } catch {
     $synced = $null
@@ -179,9 +290,9 @@ for ($i = 0; $i -lt 12; $i++) {
 if (-not $synced -or [int]$synced.synced_count -ne 64) {
   Emit-Result ([ordered]@{
     ok=$false
-    error="Composio connection exists, but the Custom MCP sync did not verify exactly 64 tools."
     slug=$slug
     connected_account_id=$accountId
+    error="Composio is connected, but Custom MCP sync did not verify exactly 64 tools."
     synced_count=$(if ($synced) { $synced.synced_count } else { $null })
   }) 2
 }
@@ -190,6 +301,7 @@ $meta = [ordered]@{
   schemaVersion = 1
   publicMcpUrl = $publicUrl
   slug = $slug
+  authConfigId = $authConfigId
   connectedAccountId = $accountId
   userId = $UserId
   syncedCount = 64
@@ -197,6 +309,7 @@ $meta = [ordered]@{
 }
 $meta | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $metaPath -Encoding UTF8
 
+$script:ApiKey = $null
 $ComposioApiKey = $null
 
 Emit-Result ([ordered]@{
