@@ -1,13 +1,31 @@
 # Windows setup
 
-This is the primary end-to-end onboarding path.
+This is the primary Windows onboarding path for OTAK-ATIK.
+
+The user-facing direction is intentionally simple:
+
+```text
+START.cmd
+  ↓
+guided preflight
+  ↓
+Tailscale / secure-route step
+  ↓
+Remote GROWTH
+  ↓
+Composio
+  ↓
+acceptance checks
+```
+
+The current CHAT 2 build implements the branded terminal wizard, real preflight checks, and resumable local setup state. The secure-route and Composio wiring is intentionally not reported as complete until the later implementation phases make those checks real.
 
 ## 1. Requirements
 
 - Windows 10 or 11
 - Node.js 20+
 - Git recommended
-- Chrome only if you want the optional MCP SuperAssistant browser bridge
+- Tailscale is part of the guided remote path
 
 ## 2. Clone
 
@@ -16,7 +34,13 @@ git clone https://github.com/exxrawrrr/otak-atik.git
 cd otak-atik
 ```
 
-## 3. Dry run
+A user can preview the setup experience immediately with:
+
+```text
+START.cmd
+```
+
+## 3. Installer dry run
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -DryRun
@@ -35,61 +59,70 @@ The installer:
 - copies Windows helper scripts to the user config directory;
 - links the `otak-atik` CLI;
 - creates a Desktop folder named `OTAK-ATIK`;
-- creates double-click launchers;
-- opens setup pages on first install.
+- creates one primary user launcher: `START.cmd`;
+- keeps historical/advanced launchers in `OTAK-ATIK\ADVANCED\`;
+- does **not** open a pile of browser tabs automatically.
 
-## 5. Start remote access
+## 5. Start the guided setup
 
 On the Desktop open:
 
 ```text
 OTAK-ATIK
-└── 01 - START REMOTE DESKTOP.bat
+└── START.cmd
 ```
 
-That launcher checks for an existing Remote Desktop Commander device-agent process before starting another one.
-
-If this is the first run, a browser authorization flow may open.
-
-Complete pairing and keep the device-agent terminal running while remote access is needed.
-
-## 6. Connect the AI client
-
-Remote MCP endpoint:
+The wizard is branded:
 
 ```text
-https://mcp.desktopcommander.app/mcp
+OTAK-ATIK
+Remote AI Setup Wizard
+Created by Rafdi D. Ulhaq - exxrawrrr
 ```
 
-See [AI clients](AI-CLIENTS.md) for client-specific notes.
+It currently performs real checks for:
 
-## 7. Check status
+- Windows;
+- PowerShell;
+- Node.js 20+;
+- Git;
+- Tailscale installation/service/account state.
 
-Double-click:
+It uses human-readable statuses:
 
 ```text
-02 - STATUS.bat
+[OK]
+[WAIT]
+[FIX]
+[INFO]
+[FAIL]
 ```
 
-The status helper reports:
+## Resumable setup state
 
-- Node availability;
-- Git availability;
-- Remote Desktop Commander process state;
-- whether MCP SuperAssistant is detected in Chrome;
-- whether the optional browser bridge appears to be running.
-
-## Optional: browser bridge
-
-If you explicitly need MCP SuperAssistant, install the extension and run:
+Safe, non-secret progress is stored outside the Git checkout under:
 
 ```text
-04 - START BROWSER BRIDGE - OPTIONAL.bat
+%LOCALAPPDATA%\otak-atik\setup-state.json
 ```
 
-Then connect the extension to the local endpoint documented by the launcher.
+Setup logs live under:
 
-See [Browser bridge](BROWSER-BRIDGE.md).
+```text
+%LOCALAPPDATA%\otak-atik\logs\
+```
+
+A rerun re-checks the real machine state instead of blindly replaying previous steps.
+
+## Advanced utilities
+
+Older provider-specific helpers remain available under:
+
+```text
+OTAK-ATIK\ADVANCED\
+```
+
+They are intentionally removed from the main launcher surface so a new user does not need to understand historical transport choices.
 
 ## Installer switches
 
@@ -100,24 +133,27 @@ See [Browser bridge](BROWSER-BRIDGE.md).
 # replace the stored default config
 .\scripts\install.ps1 -Force
 
-# do not create desktop launchers
+# do not create Desktop launchers
 .\scripts\install.ps1 -NoDesktopLaunchers
 
-# open setup pages even after first install
+# explicitly open historical setup/provider pages
 .\scripts\install.ps1 -OpenSetupPages
 
-# do not open browser pages
+# compatibility switch: suppress browser pages
 .\scripts\install.ps1 -NoOpenSetupPages
 ```
 
 ## Important
 
-The installer does not silently:
+The installer and wizard do not silently:
 
-- install a Chrome extension;
-- sign into an AI account;
+- sign into Tailscale;
+- sign into Composio;
+- sign into ChatGPT;
 - approve OAuth;
-- grant browser permissions;
-- expose a local MCP server to the public internet.
+- weaken authentication;
+- expose an unverified local service to the public internet.
 
-Those require explicit user action.
+Account-owned login and approval steps remain explicit user actions.
+
+See [Composio + Tailscale User Setup UX](COMPOSIO-TAILSCALE-SETUP-UX.md) for the locked onboarding contract.
