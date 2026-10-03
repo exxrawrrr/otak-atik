@@ -328,8 +328,9 @@ function Get-PublicBaseUrl {
 function Test-ExpectedFunnel {
   param([string]$Status,[string]$DnsName,[int]$HttpsPort,[int]$TargetPort)
   $base = Get-PublicBaseUrl -DnsName $DnsName -Port $HttpsPort
+  $marker = $base + " (Funnel on)"
   return (
-    $Status -match [regex]::Escape($base) -and
+    $Status -match [regex]::Escape($marker) -and
     $Status -match [regex]::Escape("127.0.0.1:$TargetPort")
   )
 }
@@ -337,7 +338,8 @@ function Test-ExpectedFunnel {
 function Test-FunnelPortConflict {
   param([string]$Status,[string]$DnsName,[int]$HttpsPort,[int]$TargetPort)
   $base = Get-PublicBaseUrl -DnsName $DnsName -Port $HttpsPort
-  if ($Status -notmatch [regex]::Escape($base)) { return $false }
+  $marker = $base + " (Funnel on)"
+  if ($Status -notmatch [regex]::Escape($marker)) { return $false }
   return ($Status -notmatch [regex]::Escape("127.0.0.1:$TargetPort"))
 }
 
